@@ -122,6 +122,14 @@ When Sri reports the stage: pick H1/H2/H3, delegate the fix to Codex with the ex
 
 Build stamp will read `native-auth` so Sri can confirm he's on the fixed APK. This one install is worth it — it resolves the api-acceptance question that can't be answered from the repo.
 
+**Codex D verdict (2026-07-04, independent, converges):** ranks native lane (a) as the cheapest test; validated the exact CI change (commit `069536e`). Backend evidence it added: `backend/routers/auth.py:636,645,1010` mints the custom token from backend runtime credentials (not app config), and `backend/deploy/runtime_env.yaml:5,6,61` points the prod backend at project **`based-hardware`** (prod) — so api.omiapi.com likely verifies `based-hardware`(prod) tokens (`backend/dependencies.py:31`), making **Outcome B more likely**. Exact signer needs the `custom_token` JWT `iss`/`sub` decoded (secret-dependent, can't derive from repo). No real prod `google-services.json` is committed (injected at build), so there's **no prod-config shortcut** — Outcome B → own-Firebase.
+
+**Sri must test TWO stages (not just the sign-in screen):**
+1. Google sign-in completes (no browser/custom-token error).
+2. **After sign-in, app data / API calls work — NOT 401/403.**
+
+Option (b) (web-auth + no custom-token) is **skipped** — Codex: it just moves the failure to `firebase-credential` with the same API-token risk. If stage 2 fails, **stop trying flag combos** → P1.2 = Sri's own Firebase + self-hosted `backend/` (guaranteed matched signer/app/backend; `docs/doc/developer/backend/Backend_Setup.mdx`).
+
 ## Phase exit
 
 - [ ] Sri signs in successfully from a stamped prerelease APK, or the surfaced error pinpoints the failing stage and the targeted fix is queued.

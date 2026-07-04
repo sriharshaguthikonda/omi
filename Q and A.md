@@ -58,7 +58,11 @@ installed from the link below and sign falure says.....says failed to sign in vi
 > `[custom-token] [firebase_auth/custom-token-mismatch] The custom token corresponds to a different audience.`
 > The whole OAuth dance works; the **only** broken step is the very last one — Firebase rejects the token because it was minted for a **different Firebase project** than the app is built for. Concretely: the app is built for Firebase project **`based-hardware-dev`** (the prebuilt `google-services.json`/`firebase_options.dart`), but `api.omiapi.com` issues custom tokens for **another** project. The repo ships `based-hardware-dev` configs *and* points at `api.omiapi.com` — those two were **never a matched pair**. That's the bug, and it's config, not code.
 > **This is exactly why P1 shipped** (your Q9 point): without the build stamp + surfaced error we'd still be guessing. Now it's pinned.
-> **Codex is investigating the cheapest fix** (I'm orchestrating) — ranked options: (a) your own free Firebase project + matching config [most robust, ties to D7], (b) get the Firebase config that matches `api.omiapi.com`, (c) native Google sign-in path if the shared keystore SHA is registered in `based-hardware-dev`. I'll post the recommendation + exact change shortly, then build a fix APK for you to test. **No action from you yet** — hold.
+> **A3 (Claude) — FIX SHIPPED, building now, needs your TWO-STAGE test:** I verified the decisive fact — the shared `debug.keystore` SHA-1 **is** registered in `based-hardware-dev`'s `google-services.json`. So **native Google Sign-In** (no browser, no custom token) lands a matching session and skips the mismatch entirely. Merged as P1.1 (flipped CI to `USE_WEB_AUTH=false`); Codex independently agreed it's the cheapest fix. apk-latest is rebuilding as native-lane now — I'll ping you when it's ready.
+> **When you install it, test BOTH stages and report each:**
+> 1. Does Google sign-in complete (no red error)?
+> 2. **After sign-in, does the app actually load — your data, conversations, no "unauthorized"/401?**
+> Why both: Codex found `api.omiapi.com`'s backend likely verifies **`based-hardware` (prod)** tokens, but native sign-in gives **`based-hardware-dev`** tokens. So stage 1 may pass while stage 2 fails. If it does — **that's expected, not a regression** — it means the community backend isn't ours to match, and the real fix is **your own free Firebase + self-hosted backend** (D7 sovereignty, brought early). The stamp will read `native-auth` so you know it's the fixed APK.
 
 2. **Install the new APK when notified** — after P1 merges, the first real build lands at <https://github.com/sriharshaguthikonda/omi/releases/tag/apk-latest>. You'll get a push notification. The sign-in screen footer will show a **build stamp** (version+run+sha) — no stamp = old APK.
 3. **Open decision boxes in [ROADMAP.md](./ROADMAP.md)** — answer inline (🔵 line) or drop notes in scratch below: D0b APK shape, D2 trigger scope, D3 BT mechanism order, D5 VAD, D6 ASR engine, D7 sovereignty shape, D8 .memory transport. None block P1; **D2/D3 block P2/P3 execution start** (plans are written: [plans/](./plans/README.md)).
@@ -145,3 +149,4 @@ Sri: from i think their github repo somewhere in releases i guess
 
 6. don't reinvent the wheel for all things, see if there is already a problem solved by others and just grab it
 7. use branches through other agents build other features and merge you already have research documents available.
+8. beep me multiple times i am giong away . if you need me.
