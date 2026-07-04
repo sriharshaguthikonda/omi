@@ -33,6 +33,10 @@ Protocol: either side appends. Questions get numbered `Q<n>`. Answers go directl
 
 ## Open — needs Sri
 
+**Q12 (Sri, 2026-07-04):** post deep-research areas here; I'll run them through ChatGPT Deep Research. Link a file describing what to research.
+
+> **A:** Done — [docs/research/](./docs/research/README.md) has 6 self-contained, public-safe topic files (paste each whole file as the ChatGPT prompt). Ordered by priority: **R4** (Android 14/15 background-mic constraints — could reshape the trigger design, do first), **R3** (BT media-button reality — flagship P3 feasibility), **R1** (on-device ASR engine), R2 (VAD), R5 (offline sync transport), R6 (self-host backend footprint). Each maps to an open ROADMAP decision (D5/D6/D7/D8) or a phase feasibility question. Bring findings back as a `## Findings` section in the file or a share-link + TL;DR here; I fold accepted answers into the matching decision box.
+
 **Checklist (2026-07-04) — do these while Claude/Codex implement P1:**
 
 1. **Sign-in failure details** (unblocks P1 verification): exact error text or screenshot; which button you tapped (Google / Apple / anything browser-based); where that APK came from (upstream releases page, or the CI artifact zip from run 28690006580?).
@@ -97,3 +101,7 @@ Sri: from i think their github repo somewhere in releases i guess
 ## user comments (Sri's scratch space — drop raw notes here, Claude folds them into Q&A above)
 
 (1–3 executed: Codex orchestration live, phase0 merged, APK link posted when built. 4 → Q9, 5 → Q10 above. "merge yourself" → standing rule: Claude opens + merges fork PRs autonomously, regular merge, fork main only. Sync-fork → Q11. "codex cli as worker, you orchestrate" → confirmed model, applied: Codex writes P1 code, Claude reviews/corrects (caught + reverted a redundant manifest filter Codex added) + Codex review pass before merge.)
+
+
+
+(deep-research request → Q12 above; topics live in docs/research/, ordered R4→R3→R1→R2→R5→R6.)
