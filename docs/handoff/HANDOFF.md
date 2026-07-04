@@ -1,5 +1,43 @@
 # Session Handoff Log
 
+## 2026-07-04T~15:00Z — P0 merged, P1 shipped, P1.1 native-lane sign-in fix merged + building; awaiting Sri install test
+
+### Where we are
+- **Branch:** `feature/phase1-signin` in the **main repo folder** `C:/Android_software/omi` (NO worktree — Sri hates them; `omi-phase0` removed this session).
+- **Merged to fork main this session:** PR #2 (phase0 CI+roadmap), PR #3 (P1 build stamp + error surfacing), **PR #4 (P1.1 native-lane sign-in fix)**. Regular-merge, fork-only. Standing rule **"merge yourself"**; NEVER upstream `BasedHardware/omi`.
+- Codex CLI = worker (impl + review), Claude = orchestrator + corrector.
+
+### THE LIVE THING — sign-in fix verification (P1.1)
+- **Root cause CONFIRMED** via P1's surfaced error: `[custom-token] firebase_auth/custom-token-mismatch: The custom token corresponds to a different audience.` OAuth flow works end-to-end; only final `signInWithCustomToken` fails — `api.omiapi.com` mints tokens for a project ≠ app's `based-hardware-dev` config. Config bug.
+- **Fix merged (PR #4):** CI `.dev.env` → native lane `USE_WEB_AUTH=false`+`USE_AUTH_CUSTOM_TOKEN=false`. Decisive: shared `debug.keystore` SHA-1 `50f87a68…dab3598` IS a registered Android OAuth cert in `based-hardware-dev`'s `google-services.json` → native sign-in = matching session, no custom token.
+- **BUILDING:** main run **28709261639** (native-lane) → republishes `apk-latest`. Monitor `b0r0srnov` armed.
+- **DECISION FORK when Sri tests (in plans/P1-signin.md):** **A** signs in + loads data → done. **B** signs in but API 401 → `api.omiapi.com` not on `based-hardware-dev` → pivot to Sri's own Firebase + self-host backend (P7/D7 auth slice early). Stamp reads `native-auth`.
+
+### Immediate next (in order)
+1. Build 28709261639 green → PushNotification Sri: install apk-latest, confirm stamp `native-auth`, try Google sign-in, report A or B.
+2. Fold **Codex D** verdict (task `b0nswq6fk`; read `…/bfce8b6c-…/scratchpad/codexD-signin-fix.txt`) — may pre-answer A vs B (does `api.omiapi.com` accept `based-hardware-dev` tokens?).
+3. Sri report: A → close P1. B → P1.2 own-Firebase (Codex implements).
+4. **Then Q11 sync-fork** (DEFERRED till sign-in works; upstream +149, 0 conflicts; local `git merge upstream/main` → PR → self-merge). Bundle disabling fork-noise workflows (`trigger-codemagic`, `Auto Release Desktop on Main` — FAIL every main push).
+
+### Also delivered
+- Plans: `plans/{README,P1-signin,P2-triggers-v1,P3-bt-trigger-matrix}.md` (ROADMAP.md = master).
+- Closed: **D0b arm64-only** APK, **D5 Silero VAD**.
+- Research pack `docs/research/{README,R1..R6}.md` (public-safe); Sri running R4→R3→R1→R2→R5→R6, pasting findings back.
+- **Q13 open:** Sri's ONNX models (Kaggle + FUTO keyboard fork) → folded into D6/AsrEngine; need Kaggle link + model type.
+
+### Rules
+- `Q and A.md` (repo root) = live channel; Sri edits mid-session, re-read often, fold scratch → numbered Q&A. Terse, act without asking, self-authorized merges.
+- No local flutter/phone → APK build green = compile check; Sri does real sign-in. main.yml = issue-sync only (no test CI on push).
+- Codex: `codex exec --sandbox read-only|workspace-write --cd <dir> --output-last-message <file> "…"`, background long runs. Quota short-cycles.
+- CI landmines: prebuilt+`.dev.env` before build_runner; `CM_KEYSTORE_*`; `--build-number=run_number`; Flutter 3.41.9/Java 21; APK builds only on `app/**` or workflow-file paths.
+
+### Memory rows (project=omi)
+- `mem_20260704_omi-fork-session-2026-07_78f542` (updated) — session state + rules.
+- `mem_20260704_android-deep-link-intent_c676bc` — hostless `omi://` filter already catches callbacks.
+- `mem_20260704_omi-sign-in-bug-root-cau_6f233b` — custom-token-mismatch root cause + fixes.
+
+---
+
 ## 2026-07-04T04:59:53Z — Phase-0 CI + roadmap landed; merge + sign-in triage pending
 
 ### Current task state
