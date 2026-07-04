@@ -211,6 +211,7 @@ pytest tests/unit/test_llm_gateway_client_config.py -v
 pytest tests/unit/test_llm_gateway_route_refs.py -v
 pytest tests/unit/test_llm_gateway_dependencies.py -v
 pytest tests/unit/test_llm_gateway_chat_extraction_pilot.py -v
+pytest tests/unit/test_llm_gateway_coverage_guardrails.py -v
 pytest tests/unit/test_backend_runtime_env_validator.py -v
 pytest tests/unit/test_google_credentials.py -v
 pytest tests/unit/test_llm_usage_tracker.py -v
@@ -327,6 +328,8 @@ pytest tests/unit/test_pusher_circuit_breaker.py -v
 pytest tests/unit/test_pusher_ghost_connections.py -v
 pytest tests/unit/test_async_tasks.py -v
 pytest tests/unit/test_async_resource_correctness.py -v
+pytest tests/unit/test_hermetic_network.py -v
+pytest tests/unit/test_hermetic_network_collection_guard.py -v
 pytest tests/unit/test_lock_bypass_fixes.py -v
 pytest tests/unit/test_integration_malformed_records.py -v
 pytest tests/unit/test_oauth_callback_uid_guard.py -v
