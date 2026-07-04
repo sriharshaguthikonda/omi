@@ -69,6 +69,14 @@ Sri: from i think their github repo somewhere in releases i guess
 
 > **A:** Matches the root-cause analysis (upstream release APK = their Firebase/signing, sideloaded without env-baked web-auth). Logged for the P1 write-up; no further action.
 
+**Q9 (Sri, 2026-07-04):** what code changes did you make to test the app? none? / the built version is no different from the old version because there are no code changes done in the actual app.
+
+> **A:** Correct — P0 changed **zero app code**. Only CI workflow + docs. The CI APK differs from upstream's release APK in *baked env only* (web-auth lane, `api.omiapi.com`, community keystore signature) — invisible in the UI, and absent entirely if the APK you installed was upstream's (Q7). **P1 fixes this now:** real app code changes — a visible build stamp (version + run number + git sha + auth-lane) on the sign-in screen and in About, plus sign-in error surfacing — so the next APK is provably ours and diagnosable. Codex is implementing; link lands in ROADMAP P0 when the build is live.
+
+**Q10 (Sri, 2026-07-04):** hopefully you are not merging with the upstream!!!
+
+> **A:** Never. All PRs/merges stay **inside the fork** `sriharshaguthikonda/omi` (origin). Upstream `BasedHardware/omi` is a read-only donor — no pushes, no PRs to it, ever. The ROADMAP "upstream sync" bullet means *pulling* their code into our fork on our schedule, and even that only when you say so.
+
 ---
 
 ## Log
@@ -78,3 +86,5 @@ Sri: from i think their github repo somewhere in releases i guess
 
 
 ## user comments (Sri's scratch space — drop raw notes here, Claude folds them into Q&A above)
+
+(1–3 executed: Codex orchestration live, phase0 merged, APK link posted when built. 4 → Q9, 5 → Q10 above.)
