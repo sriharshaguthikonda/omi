@@ -77,6 +77,8 @@ Phases are ordered by dependency, not by importance. P3 is the flagship user req
 
 **Goal:** the APK you sideload from the prerelease page signs in successfully, first try.
 
+**Execution plan:** [plans/P1-signin.md](./plans/P1-signin.md) — verified auth-flow facts (file:line) + tasks. P2/P3 plans: [plans/](./plans/README.md). Correction to "mostly verification" below: Sri's Q9 stands — P0 shipped zero app code, so P1 **does** ship real app changes (build stamp, error surfacing, deep-link audit).
+
 **Why it was broken** (root cause, verified):
 1. Native Google Sign-In requires the APK signing cert's SHA-1/256 registered in the Firebase project. Upstream owns `based-hardware-dev`/`-prod`; a random keystore's cert isn't there → `ApiException: 10`. (The community `debug.keystore` we now use is upstream's shared one — its SHA is plausibly registered, but that's not provable from the repo.)
 2. Builds made without `.dev.env` get an empty `API_BASE_URL` (envied codegen) → even successful Firebase auth goes nowhere.
