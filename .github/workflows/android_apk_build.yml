@@ -1,0 +1,102 @@
+name: Android APK (dev)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'app/**'
+      - '.github/workflows/android_apk_build.yml'
+
+concurrency:
+  group: android-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+# GitHub Actions sets CI=true, which flips app/android/app/build.gradle's release
+# signing config into its Codemagic branch and crashes gradle configuration on
+# file(null) unless CM_* are set. Point them at the shared prebuilt keystore.
+# Dev-flavor release APKs still sign via signingConfigs.debug + key.properties.
+env:
+  CM_KEYSTORE_PATH: ${{ github.workspace }}/app/setup/prebuilt/debug.keystore
+  CM_KEYSTORE_PASSWORD: android
+  CM_KEY_ALIAS: androiddebugkey
+  CM_KEY_PASSWORD: android
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.9' # keep in sync with codemagic.yaml
+          channel: stable
+          cache: true
+
+      - name: Bootstrap Android dev flavor
+        shell: bash
+        working-directory: app
+        run: |
+          cp setup/prebuilt/key.properties android/
+          mkdir -p android/app/src/dev/ android/app/src/prod/
+          cp setup/prebuilt/firebase_options.dart lib/firebase_options_dev.dart
+          cp setup/prebuilt/firebase_options.dart lib/firebase_options_prod.dart
+          cp setup/prebuilt/google-services.json android/app/src/dev/
+          cp setup/prebuilt/google-services.json android/app/src/prod/
+          printf 'API_BASE_URL=https://api.omiapi.com/\nUSE_WEB_AUTH=true\nUSE_AUTH_CUSTOM_TOKEN=true\n' > .dev.env
+
+      - name: Install Flutter dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: Generate build files
+        working-directory: app
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build dev release APK
+        working-directory: app
+        # run_number as versionCode keeps upgrades in-place installable
+        run: flutter build apk --release --flavor dev --build-number=${{ github.run_number }}
+
+      - name: Rename APK
+        working-directory: app
+        run: |
+          cp build/app/outputs/flutter-apk/app-dev-release.apk "../omi-dev-${{ github.sha }}.apk"
+          cp build/app/outputs/flutter-apk/app-dev-release.apk "../omi-dev-latest.apk"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: omi-dev-apk
+          path: omi-dev-${{ github.sha }}.apk
+
+      # softprops updates assets but GitHub never moves an existing tag, so the
+      # release would stay pinned to the first tagged commit; move it ourselves.
+      - name: Move apk-latest tag to current commit
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git tag -f apk-latest
+          git push origin apk-latest --force
+
+      - name: Publish rolling APK release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-latest
+          prerelease: true
+          name: Omi dev APK (rolling)
+          body: |
+            Rolling dev-flavor APK from main. Signed with the shared setup.sh
+            debug keystore, so it installs over local setup.sh builds in place.
+
+            Commit: ${{ github.sha }} (build ${{ github.run_number }})
+          files: omi-dev-latest.apk
