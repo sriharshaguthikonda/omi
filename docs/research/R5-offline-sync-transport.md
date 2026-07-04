@@ -32,3 +32,17 @@ Personal setup: an Android app produces capture "bundles" (JSON metadata + trans
 ## Why it matters
 
 Closes D8, sizes P8 (`.memory` integration transport). We want zero new always-on server and offline-first durability; this confirms or replaces the file-drop default.
+
+
+
+
+
+https://chatgpt.com/c/6a4917aa-b1b4-83e8-8322-e186a3d0c183
+
+
+
+
+
+
+
+

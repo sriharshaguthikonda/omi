@@ -35,16 +35,36 @@ Protocol: either side appends. Questions get numbered `Q<n>`. Answers go directl
 
 **Q13 (Claude → Sri, 2026-07-04):** you wrote in D5 "i am training models elsewhere — link that." Drop the link/repo/notes here and I'll wire it into the ROADMAP (D6 ASR + the `AsrEngine` interface) so your trained model is a first-class drop-in candidate alongside Moonshine/sherpa. What is it — a fine-tuned ASR, a VAD, a wake-word, something else? What framework/output format (ONNX? TFLite?)?
 
+onnx i think you be able to find them in them on my kaggle. futo keyboard fork i have shipped with some 
+
+> **A (Claude):** ONNX is ideal — it loads straight into ONNX Runtime / sherpa-onnx, so your model becomes a drop-in ASR backend, not a special case. Folded into ROADMAP D6: the `AsrEngine` interface will target an ONNX-Runtime backend that can load Moonshine, sherpa, **or** your trained model; added a "Spike C (Sri's own)" task. **Two quick follow-ups so I can wire it:** (a) your Kaggle profile/dataset link (I'll find the models); (b) what are they — ASR, VAD, or wake-word — and are they streaming-capable? Drop answers here.
+
+
 **Q12 (Sri, 2026-07-04):** post deep-research areas here; I'll run them through ChatGPT Deep Research. Link a file describing what to research.
 
 > **A:** Done — [docs/research/](./docs/research/README.md) has 6 self-contained, public-safe topic files (paste each whole file as the ChatGPT prompt). Ordered by priority: **R4** (Android 14/15 background-mic constraints — could reshape the trigger design, do first), **R3** (BT media-button reality — flagship P3 feasibility), **R1** (on-device ASR engine), R2 (VAD), R5 (offline sync transport), R6 (self-host backend footprint). Each maps to an open ROADMAP decision (D5/D6/D7/D8) or a phase feasibility question. Bring findings back as a `## Findings` section in the file or a share-link + TL;DR here; I fold accepted answers into the matching decision box.
 
+research on the way in the orderr you asked. will paste the research in the smae research requirement files
+
+
 **Checklist (2026-07-04) — do these while Claude/Codex implement P1:**
 
 1. **Sign-in failure details** (unblocks P1 verification): exact error text or screenshot; which button you tapped (Google / Apple / anything browser-based); where that APK came from (upstream releases page, or the CI artifact zip from run 28690006580?).
+
+installed from the link below and sign falure says.....says failed to sign in via google, try again later. after it takes me to the webpage and i click my google accound and then it takes me back to the app but then gives red bottom banner with that error.
+
+> **A (Claude) — breakthrough, this narrows it a lot:** Your flow proves the web-auth lane is **working through the hard parts**: browser opened (so `USE_WEB_AUTH` is baked and the authorize URL is reachable), you picked your account, and it **returned to the app** (so the `omi://auth/callback` deep link fired). The failure is the **last step** — exchanging the code for a token at `api.omiapi.com/v1/auth/token`, or the Firebase custom-token sign-in. That collapses to the generic "failed to sign in with Google" banner. **Two things:** (1) The APK you installed is the **OLD apk-latest** (published before P1) — it has no build stamp and no error detail, so it can't tell you the real stage. (2) P1 just merged; the **new apk-latest is building now**. Reinstall it when I ping you: the red banner will **append the real failing stage** (e.g. `token-exchange:400` or `custom-token`), and the sign-in footer will show a build stamp. That exact stage tells us whether the community backend rejects the exchange or the custom-token step breaks — then it's a targeted fix, not a guess.
+> **A2 (Claude) — ROOT CAUSE CONFIRMED, and P1 did its job:** Your stamped-APK error is the smoking gun:
+> `[custom-token] [firebase_auth/custom-token-mismatch] The custom token corresponds to a different audience.`
+> The whole OAuth dance works; the **only** broken step is the very last one — Firebase rejects the token because it was minted for a **different Firebase project** than the app is built for. Concretely: the app is built for Firebase project **`based-hardware-dev`** (the prebuilt `google-services.json`/`firebase_options.dart`), but `api.omiapi.com` issues custom tokens for **another** project. The repo ships `based-hardware-dev` configs *and* points at `api.omiapi.com` — those two were **never a matched pair**. That's the bug, and it's config, not code.
+> **This is exactly why P1 shipped** (your Q9 point): without the build stamp + surfaced error we'd still be guessing. Now it's pinned.
+> **Codex is investigating the cheapest fix** (I'm orchestrating) — ranked options: (a) your own free Firebase project + matching config [most robust, ties to D7], (b) get the Firebase config that matches `api.omiapi.com`, (c) native Google sign-in path if the shared keystore SHA is registered in `based-hardware-dev`. I'll post the recommendation + exact change shortly, then build a fix APK for you to test. **No action from you yet** — hold.
+
 2. **Install the new APK when notified** — after P1 merges, the first real build lands at <https://github.com/sriharshaguthikonda/omi/releases/tag/apk-latest>. You'll get a push notification. The sign-in screen footer will show a **build stamp** (version+run+sha) — no stamp = old APK.
 3. **Open decision boxes in [ROADMAP.md](./ROADMAP.md)** — answer inline (🔵 line) or drop notes in scratch below: D0b APK shape, D2 trigger scope, D3 BT mechanism order, D5 VAD, D6 ASR engine, D7 sovereignty shape, D8 .memory transport. None block P1; **D2/D3 block P2/P3 execution start** (plans are written: [plans/](./plans/README.md)).
 4. **After install:** try sign-in, report stamp text + what happens, per item 1 format.
+
+
 
 ---
 
@@ -107,3 +127,21 @@ Sri: from i think their github repo somewhere in releases i guess
 
 
 (deep-research request → Q12 above; topics live in docs/research/, ordered R4→R3→R1→R2→R5→R6.)
+
+
+1. research on the way in the asked order
+2. talk to me at the end of the file.....who writes somewhere in the middle of the file...who the fuck finds it....even a diff editor wont work consiering the regular commits..!!
+
+
+3. i have answered d2 d3 in reoadmap...which branch you tell me since you create this mess.!
+4. if you need a answer for a question then you post here and update it in roadmap or where ever the fuck you use that question annswer!
+
+
+
+
+
+
+5. see there should be already fixes and issues elsewhere in their repository, others might have solved the problem already.
+
+6. don't reinvent the wheel for all things, see if there is already a problem solved by others and just grab it
+7. use branches through other agents build other features and merge you already have research documents available.
