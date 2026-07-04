@@ -96,4 +96,4 @@ Sri: from i think their github repo somewhere in releases i guess
 
 ## user comments (Sri's scratch space — drop raw notes here, Claude folds them into Q&A above)
 
-(1–3 executed: Codex orchestration live, phase0 merged, APK link posted when built. 4 → Q9, 5 → Q10 above. "merge yourself" → standing rule: Claude opens + merges fork PRs autonomously, regular merge, fork main only. Sync-fork → Q11.)
+(1–3 executed: Codex orchestration live, phase0 merged, APK link posted when built. 4 → Q9, 5 → Q10 above. "merge yourself" → standing rule: Claude opens + merges fork PRs autonomously, regular merge, fork main only. Sync-fork → Q11. "codex cli as worker, you orchestrate" → confirmed model, applied: Codex writes P1 code, Claude reviews/corrects (caught + reverted a redundant manifest filter Codex added) + Codex review pass before merge.)

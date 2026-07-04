@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 
 import 'package:omi/providers/auth_provider.dart';
 import 'package:omi/utils/l10n_extensions.dart';
+import 'package:omi/widgets/build_stamp.dart';
 
 class AuthComponent extends StatefulWidget {
   final VoidCallback onSignIn;
@@ -160,6 +161,8 @@ class _AuthComponentState extends State<AuthComponent> {
                         ],
                       ),
                     ),
+                    const SizedBox(height: 8),
+                    const BuildStamp(compact: true),
                   ],
                 ),
               ),

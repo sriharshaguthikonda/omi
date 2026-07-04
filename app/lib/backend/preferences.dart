@@ -194,6 +194,10 @@ class SharedPreferencesUtil {
 
   bool get autoCreateSpeakersEnabled => getBool('autoCreateSpeakersEnabled', defaultValue: true);
 
+  set lastAuthError(String value) => saveString('lastAuthError', value);
+
+  String get lastAuthError => getString('lastAuthError');
+
   // Goal tracker widget on homepage - default is true (experimental feature)
   set showGoalTrackerEnabled(bool value) => saveBool('showGoalTrackerEnabled', value);
 

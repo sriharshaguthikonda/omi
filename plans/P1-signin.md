@@ -72,9 +72,9 @@ class BuildStamp extends StatelessWidget { final bool compact; ... } // FutureBu
 - Inspect: `app/android/app/src/main/AndroidManifest.xml` (+ dev flavor overlays if any) for `omi://auth/callback` scheme intent-filter; `app_links` package registration
 - Modify (only if missing): add `<intent-filter>` with `<data android:scheme="omi" android:host="auth"/>` on the main activity
 
-- [ ] **Step 1:** Grep manifests for `android:scheme="omi"`. If present → tick + note evidence here. If absent → add filter.
-- [ ] **Step 2:** Evidence either way recorded in commit message / this file.
-- [ ] **Step 3: Commit** (only if changed) `fix(p1): register omi:// deep link for web-auth callback`
+- [x] **Step 1:** Grepped manifests. **Verdict: no change needed.** `app/android/app/src/main/AndroidManifest.xml:172-177` already has a generic `omi://` intent-filter (scheme, no host) on `.MainActivity` (`launchMode=singleTask`) — it already catches `omi://auth/callback`. Codex first added a redundant host-scoped duplicate; Claude reverted it (a host-specific filter is a strict subset of the existing generic one, same activity → zero functional gain, violates minimal-diff rule). **Deep link was never the sign-in failure cause.**
+- [x] **Step 2:** Evidence recorded above.
+- [x] **Step 3:** No commit — manifest unchanged from upstream.
 
 ### Task 4: CI passes stamp values
 

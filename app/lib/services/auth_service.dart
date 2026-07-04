@@ -16,6 +16,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:omi/backend/http/api/users.dart';
 import 'package:omi/backend/preferences.dart';
 import 'package:omi/env/env.dart';
+import 'package:omi/services/auth_error_log.dart';
 import 'package:omi/utils/logger.dart';
 
 class AuthService {
@@ -256,12 +257,14 @@ class AuthService {
       });
 
       // Now launch the URL
-      final launched = await launchUrl(Uri.parse(authUrl), mode: LaunchMode.inAppBrowserView);
+      final launched = await _launchAuthUrl(authUrl);
 
       if (!launched) {
         linkSubscription.cancel();
         _deepLinkChannel.setMethodCallHandler(null);
-        throw Exception('Failed to launch authentication URL');
+        final error = Exception('Failed to launch authentication URL');
+        AuthErrorLog.record('launch', error);
+        throw error;
       }
 
       final result = await completer.future.timeout(
@@ -269,7 +272,9 @@ class AuthService {
         onTimeout: () {
           linkSubscription.cancel();
           _deepLinkChannel.setMethodCallHandler(null);
-          throw Exception('Authentication timeout');
+          final error = Exception('Authentication timeout waiting for omi://auth/callback');
+          AuthErrorLog.record('callback-timeout', error);
+          throw error;
         },
       );
 
@@ -278,11 +283,15 @@ class AuthService {
       final returnedState = uri.queryParameters['state'];
 
       if (code == null) {
-        throw Exception('No authorization code received');
+        final error = Exception('No authorization code received');
+        AuthErrorLog.record('no-code', error);
+        throw error;
       }
 
       if (returnedState != state) {
-        throw Exception('Invalid state parameter');
+        final error = Exception('Invalid state parameter');
+        AuthErrorLog.record('state-mismatch', error);
+        throw error;
       }
 
       // Exchange the code for OAuth credentials
@@ -334,10 +343,12 @@ class AuthService {
         return json.decode(response.body);
       } else {
         Logger.debug('Token exchange failed: ${response.body}');
+        AuthErrorLog.record('token-exchange:${response.statusCode}', 'Token exchange failed: ${response.body}');
         return null;
       }
     } catch (e) {
       Logger.debug('Token exchange error: $e');
+      AuthErrorLog.record('token-exchange:error', e);
       return null;
     }
   }
@@ -350,7 +361,12 @@ class AuthService {
     // Use custom token if enabled and available
     if (useCustomToken && customToken != null) {
       Logger.debug('Signing in with Firebase custom token from $provider');
-      return await FirebaseAuth.instance.signInWithCustomToken(customToken);
+      try {
+        return await FirebaseAuth.instance.signInWithCustomToken(customToken);
+      } catch (e) {
+        AuthErrorLog.record('custom-token', e);
+        rethrow;
+      }
     }
 
     // Fallback to OAuth credentials
@@ -361,12 +377,31 @@ class AuthService {
 
     if (provider == 'google') {
       final credential = GoogleAuthProvider.credential(idToken: idToken, accessToken: accessToken);
-      return await FirebaseAuth.instance.signInWithCredential(credential);
+      try {
+        return await FirebaseAuth.instance.signInWithCredential(credential);
+      } catch (e) {
+        AuthErrorLog.record('firebase-credential', e);
+        rethrow;
+      }
     } else if (provider == 'apple') {
       final credential = OAuthProvider('apple.com').credential(idToken: idToken, accessToken: accessToken);
-      return await FirebaseAuth.instance.signInWithCredential(credential);
+      try {
+        return await FirebaseAuth.instance.signInWithCredential(credential);
+      } catch (e) {
+        AuthErrorLog.record('firebase-credential', e);
+        rethrow;
+      }
     } else {
       throw Exception('Unsupported provider: $provider');
+    }
+  }
+
+  Future<bool> _launchAuthUrl(String authUrl) async {
+    try {
+      return await launchUrl(Uri.parse(authUrl), mode: LaunchMode.inAppBrowserView);
+    } catch (e) {
+      AuthErrorLog.record('launch', e);
+      rethrow;
     }
   }
 

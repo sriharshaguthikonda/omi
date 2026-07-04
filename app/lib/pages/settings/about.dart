@@ -7,6 +7,7 @@ import 'package:omi/pages/settings/webview.dart';
 import 'package:omi/utils/analytics/intercom.dart';
 import 'package:omi/utils/l10n_extensions.dart';
 import 'package:omi/utils/other/temp.dart';
+import 'package:omi/widgets/build_stamp.dart';
 
 class AboutOmiPage extends StatefulWidget {
   const AboutOmiPage({super.key});
@@ -56,6 +57,12 @@ class _AboutOmiPageState extends State<AboutOmiPage> {
               onTap: () async {
                 await IntercomManager.instance.intercom.displayMessenger();
               },
+            ),
+            const ListTile(
+              contentPadding: EdgeInsets.fromLTRB(4, 0, 24, 0),
+              title: Text('Build Info', style: TextStyle(color: Colors.white)),
+              subtitle: BuildStamp(),
+              trailing: Icon(Icons.info_outline, color: Colors.white, size: 20),
             ),
             ListTile(
               contentPadding: const EdgeInsets.fromLTRB(4, 0, 24, 0),

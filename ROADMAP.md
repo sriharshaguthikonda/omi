@@ -67,8 +67,8 @@ Phases are ordered by dependency, not by importance. P3 is the flagship user req
 **Decision D0b — APK shape** (fat is what the workflow currently builds; debate stays open)
 - [ ] Fat APK (all ABIs, ~1 file, biggest download) 🟢
   - 🟢 Claude: zero pick-the-right-file friction; switch to arm64-only later if build time or size ever hurts.
-  - 🔵 Sri:
-- [ ] `--target-platform android-arm64` only — smaller/faster, covers virtually every modern phone
+  - 🔵 Sri: arm 64 for now but in future we will revisit put it somewehre in plan to revisit
+- [x] `--target-platform android-arm64` only — smaller/faster, covers virtually every modern phone
 - [ ] `--split-per-abi` — smallest per-file, but the release page grows three files per build
 
 ---
@@ -99,6 +99,8 @@ Phases are ordered by dependency, not by importance. P3 is the flagship user req
   - 🔵 Sri: agreed 2026-07-04.
 - [ ] Own Firebase + self-hosted backend immediately — days of setup before first working APK; blocks the fun parts
 - [ ] Local-only (no auth at all) — biggest surgery; becomes realistic only after P6's local queue exists (revisit inside P7)
+	🔵 Sri: may be weill be able to host this is free oracle cloud in future?!
+	🔵 Sri: the kaggle dataset where we use the data for training the moonshine and asr models can be used as cloud storage as well?!
 
 ---
 
@@ -129,7 +131,7 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 - [ ] Notification + tile + explicit intent (Tasker) 🟢
   - 🟢 Claude: the intent receiver is ~50 extra lines and instantly unlocks *every* automation app (Tasker, MacroDroid, KDE Connect) as a trigger source — cheapest leverage in the whole roadmap.
   - 🔵 Sri:
-- [ ] All of the above + in-app big-red-button redesign — UI polish can wait
+- [x] All of the above + in-app big-red-button redesign — UI polish can wait
 
 ---
 
@@ -164,7 +166,7 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 **Swallow sources:** repo's own BLE stack (`OmiBleManager.kt`, `BleCompanionService.kt`, `pigeon_interfaces.dart`); Media3 `MediaSessionService` official samples; `C:/Android_software/phonebatteryoptimization` sibling (BT connect/disconnect event handling reference).
 
 **Decision D3 — which button mechanism ships first**
-- [ ] MediaSession KeyEvents first, BLE GATT second 🟢
+- [x] MediaSession KeyEvents first, BLE GATT second 🟢
   - 🟢 Claude: your existing headsets/earbuds work day one with zero custom hardware; BLE GATT path already exists in-repo for omi wearables so it's a fast follow, not a rewrite.
   - 🔵 Sri:
 - [ ] BLE GATT first — only makes sense if your primary trigger device is an omi wearable/custom peripheral today
@@ -193,9 +195,9 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 **Swallow sources:** `OmiBatchAudioWriter.kt` (in-repo), Silero VAD ONNX, WebRTC VAD.
 
 **Decision D5 — VAD**
-- [ ] Silero VAD (ONNX) 🟢
+- [x] Silero VAD (ONNX) 🟢
   - 🟢 Claude: near-SOTA accuracy, <1 ms/chunk on one CPU thread, ONNX runs everywhere; the report's default pick.
-  - 🔵 Sri:
+  - 🔵 Sri: we will do moonshine tiny streaming in future anyway as on option for sure. i am training models elsewehre link that 
 - [ ] WebRTC VAD — smaller/faster, more false positives; fine as a low-power pre-gate later
 - [ ] Moonshine integrated pipeline — couples VAD to the ASR choice (see D6); revisit if D6 lands on Moonshine anyway
 

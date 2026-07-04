@@ -8,8 +8,10 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:omi/backend/http/api/apps.dart' as apps_api;
 import 'package:omi/backend/preferences.dart';
 import 'package:omi/env/env.dart';
+import 'package:omi/flavors.dart';
 import 'package:omi/app_globals.dart';
 import 'package:omi/providers/base_provider.dart';
+import 'package:omi/services/auth_error_log.dart';
 import 'package:omi/services/auth_service.dart';
 import 'package:omi/services/notifications.dart';
 import 'package:omi/utils/alerts/app_snackbar.dart';
@@ -83,6 +85,12 @@ class AuthenticationProvider extends BaseProvider {
     notifyListeners();
   }
 
+  String _authErrorMessage(String message) {
+    final lastError = AuthErrorLog.last;
+    if (F.env != Environment.dev || lastError == null) return message;
+    return '$message\n$lastError';
+  }
+
   Future<void> onGoogleSignIn(Function() onSignIn) async {
     final useWebAuth = Env.useWebAuth;
     if (!loading) {
@@ -98,14 +106,18 @@ class AuthenticationProvider extends BaseProvider {
           _signIn(onSignIn);
         } else {
           AppSnackbar.showSnackbarError(
-            globalNavigatorKey.currentContext?.l10n.authFailedToSignInWithGoogle ??
-                'Failed to sign in with Google, please try again.',
+            _authErrorMessage(
+              globalNavigatorKey.currentContext?.l10n.authFailedToSignInWithGoogle ??
+                  'Failed to sign in with Google, please try again.',
+            ),
           );
         }
       } catch (e) {
         Logger.debug('OAuth Google sign in error: $e');
         AppSnackbar.showSnackbarError(
-          globalNavigatorKey.currentContext?.l10n.authenticationFailed ?? 'Authentication failed. Please try again.',
+          _authErrorMessage(
+            globalNavigatorKey.currentContext?.l10n.authenticationFailed ?? 'Authentication failed. Please try again.',
+          ),
         );
       }
       setLoadingState(false);
@@ -127,14 +139,18 @@ class AuthenticationProvider extends BaseProvider {
           _signIn(onSignIn);
         } else {
           AppSnackbar.showSnackbarError(
-            globalNavigatorKey.currentContext?.l10n.authFailedToSignInWithApple ??
-                'Failed to sign in with Apple, please try again.',
+            _authErrorMessage(
+              globalNavigatorKey.currentContext?.l10n.authFailedToSignInWithApple ??
+                  'Failed to sign in with Apple, please try again.',
+            ),
           );
         }
       } catch (e) {
         Logger.debug('OAuth Apple sign in error: $e');
         AppSnackbar.showSnackbarError(
-          globalNavigatorKey.currentContext?.l10n.authenticationFailed ?? 'Authentication failed. Please try again.',
+          _authErrorMessage(
+            globalNavigatorKey.currentContext?.l10n.authenticationFailed ?? 'Authentication failed. Please try again.',
+          ),
         );
       }
       setLoadingState(false);
@@ -150,8 +166,10 @@ class AuthenticationProvider extends BaseProvider {
       return token;
     } catch (e, stackTrace) {
       AppSnackbar.showSnackbarError(
-        globalNavigatorKey.currentContext?.l10n.authFailedToRetrieveToken ??
-            'Failed to retrieve firebase token, please try again.',
+        _authErrorMessage(
+          globalNavigatorKey.currentContext?.l10n.authFailedToRetrieveToken ??
+              'Failed to retrieve firebase token, please try again.',
+        ),
       );
       PlatformManager.instance.crashReporter.reportCrash(e, stackTrace);
 
@@ -168,8 +186,10 @@ class AuthenticationProvider extends BaseProvider {
         user = FirebaseAuth.instance.currentUser!;
       } catch (e, stackTrace) {
         AppSnackbar.showSnackbarError(
-          globalNavigatorKey.currentContext?.l10n.authUnexpectedErrorFirebase ??
-              'Unexpected error signing in, Firebase error, please try again.',
+          _authErrorMessage(
+            globalNavigatorKey.currentContext?.l10n.authUnexpectedErrorFirebase ??
+                'Unexpected error signing in, Firebase error, please try again.',
+          ),
         );
 
         PlatformManager.instance.crashReporter.reportCrash(e, stackTrace);
@@ -181,7 +201,10 @@ class AuthenticationProvider extends BaseProvider {
       onSignIn();
     } else {
       AppSnackbar.showSnackbarError(
-        globalNavigatorKey.currentContext?.l10n.authUnexpectedError ?? 'Unexpected error signing in, please try again',
+        _authErrorMessage(
+          globalNavigatorKey.currentContext?.l10n.authUnexpectedError ??
+              'Unexpected error signing in, please try again',
+        ),
       );
     }
   }
