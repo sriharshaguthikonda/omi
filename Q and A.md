@@ -63,6 +63,7 @@ installed from the link below and sign falure says.....says failed to sign in vi
 > 1. Does Google sign-in complete (no red error)?
 > 2. **After sign-in, does the app actually load — your data, conversations, no "unauthorized"/401?**
 > Why both: Codex found `api.omiapi.com`'s backend likely verifies **`based-hardware` (prod)** tokens, but native sign-in gives **`based-hardware-dev`** tokens. So stage 1 may pass while stage 2 fails. If it does — **that's expected, not a regression** — it means the community backend isn't ours to match, and the real fix is **your own free Firebase + self-hosted backend** (D7 sovereignty, brought early). The stamp will read `native-auth` so you know it's the fixed APK.
+> **✅ LIVE NOW (2026-07-04 15:41Z):** native-lane apk-latest is published — <https://github.com/sriharshaguthikonda/omi/releases/tag/apk-latest>. Install, confirm stamp reads **`native-auth`**, run the two-stage test above, report both results here. (First build got cancelled by a concurrency collision with your direct-to-main docs commit; re-dispatched and it's green now.)
 
 2. **Install the new APK when notified** — after P1 merges, the first real build lands at <https://github.com/sriharshaguthikonda/omi/releases/tag/apk-latest>. You'll get a push notification. The sign-in screen footer will show a **build stamp** (version+run+sha) — no stamp = old APK.
 3. **Open decision boxes in [ROADMAP.md](./ROADMAP.md)** — answer inline (🔵 line) or drop notes in scratch below: D0b APK shape, D2 trigger scope, D3 BT mechanism order, D5 VAD, D6 ASR engine, D7 sovereignty shape, D8 .memory transport. None block P1; **D2/D3 block P2/P3 execution start** (plans are written: [plans/](./plans/README.md)).
@@ -144,9 +145,18 @@ Sri: from i think their github repo somewhere in releases i guess
 
 
 
+## user comments 
+
 
 5. see there should be already fixes and issues elsewhere in their repository, others might have solved the problem already.
 
 6. don't reinvent the wheel for all things, see if there is already a problem solved by others and just grab it
 7. use branches through other agents build other features and merge you already have research documents available.
-8. beep me multiple times i am giong away . if you need me.
+8. compact sooner
+9. beep me multiple times i am giong away . if you need me.
+
+10. asshole talk to me at the end of this file. dont wirte stuff in some hole...where i cant find where you have written ?!?! what is the point ot writing a mail if you send it to wrong address 
+
+
+
+
