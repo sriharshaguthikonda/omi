@@ -22,7 +22,7 @@
 | Phase | Name | Outcome | Status |
 |---|---|---|---|
 | P0 | CI foundation | Push → installable dev APK | 🔨 this PR |
-| P1 | Sign-in that works | Sideloaded APK signs in via community lane | next |
+| P1 | Sign-in that works | Sideloaded APK signs in via community lane | 🔨 in progress |
 | P2 | Triggers v1 (phone-only) | Record without opening the app | |
 | P3 | **BT multi-device trigger matrix** | Any button on any of your BT devices starts capture | flagship |
 | P4 | Local-first capture core | Ring buffer, VAD, mark-last-buffer salvage | |
@@ -46,7 +46,8 @@ Phases are ordered by dependency, not by importance. P3 is the flagship user req
 - [x] Rolling `apk-latest` prerelease on `main` pushes (this PR)
 - [x] Enable GitHub Actions on the fork (done by Sri, 2026-07-04 — the enable button has no API/gh equivalent)
 - [x] First green run verified (run 28690006580, ~18 min, 86 MB artifact, 2026-07-04)
-- [ ] APK installed on phone + sign-in tested (prerelease link appears after first merge to main; until then use the run's artifact)
+- [ ] APK installed on phone + sign-in tested — **download: <https://github.com/sriharshaguthikonda/omi/releases/tag/apk-latest>** (live after first `main` build; refreshes on every main push)
+  - Sri 2026-07-04: installed one built APK, could not sign in, errored out → tracked as P1; root note: that build had zero app-code changes (see Q9 in Q and A.md), P1 adds a visible build stamp so installed-APK identity is never ambiguous again
 - [ ] Optional: build-status badge in README
 
 **How it works (so future-us doesn't re-derive it)**
