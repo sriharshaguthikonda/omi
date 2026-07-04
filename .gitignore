@@ -241,3 +241,6 @@ builds-snapshot.md
 # Agent planning artifacts (ephemeral; do not commit)
 .cursor/plans/
 .hermes/
+
+# serena MCP local cache
+.serena/

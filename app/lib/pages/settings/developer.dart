@@ -27,6 +27,7 @@ import 'package:omi/pages/settings/widgets/mcp_api_key_list_item.dart';
 import 'package:omi/providers/device_provider.dart';
 import 'package:omi/providers/developer_mode_provider.dart';
 import 'package:omi/providers/mcp_provider.dart';
+import 'package:omi/services/auth_error_log.dart';
 import 'package:omi/utils/alerts/app_snackbar.dart';
 import 'package:omi/utils/debug_log_manager.dart';
 import 'package:omi/utils/l10n_extensions.dart';
@@ -147,6 +148,42 @@ class _DeveloperSettingsPageState extends State<_DeveloperSettingsPageView> {
           ),
         ),
         Switch(value: value, onChanged: onChanged, activeThumbColor: const Color(0xFF22C55E)),
+      ],
+    );
+  }
+
+  Widget _buildDiagnosticInfoItem({
+    required String title,
+    required String value,
+    required IconData icon,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(color: const Color(0xFF2A2A2E), borderRadius: BorderRadius.circular(10)),
+          child: Center(child: FaIcon(icon, color: Colors.grey.shade400, size: 16)),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 4),
+              SelectableText(
+                value,
+                maxLines: 5,
+                style: TextStyle(color: Colors.grey.shade500, fontSize: 12, height: 1.3),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -835,6 +872,15 @@ class _DeveloperSettingsPageState extends State<_DeveloperSettingsPageView> {
                             ],
                           ),
                         ],
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Divider(color: Colors.grey.shade800, height: 1),
+                        ),
+                        _buildDiagnosticInfoItem(
+                          title: 'Last sign-in error',
+                          value: AuthErrorLog.last ?? context.l10n.notSet,
+                          icon: FontAwesomeIcons.triangleExclamation,
+                        ),
                       ],
                     ),
                   ),

@@ -64,11 +64,12 @@ Phases are ordered by dependency, not by importance. P3 is the flagship user req
 - [ ] Artifacts only — requires GitHub login + unzip on phone
 - [ ] Tagged releases only — manual step per build
 
-**Decision D0b — APK shape** (fat is what the workflow currently builds; debate stays open)
-- [ ] Fat APK (all ABIs, ~1 file, biggest download) 🟢
+**Decision D0b — APK shape** ✅ closed 2026-07-04
+- [ ] Fat APK (all ABIs, ~1 file, biggest download)
   - 🟢 Claude: zero pick-the-right-file friction; switch to arm64-only later if build time or size ever hurts.
-  - 🔵 Sri:
-- [ ] `--target-platform android-arm64` only — smaller/faster, covers virtually every modern phone
+- [x] `--target-platform android-arm64` only — smaller/faster, covers virtually every modern phone
+  - 🔵 Sri: arm64 for now, revisit in future (revisit marker added to P10).
+  - 🟢 Claude: applied to the workflow (P1 build, `android_apk_build.yml`) 2026-07-04.
 - [ ] `--split-per-abi` — smallest per-file, but the release page grows three files per build
 
 ---
@@ -76,6 +77,8 @@ Phases are ordered by dependency, not by importance. P3 is the flagship user req
 ## P1 — Sign-in that works
 
 **Goal:** the APK you sideload from the prerelease page signs in successfully, first try.
+
+**Execution plan:** [plans/P1-signin.md](./plans/P1-signin.md) — verified auth-flow facts (file:line) + tasks. P2/P3 plans: [plans/](./plans/README.md). Correction to "mostly verification" below: Sri's Q9 stands — P0 shipped zero app code, so P1 **does** ship real app changes (build stamp, error surfacing, deep-link audit).
 
 **Why it was broken** (root cause, verified):
 1. Native Google Sign-In requires the APK signing cert's SHA-1/256 registered in the Firebase project. Upstream owns `based-hardware-dev`/`-prod`; a random keystore's cert isn't there → `ApiException: 10`. (The community `debug.keystore` we now use is upstream's shared one — its SHA is plausibly registered, but that's not provable from the repo.)
@@ -97,6 +100,8 @@ Phases are ordered by dependency, not by importance. P3 is the flagship user req
   - 🔵 Sri: agreed 2026-07-04.
 - [ ] Own Firebase + self-hosted backend immediately — days of setup before first working APK; blocks the fun parts
 - [ ] Local-only (no auth at all) — biggest surgery; becomes realistic only after P6's local queue exists (revisit inside P7)
+	🔵 Sri: may be weill be able to host this is free oracle cloud in future?!
+	🔵 Sri: the kaggle dataset where we use the data for training the moonshine and asr models can be used as cloud storage as well?!
 
 ---
 
@@ -127,7 +132,7 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 - [ ] Notification + tile + explicit intent (Tasker) 🟢
   - 🟢 Claude: the intent receiver is ~50 extra lines and instantly unlocks *every* automation app (Tasker, MacroDroid, KDE Connect) as a trigger source — cheapest leverage in the whole roadmap.
   - 🔵 Sri:
-- [ ] All of the above + in-app big-red-button redesign — UI polish can wait
+- [x] All of the above + in-app big-red-button redesign — UI polish can wait
 
 ---
 
@@ -162,7 +167,7 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 **Swallow sources:** repo's own BLE stack (`OmiBleManager.kt`, `BleCompanionService.kt`, `pigeon_interfaces.dart`); Media3 `MediaSessionService` official samples; `C:/Android_software/phonebatteryoptimization` sibling (BT connect/disconnect event handling reference).
 
 **Decision D3 — which button mechanism ships first**
-- [ ] MediaSession KeyEvents first, BLE GATT second 🟢
+- [x] MediaSession KeyEvents first, BLE GATT second 🟢
   - 🟢 Claude: your existing headsets/earbuds work day one with zero custom hardware; BLE GATT path already exists in-repo for omi wearables so it's a fast follow, not a rewrite.
   - 🔵 Sri:
 - [ ] BLE GATT first — only makes sense if your primary trigger device is an omi wearable/custom peripheral today
@@ -190,10 +195,10 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 
 **Swallow sources:** `OmiBatchAudioWriter.kt` (in-repo), Silero VAD ONNX, WebRTC VAD.
 
-**Decision D5 — VAD**
-- [ ] Silero VAD (ONNX) 🟢
+**Decision D5 — VAD** ✅ closed 2026-07-04
+- [x] Silero VAD (ONNX) 🟢
   - 🟢 Claude: near-SOTA accuracy, <1 ms/chunk on one CPU thread, ONNX runs everywhere; the report's default pick.
-  - 🔵 Sri:
+  - 🔵 Sri: agreed as the VAD. Also: **Moonshine-tiny streaming is a future option for sure** (tracked against D6/R1 — Moonshine is already an ASR candidate there), and **Sri is training models elsewhere** — link pending (see Q13). Ties into the `AsrEngine`-interface plan so a Sri-trained model can drop in.
 - [ ] WebRTC VAD — smaller/faster, more false positives; fine as a low-power pre-gate later
 - [ ] Moonshine integrated pipeline — couples VAD to the ASR choice (see D6); revisit if D6 lands on Moonshine anyway
 
@@ -310,6 +315,9 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 - [ ] ESP32-S3 if a custom audio front-end ever matters (vector ops for on-edge DSP)
 - [ ] EMG / ear-EEG / "brain-triggered capture": **research-only lane.** Current public results = small command vocabularies, fragile placement, session drift. Revisit yearly; keep the Trigger Router extensible so a future exotic trigger is just another input.
 - Copy the boring parts of omi's BLE protocol when the day comes (battery svc, device-info svc, one custom trigger/audio svc, codec characteristic, packet numbering — documented upstream).
+
+### Revisit backlog (deferred decisions to reopen later)
+- **APK shape (D0b):** currently arm64-only. Revisit fat/`--split-per-abi` if a non-arm64 target device appears or the release page needs multi-arch (Sri, 2026-07-04).
 
 ---
 

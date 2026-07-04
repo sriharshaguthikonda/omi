@@ -64,8 +64,15 @@ jobs:
 
       - name: Build dev release APK
         working-directory: app
-        # run_number as versionCode keeps upgrades in-place installable
-        run: flutter build apk --release --flavor dev --build-number=${{ github.run_number }}
+        # run_number as versionCode keeps upgrades in-place installable.
+        # arm64-only (D0b, 2026-07-04): smaller/faster, covers ~every modern phone.
+        # Revisit fat/split-per-abi if a non-arm64 target ever matters (see ROADMAP P10 revisit note).
+        run: >
+          flutter build apk --release --flavor dev --build-number=${{ github.run_number }}
+          --target-platform android-arm64
+          --dart-define=OMI_BUILD_SHA=${{ github.sha }}
+          --dart-define=OMI_BUILD_RUN=${{ github.run_number }}
+          --dart-define=OMI_BUILD_BRANCH=${{ github.ref_name }}
 
       - name: Rename APK
         working-directory: app
