@@ -211,7 +211,8 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 **Tasks**
 - [ ] Spike A: Moonshine Android (Maven package) — live latency + battery on your actual phone, 15-min session
 - [ ] Spike B (hedge): sherpa-onnx Android demo with a streaming model — same measurements
-- [ ] Pick engine (D6), integrate behind an `AsrEngine` interface (so the loser stays swappable-in)
+- [ ] Spike C (Sri's own): Sri has **ONNX models on his Kaggle** + shipped some in a **FUTO keyboard fork** (Q13). ONNX ⇒ drops straight into the ONNX-Runtime / sherpa-onnx path. Evaluate these as a first-class candidate: get the Kaggle link (Q13 follow-up), check task (ASR? VAD? wake-word?), streaming-capable?, size/latency on-device.
+- [ ] Pick engine (D6), integrate behind an `AsrEngine` interface — must accommodate a **Sri-supplied ONNX model** as a drop-in, not just Moonshine/sherpa.
 - [ ] Confidence score per segment surfaced to the queue (drives retention policy in P6)
 - [ ] Later: whisper.cpp as **batch re-checker** for low-confidence saved clips (never the live path)
 
@@ -219,8 +220,9 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 - [ ] Moonshine 🟢
   - 🟢 Claude: published streaming latency 34–107 ms vs Whisper-tiny's 277 ms+; Android Maven artifact; one focused SDK. Caveat tracked in license ledger: English models MIT, multilingual models are community-license (non-commercial) — fine for personal use, flagged if this ever ships publicly.
   - 🔵 Sri:
-- [ ] sherpa-onnx — broadest toolkit (VAD+KWS+ASR+wake word in one, Apache-2.0); more plumbing, more model-choice burden
+- [ ] sherpa-onnx — broadest toolkit (VAD+KWS+ASR+wake word in one, Apache-2.0); more plumbing, more model-choice burden. **Also the natural host for Sri's own ONNX models (Q13).**
 - [ ] Both permanently behind the interface — costs double maintenance; only if spikes tie
+- 🔵 Sri (Q13): has own ONNX models (Kaggle + FUTO keyboard fork) — wants them usable here. Leans the interface toward an ONNX-Runtime backend that can load Moonshine, sherpa, **or** a Sri-trained model.
 
 ---
 
