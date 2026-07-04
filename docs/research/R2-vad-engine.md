@@ -31,3 +31,12 @@ Personal Android app with a rolling audio buffer. Need a VAD to (a) gate the mic
 ## Why it matters
 
 Closes D5, sizes P4's VAD gate + segmentation. Keep it independent of D6 unless the ASR engine's bundled VAD is clearly better.
+
+
+
+
+
+
+
+
+

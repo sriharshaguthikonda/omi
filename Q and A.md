@@ -54,6 +54,12 @@ research on the way in the orderr you asked. will paste the research in the smae
 installed from the link below and sign falure says.....says failed to sign in via google, try again later. after it takes me to the webpage and i click my google accound and then it takes me back to the app but then gives red bottom banner with that error.
 
 > **A (Claude) — breakthrough, this narrows it a lot:** Your flow proves the web-auth lane is **working through the hard parts**: browser opened (so `USE_WEB_AUTH` is baked and the authorize URL is reachable), you picked your account, and it **returned to the app** (so the `omi://auth/callback` deep link fired). The failure is the **last step** — exchanging the code for a token at `api.omiapi.com/v1/auth/token`, or the Firebase custom-token sign-in. That collapses to the generic "failed to sign in with Google" banner. **Two things:** (1) The APK you installed is the **OLD apk-latest** (published before P1) — it has no build stamp and no error detail, so it can't tell you the real stage. (2) P1 just merged; the **new apk-latest is building now**. Reinstall it when I ping you: the red banner will **append the real failing stage** (e.g. `token-exchange:400` or `custom-token`), and the sign-in footer will show a build stamp. That exact stage tells us whether the community backend rejects the exchange or the custom-token step breaks — then it's a targeted fix, not a guess.
+> **A2 (Claude) — ROOT CAUSE CONFIRMED, and P1 did its job:** Your stamped-APK error is the smoking gun:
+> `[custom-token] [firebase_auth/custom-token-mismatch] The custom token corresponds to a different audience.`
+> The whole OAuth dance works; the **only** broken step is the very last one — Firebase rejects the token because it was minted for a **different Firebase project** than the app is built for. Concretely: the app is built for Firebase project **`based-hardware-dev`** (the prebuilt `google-services.json`/`firebase_options.dart`), but `api.omiapi.com` issues custom tokens for **another** project. The repo ships `based-hardware-dev` configs *and* points at `api.omiapi.com` — those two were **never a matched pair**. That's the bug, and it's config, not code.
+> **This is exactly why P1 shipped** (your Q9 point): without the build stamp + surfaced error we'd still be guessing. Now it's pinned.
+> **Codex is investigating the cheapest fix** (I'm orchestrating) — ranked options: (a) your own free Firebase project + matching config [most robust, ties to D7], (b) get the Firebase config that matches `api.omiapi.com`, (c) native Google sign-in path if the shared keystore SHA is registered in `based-hardware-dev`. I'll post the recommendation + exact change shortly, then build a fix APK for you to test. **No action from you yet** — hold.
+
 2. **Install the new APK when notified** — after P1 merges, the first real build lands at <https://github.com/sriharshaguthikonda/omi/releases/tag/apk-latest>. You'll get a push notification. The sign-in screen footer will show a **build stamp** (version+run+sha) — no stamp = old APK.
 3. **Open decision boxes in [ROADMAP.md](./ROADMAP.md)** — answer inline (🔵 line) or drop notes in scratch below: D0b APK shape, D2 trigger scope, D3 BT mechanism order, D5 VAD, D6 ASR engine, D7 sovereignty shape, D8 .memory transport. None block P1; **D2/D3 block P2/P3 execution start** (plans are written: [plans/](./plans/README.md)).
 4. **After install:** try sign-in, report stamp text + what happens, per item 1 format.
@@ -129,3 +135,10 @@ Sri: from i think their github repo somewhere in releases i guess
 
 3. i have answered d2 d3 in reoadmap...which branch you tell me since you create this mess.!
 4. if you need a answer for a question then you post here and update it in roadmap or where ever the fuck you use that question annswer!
+
+
+
+
+
+
+5. 

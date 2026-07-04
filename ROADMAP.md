@@ -80,19 +80,24 @@ Phases are ordered by dependency, not by importance. P3 is the flagship user req
 
 **Execution plan:** [plans/P1-signin.md](./plans/P1-signin.md) — verified auth-flow facts (file:line) + tasks. P2/P3 plans: [plans/](./plans/README.md). Correction to "mostly verification" below: Sri's Q9 stands — P0 shipped zero app code, so P1 **does** ship real app changes (build stamp, error surfacing, deep-link audit).
 
-**Why it was broken** (root cause, verified):
-1. Native Google Sign-In requires the APK signing cert's SHA-1/256 registered in the Firebase project. Upstream owns `based-hardware-dev`/`-prod`; a random keystore's cert isn't there → `ApiException: 10`. (The community `debug.keystore` we now use is upstream's shared one — its SHA is plausibly registered, but that's not provable from the repo.)
-2. Builds made without `.dev.env` get an empty `API_BASE_URL` (envied codegen) → even successful Firebase auth goes nowhere.
-3. The APK you originally downloaded had one or both problems baked in.
+**CONFIRMED ROOT CAUSE (2026-07-04, from the stamped APK's surfaced error):**
+`[custom-token] [firebase_auth/custom-token-mismatch] The custom token corresponds to a different audience.`
+The web-auth OAuth flow works end-to-end (browser → account → `omi://auth/callback` → token exchange succeeds). The **only** failure is the final `FirebaseAuth.signInWithCustomToken` (`app/lib/services/auth_service.dart:362-366`): the app is built for Firebase project **`based-hardware-dev`** (prebuilt `google-services.json`/`firebase_options.dart`, `project_id: based-hardware-dev`), but `api.omiapi.com` mints custom tokens for a **different** project. Repo ships `based-hardware-dev` configs *and* points at `api.omiapi.com` — never a matched pair. **Config bug, not code.** Fix tracked as P1.1 (Codex investigating ranked options; see [plans/P1-signin.md](./plans/P1-signin.md) Post-merge diagnosis).
 
-**The fix we ship (community lane):** upstream already solved this for community builds — `USE_WEB_AUTH=true` + `USE_AUTH_CUSTOM_TOKEN=true` routes sign-in through a **browser OAuth flow + Firebase custom token** (`app/lib/services/auth_service.dart:316,347`, `app/lib/pages/onboarding/custom_auth/`), which is signature-independent. P0's workflow bakes this in, so P1 is mostly *verification*, not construction.
+**Earlier hypotheses (superseded by the confirmed cause above, kept for history):**
+1. Native Google Sign-In SHA-not-registered → `ApiException: 10` (this is the *native* lane; we're on web-auth).
+2. Empty `API_BASE_URL` when `.dev.env` missing — ruled out; the CI build bakes it and the exchange reaches the backend.
+3. The originally-downloaded upstream APK had its own problems (Q7).
+
+**The community lane we ship:** `USE_WEB_AUTH=true` + `USE_AUTH_CUSTOM_TOKEN=true` = browser OAuth + Firebase custom token (`app/lib/services/auth_service.dart:197,362`), signature-independent. Works — *except* the custom token's Firebase project must match the app's. That match is P1.1.
 
 **Tasks**
-- [ ] Install CI APK → sign in via web-auth flow → confirm API calls hit `api.omiapi.com`
-- [ ] Also try native Google Sign-In (community keystore SHA may be registered upstream) — record which paths work
-- [ ] Document the exact sign-in path + failure modes in `docs/` (screenshot the flow once)
-- [ ] Add a visible build stamp (branch + short sha + run number) in app settings/about so we always know which APK is installed
-- [ ] If web-auth breaks: triage order — `USE_WEB_AUTH` flag reached envied codegen? → backend reachable? → upstream changed the custom-token endpoint?
+- [x] Visible **build stamp** (branch + short sha + run number + auth-lane) on sign-in footer + About — done, proven on-device (it's what surfaced the root cause)
+- [x] **Surface real sign-in error + stage** (dev flavor) — done, pinpointed `custom-token-mismatch`
+- [x] Install CI APK → run web-auth flow → confirmed it reaches `api.omiapi.com` and fails only at Firebase custom-token
+- [ ] **P1.1 fix the audience mismatch** (Codex ranking: own Firebase / matching community config / native-lane) → build fix APK → Sri re-tests
+- [ ] Also try native Google Sign-In (shared keystore SHA may be registered in `based-hardware-dev`) — one of the P1.1 options
+- [ ] Document the final working sign-in path in `docs/` once P1.1 lands
 
 **Decision D1 — auth lane going forward** ✅ closed 2026-07-04
 - [x] **Community lane now** (upstream dev Firebase + api.omiapi.com), sovereignty deferred to P7 — agreed 2026-07-04

@@ -102,6 +102,16 @@ class BuildStamp extends StatelessWidget { final bool compact; ... } // FutureBu
 - [ ] **Step 4:** Update ROADMAP P0/P1 checkboxes + Q&A; PushNotification Sri: install + read stamp + report per checklist item 1.
 - [ ] **Step 5:** Sri verification: stamp visible on sign-in screen; sign-in attempt; if failure → error text now tells us the failing stage → targeted fix next.
 
+## Post-merge diagnosis (ready for Sri's error-stage report)
+
+Sri's flow (old apk-latest, pre-stamp): Google → browser opens → picks account → returns to app → red banner "failed to sign in via google". So browser launch + `omi://auth/callback` both work; failure is post-callback. `authenticateWithProvider` (auth_service.dart:197-317) swallows any inner exception → returns null → `authFailedToSignInWithGoogle`. The new build's `AuthErrorLog` names the real stage. Ranked hypotheses + fix directions:
+
+- **H1 — `token-exchange:<4xx>` (most likely).** `_exchangeCodeForOAuthCredentials` (auth_service.dart:319-354) POSTs to `api.omiapi.com/v1/auth/token` and gets non-200. Causes: PKCE `code_verifier`/`code_challenge` mismatch, `redirect_uri` not allow-listed for the community client, code expired, or the community backend doesn't fully implement this exchange. **Fix:** read the exact status + body now surfaced in the banner; if 400/401, compare against upstream's expected `/v1/auth/authorize`+`/v1/auth/token` contract; may need a client identifier the community lane omits.
+- **H2 — `custom-token` (Firebase audience mismatch).** `_signInWithOAuthCredentials` → `signInWithCustomToken` (auth_service.dart:362-366) throws. The CI workflow copies the SAME prebuilt `firebase_options.dart` into both `firebase_options_dev.dart` and `_prod.dart`; if that prebuilt project ≠ the Firebase project the backend's custom token is minted for, Firebase rejects with "custom token corresponds to a different audience." **Fix:** confirm the prebuilt `app/setup/prebuilt/firebase_options.dart` project id matches the backend token issuer; if mismatched, the community lane needs the matching options.
+- **H3 — `token-exchange:error` / other.** Network/JSON. Fix per surfaced text.
+
+When Sri reports the stage: pick H1/H2/H3, delegate the fix to Codex with the exact stage + this section, Claude reviews, ship as P1.1.
+
 ## Phase exit
 
 - [ ] Sri signs in successfully from a stamped prerelease APK, or the surfaced error pinpoints the failing stage and the targeted fix is queued.
