@@ -112,6 +112,16 @@ Sri's flow (old apk-latest, pre-stamp): Google → browser opens → picks accou
 
 When Sri reports the stage: pick H1/H2/H3, delegate the fix to Codex with the exact stage + this section, Claude reviews, ship as P1.1.
 
+### P1.1 — confirmed H2, native-lane fix + decision fork (2026-07-04)
+
+**Decisive evidence:** the shared prebuilt `debug.keystore` SHA-1 = `50f87a68e0496a85d6644d54426406866dab3598`, and that exact hash is an Android OAuth client `certificate_hash` in `app/setup/prebuilt/google-services.json` for `based-hardware-dev` (com.friend.ios.dev). So **native Google Sign-In will pass** — the cert is registered. Fix shipped: CI `.dev.env` flipped to `USE_WEB_AUTH=false` + `USE_AUTH_CUSTOM_TOKEN=false` → native lane → a `based-hardware-dev` session that matches the app config → no custom token, no audience mismatch.
+
+**Open risk (only a live install resolves it):** the mismatch proves `api.omiapi.com` mints for a project ≠ `based-hardware-dev`, so it may also **reject `based-hardware-dev` ID tokens** on API calls. Two outcomes, predetermined next step each:
+- **Outcome A — full success:** signs in AND app loads data. Native lane is the fix. Tick P1, document the working path, done.
+- **Outcome B — signs in but data fails (API 401/403):** native fixed the sign-in *screen*, but `api.omiapi.com` isn't on `based-hardware-dev`. Then the community lane fundamentally needs a **Firebase config matching `api.omiapi.com`** (not in repo) or **Sri's own Firebase + self-hosted backend** (bring the auth slice of P7/D7 forward). Pivot there; do **not** keep guessing configs.
+
+Build stamp will read `native-auth` so Sri can confirm he's on the fixed APK. This one install is worth it — it resolves the api-acceptance question that can't be answered from the repo.
+
 ## Phase exit
 
 - [ ] Sri signs in successfully from a stamped prerelease APK, or the surfaced error pinpoints the failing stage and the targeted fix is queued.
