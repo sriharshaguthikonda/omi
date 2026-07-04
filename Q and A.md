@@ -33,7 +33,12 @@ Protocol: either side appends. Questions get numbered `Q<n>`. Answers go directl
 
 ## Open — needs Sri
 
-(nothing right now)
+**Checklist (2026-07-04) — do these while Claude/Codex implement P1:**
+
+1. **Sign-in failure details** (unblocks P1 verification): exact error text or screenshot; which button you tapped (Google / Apple / anything browser-based); where that APK came from (upstream releases page, or the CI artifact zip from run 28690006580?).
+2. **Install the new APK when notified** — after P1 merges, the first real build lands at <https://github.com/sriharshaguthikonda/omi/releases/tag/apk-latest>. You'll get a push notification. The sign-in screen footer will show a **build stamp** (version+run+sha) — no stamp = old APK.
+3. **Open decision boxes in [ROADMAP.md](./ROADMAP.md)** — answer inline (🔵 line) or drop notes in scratch below: D0b APK shape, D2 trigger scope, D3 BT mechanism order, D5 VAD, D6 ASR engine, D7 sovereignty shape, D8 .memory transport. None block P1; **D2/D3 block P2/P3 execution start** (plans are written: [plans/](./plans/README.md)).
+4. **After install:** try sign-in, report stamp text + what happens, per item 1 format.
 
 ---
 
