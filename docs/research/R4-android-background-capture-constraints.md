@@ -2,6 +2,10 @@
 
 **Priority: HIGHEST.** This is a sleeper risk: if modern Android forbids the capture pattern we're designing, we need to know *before* building P2–P4, not after.
 
+
+https://chatgpt.com/c/6a48a44e-c794-83ee-9ea9-67438fd6cc2a
+
+
 ## Context (for the researcher)
 
 I'm building a personal Android app (targeting recent Android, `targetSdk` 34/35) that must:

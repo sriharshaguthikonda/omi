@@ -69,3 +69,47 @@
 8. Delegate any code fix to Codex: `codex exec --full-auto --cd <worktree> --output-last-message <scratch>/out.txt "<task>"` (background, then read out.txt).
 9. Memory search `project=omi` for build recipe + decisions before re-deriving anything.
 10. PushNotification Sri when apk-latest is downloadable.
+
+---
+
+## 2026-07-04T~06:00Z — P1 implemented + reviewed, arm64 build running, merge-on-green pending
+
+### CRITICAL rules (Sri, this session)
+- **NO separate worktrees.** Sri was angry about `omi-phase0`. It's DELETED. Work branches in the main repo folder `C:/Android_software/omi` directly. Current branch: `feature/phase1-signin`.
+- **"merge yourself"** — Claude self-merges fork PRs autonomously: regular merge (NEVER squash), fork `sriharshaguthikonda/omi` main only. **NEVER touch upstream `BasedHardware/omi`** (Q10).
+- **"codex cli as worker, you orchestrate"** — Codex CLI = implementation + review passes; Claude = orchestrate + correct. Announce who's lifting. Codex quota short-cycles (dead ~10:40 IST, back ~10:58 same day) — retry before falling back to Claude subagents.
+- Q&A channel = `Q and A.md` at repo ROOT (tracked). Sri edits it LIVE mid-session — re-read the scratch section (bottom) often; fold notes into numbered Q's.
+
+### Current state
+- Branch `feature/phase1-signin` pushed, HEAD ~`e6740b52c`. Phase0 already merged to main (PR #2).
+- **P1 code DONE** (Codex impl + Claude corrected + Codex review = **SHIP, 0 blockers**). Files:
+  - `app/lib/widgets/build_stamp.dart` — `BuildInfo` (dart-define `OMI_BUILD_SHA`/`OMI_BUILD_RUN`/`OMI_BUILD_BRANCH`, defaults local/0/dev) + `BuildStamp` widget.
+  - `app/lib/services/auth_error_log.dart` + `app/lib/backend/preferences.dart` (`lastAuthError` get/set) — persist last sign-in failure w/ stage.
+  - `app/lib/services/auth_service.dart` — `AuthErrorLog.record('<stage>', e)` on every web-auth failure branch only.
+  - `app/lib/providers/auth_provider.dart` — `_authErrorMessage()` appends real error, **dev-gated** via `F.env == Environment.dev`.
+  - `app/lib/pages/settings/developer.dart` — "Last sign-in error" row. `about.dart` + `pages/onboarding/auth.dart` — `BuildStamp` mounted.
+  - `app/test/widgets/build_stamp_test.dart` — widget test (can't run: no flutter locally, no test-CI on push).
+  - `.github/workflows/android_apk_build.yml` — bakes dart-defines + **arm64-only** (`--target-platform android-arm64`, D0b).
+  - Manifest: NO change (Claude reverted Codex's redundant `omi://auth` filter — generic `omi://` at `AndroidManifest.xml:172-177` already catches the callback; see memory `mem_20260704_android-deep-link-intent_c676bc`).
+
+### NEXT STEPS (in order) — resume here
+1. **Watch arm64 build** run `28697117742` (Monitor task `bjmkv4ecg` armed; may already have fired). Green = compile verification (only path — no local flutter).
+2. On green: `gh pr create --repo sriharshaguthikonda/omi --base main --head feature/phase1-signin --title "P1: sign-in build stamp + error surfacing"` → `gh pr merge <n> --repo sriharshaguthikonda/omi --merge` (self-merge authorized).
+3. Main push → main APK build → publishes `https://github.com/sriharshaguthikonda/omi/releases/tag/apk-latest`. PushNotification Sri: install, read the build stamp on sign-in footer, try sign-in, report per Q&A checklist item 1.
+4. **Then Q11 sync-fork** (deferred until P1 merged): `git fetch upstream main` (upstream remote added; +149 commits, 0 conflicts via merge-tree). Web Sync-fork button fails because upstream touched `.github/workflows/**`. Do it via local `git checkout main && git merge upstream/main` → push branch → PR → self-merge. Direction upstream→fork ONLY.
+
+### Open — needs Sri (non-blocking, in Q&A)
+- **Q13:** link to models Sri is "training elsewhere" (wire into D6 ASR + `AsrEngine` interface).
+- Sign-in error details (exact text/screenshot, which button, APK source).
+- Decisions still OPEN: **D2** (trigger scope) + **D3** (BT mechanism order) — these GATE P2/P3 execution start. Also D6 (ASR), D7 (sovereignty), D8 (transport).
+- Closed this session: D0b (arm64), D5 (Silero VAD). Earlier: D0a, D1, D4.
+
+### Artifacts created this session
+- Plans: `plans/README.md` + `plans/P1-signin.md` + `plans/P2-triggers-v1.md` + `plans/P3-bt-trigger-matrix.md`.
+- Research pack (Sri runs via ChatGPT Deep Research): `docs/research/README.md` + `R1..R6` (priority R4→R3→R1→R2→R5→R6). Public-safe.
+- Memory: `mem_20260704_omi-fork-session-2026-07_78f542` (project_state, updated), `mem_20260704_android-deep-link-intent_c676bc` (deep-link lesson).
+
+### Gotchas
+- No flutter/dart on PATH locally → cannot run `flutter analyze`/tests/build. CI APK build = the only compile check. Sri exercises real sign-in on device.
+- gh run status can lag; trust fresh `gh run view <id> --json status,conclusion`.
+- Memory `remember`/`update`: no `→`/unicode arrows (charmap encode error); `update` takes `patch` not `content`; `source_ref` must be under raw_logs/context_packs/hardcopy or omitted.

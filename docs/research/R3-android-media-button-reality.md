@@ -2,6 +2,11 @@
 
 **Priority: HIGH.** This determines whether the flagship feature (P3: "any button on any of my BT devices triggers capture") is achievable on real hardware or needs a fallback.
 
+
+
+https://chatgpt.com/c/6a48a502-4654-83e8-9c8d-5ddf535c5129
+
+
 ## Context (for the researcher)
 
 Personal Android app. I want any button on any paired Bluetooth device (classic A2DP/AVRCP headsets, TWS earbuds, BLE HID remotes) to trigger an action in my app — start/stop/mark a recording. Plan: hold an active `MediaSession` while "armed" and receive `KeyEvent`s (play/pause/next/prev, single/double/long-press). I need the real-world truth, not the happy-path docs.
