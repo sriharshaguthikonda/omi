@@ -141,4 +141,7 @@ Sri: from i think their github repo somewhere in releases i guess
 
 
 
-5. 
+5. see there should be already fixes and issues elsewhere in their repository, others might have solved the problem already.
+
+6. don't reinvent the wheel for all things, see if there is already a problem solved by others and just grab it
+7. use branches through other agents build other features and merge you already have research documents available.
