@@ -33,6 +33,8 @@ Protocol: either side appends. Questions get numbered `Q<n>`. Answers go directl
 
 ## Open — needs Sri
 
+**Q13 (Claude → Sri, 2026-07-04):** you wrote in D5 "i am training models elsewhere — link that." Drop the link/repo/notes here and I'll wire it into the ROADMAP (D6 ASR + the `AsrEngine` interface) so your trained model is a first-class drop-in candidate alongside Moonshine/sherpa. What is it — a fine-tuned ASR, a VAD, a wake-word, something else? What framework/output format (ONNX? TFLite?)?
+
 **Q12 (Sri, 2026-07-04):** post deep-research areas here; I'll run them through ChatGPT Deep Research. Link a file describing what to research.
 
 > **A:** Done — [docs/research/](./docs/research/README.md) has 6 self-contained, public-safe topic files (paste each whole file as the ChatGPT prompt). Ordered by priority: **R4** (Android 14/15 background-mic constraints — could reshape the trigger design, do first), **R3** (BT media-button reality — flagship P3 feasibility), **R1** (on-device ASR engine), R2 (VAD), R5 (offline sync transport), R6 (self-host backend footprint). Each maps to an open ROADMAP decision (D5/D6/D7/D8) or a phase feasibility question. Bring findings back as a `## Findings` section in the file or a share-link + TL;DR here; I fold accepted answers into the matching decision box.

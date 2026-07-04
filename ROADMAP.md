@@ -195,10 +195,10 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 
 **Swallow sources:** `OmiBatchAudioWriter.kt` (in-repo), Silero VAD ONNX, WebRTC VAD.
 
-**Decision D5 — VAD**
+**Decision D5 — VAD** ✅ closed 2026-07-04
 - [x] Silero VAD (ONNX) 🟢
   - 🟢 Claude: near-SOTA accuracy, <1 ms/chunk on one CPU thread, ONNX runs everywhere; the report's default pick.
-  - 🔵 Sri: we will do moonshine tiny streaming in future anyway as on option for sure. i am training models elsewehre link that 
+  - 🔵 Sri: agreed as the VAD. Also: **Moonshine-tiny streaming is a future option for sure** (tracked against D6/R1 — Moonshine is already an ASR candidate there), and **Sri is training models elsewhere** — link pending (see Q13). Ties into the `AsrEngine`-interface plan so a Sri-trained model can drop in.
 - [ ] WebRTC VAD — smaller/faster, more false positives; fine as a low-power pre-gate later
 - [ ] Moonshine integrated pipeline — couples VAD to the ASR choice (see D6); revisit if D6 lands on Moonshine anyway
 
