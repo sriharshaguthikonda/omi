@@ -64,11 +64,12 @@ Phases are ordered by dependency, not by importance. P3 is the flagship user req
 - [ ] Artifacts only — requires GitHub login + unzip on phone
 - [ ] Tagged releases only — manual step per build
 
-**Decision D0b — APK shape** (fat is what the workflow currently builds; debate stays open)
-- [ ] Fat APK (all ABIs, ~1 file, biggest download) 🟢
+**Decision D0b — APK shape** ✅ closed 2026-07-04
+- [ ] Fat APK (all ABIs, ~1 file, biggest download)
   - 🟢 Claude: zero pick-the-right-file friction; switch to arm64-only later if build time or size ever hurts.
-  - 🔵 Sri: arm 64 for now but in future we will revisit put it somewehre in plan to revisit
 - [x] `--target-platform android-arm64` only — smaller/faster, covers virtually every modern phone
+  - 🔵 Sri: arm64 for now, revisit in future (revisit marker added to P10).
+  - 🟢 Claude: applied to the workflow (P1 build, `android_apk_build.yml`) 2026-07-04.
 - [ ] `--split-per-abi` — smallest per-file, but the release page grows three files per build
 
 ---
@@ -314,6 +315,9 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 - [ ] ESP32-S3 if a custom audio front-end ever matters (vector ops for on-edge DSP)
 - [ ] EMG / ear-EEG / "brain-triggered capture": **research-only lane.** Current public results = small command vocabularies, fragile placement, session drift. Revisit yearly; keep the Trigger Router extensible so a future exotic trigger is just another input.
 - Copy the boring parts of omi's BLE protocol when the day comes (battery svc, device-info svc, one custom trigger/audio svc, codec characteristic, packet numbering — documented upstream).
+
+### Revisit backlog (deferred decisions to reopen later)
+- **APK shape (D0b):** currently arm64-only. Revisit fat/`--split-per-abi` if a non-arm64 target device appears or the release page needs multi-arch (Sri, 2026-07-04).
 
 ---
 
