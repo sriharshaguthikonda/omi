@@ -9,6 +9,7 @@ import 'package:omi/core/app_shell.dart';
 import 'package:omi/services/auth_service.dart';
 import 'package:omi/pages/settings/developer.dart';
 import 'package:omi/pages/settings/notifications_settings_page.dart';
+import 'package:omi/pages/onboarding/wrapper.dart';
 import 'package:omi/pages/settings/permissions_page.dart';
 import 'package:omi/pages/settings/profile.dart';
 import 'package:omi/pages/memories/page.dart';
@@ -284,6 +285,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
 
   List<_SearchableItem> _buildSearchableItems(BuildContext context) {
     final deviceProvider = Provider.of<DeviceProvider>(context, listen: false);
+    final isSignedIn = AuthService.instance.isSignedIn();
 
     void goToProfile() => routeToPage(context, const ProfilePage());
     void goToNotifications() => routeToPage(context, const NotificationsSettingsPage());
@@ -303,6 +305,13 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
 
     void goToMemories() => routeToPage(context, const MemoriesPage());
     void goToDeveloper() async => await routeToPage(context, const DeveloperSettingsPage());
+    void goToCloudSignIn() {
+      Navigator.of(context).pop();
+      final rootCtx = globalNavigatorKey.currentContext;
+      if (rootCtx != null && rootCtx.mounted) {
+        routeToPage(rootCtx, const OnboardingWrapper());
+      }
+    }
 
     const profileIcon = FaIcon(FontAwesomeIcons.solidUser, color: Color(0xFF8E8E93), size: 20);
     const notifIcon = FaIcon(FontAwesomeIcons.solidBell, color: Color(0xFF8E8E93), size: 20);
@@ -419,38 +428,47 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
         icon: const FaIcon(FontAwesomeIcons.gift, color: Color(0xFF8E8E93), size: 20),
         onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ReferralPage())),
       ),
-      // --- Sign Out ---
-      _SearchableItem(
-        title: context.l10n.signOut,
-        icon: const FaIcon(FontAwesomeIcons.rightFromBracket, color: Color(0xFF8E8E93), size: 20),
-        onTap: () async {
-          final navigator = Navigator.of(context);
-          navigator.pop();
-          await showDialog(
-            context: context,
-            builder: (ctx) {
-              return getDialog(
-                ctx,
-                () => Navigator.of(ctx).pop(),
-                () async {
-                  Navigator.of(ctx).pop();
-                  final rootCtx = globalNavigatorKey.currentContext;
-                  if (rootCtx != null && rootCtx.mounted) {
-                    clearAllUserState(rootCtx);
-                  }
-                  await SharedPreferencesUtil().clear();
-                  await AuthService.instance.signOut();
-                  if (rootCtx != null && rootCtx.mounted) {
-                    routeToPage(rootCtx, const AppShell(), replace: true);
-                  }
-                },
-                context.l10n.signOutQuestion,
-                context.l10n.signOutConfirmation,
-              );
-            },
-          );
-        },
-      ),
+      if (isSignedIn) ...[
+        // --- Sign Out ---
+        _SearchableItem(
+          title: context.l10n.signOut,
+          icon: const FaIcon(FontAwesomeIcons.rightFromBracket, color: Color(0xFF8E8E93), size: 20),
+          onTap: () async {
+            final navigator = Navigator.of(context);
+            navigator.pop();
+            await showDialog(
+              context: context,
+              builder: (ctx) {
+                return getDialog(
+                  ctx,
+                  () => Navigator.of(ctx).pop(),
+                  () async {
+                    Navigator.of(ctx).pop();
+                    final rootCtx = globalNavigatorKey.currentContext;
+                    if (rootCtx != null && rootCtx.mounted) {
+                      clearAllUserState(rootCtx);
+                    }
+                    await SharedPreferencesUtil().clear();
+                    await AuthService.instance.signOut();
+                    if (rootCtx != null && rootCtx.mounted) {
+                      routeToPage(rootCtx, const AppShell(), replace: true);
+                    }
+                  },
+                  context.l10n.signOutQuestion,
+                  context.l10n.signOutConfirmation,
+                );
+              },
+            );
+          },
+        ),
+      ] else ...[
+        // --- Cloud Sign In ---
+        _SearchableItem(
+          title: context.l10n.connectTo('Omi Cloud'),
+          icon: const FaIcon(FontAwesomeIcons.cloudArrowUp, color: Color(0xFF8E8E93), size: 20),
+          onTap: goToCloudSignIn,
+        ),
+      ],
     ];
 
     return items;
@@ -482,6 +500,8 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
   Widget _buildOmiModeContent(BuildContext context) {
     return Consumer<UsageProvider>(
       builder: (context, usageProvider, child) {
+        final isSignedIn = AuthService.instance.isSignedIn();
+
         return Column(
           children: [
             // Profile & Notifications Section
@@ -689,47 +709,60 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
             ),
             const SizedBox(height: 32),
 
-            // Sign Out Section
+            // Cloud Account Section
             _buildSectionContainer(
               children: [
-                _buildSettingsItem(
-                  title: context.l10n.signOut,
-                  icon: const FaIcon(FontAwesomeIcons.rightFromBracket, color: Color(0xFF8E8E93), size: 20),
-                  onTap: () async {
-                    final navigator = Navigator.of(context);
+                if (isSignedIn)
+                  _buildSettingsItem(
+                    title: context.l10n.signOut,
+                    icon: const FaIcon(FontAwesomeIcons.rightFromBracket, color: Color(0xFF8E8E93), size: 20),
+                    onTap: () async {
+                      final navigator = Navigator.of(context);
 
-                    navigator.pop(); // Close the settings drawer
+                      navigator.pop(); // Close the settings drawer
 
-                    await showDialog(
-                      context: context,
-                      builder: (ctx) {
-                        return getDialog(
-                          ctx,
-                          () => Navigator.of(ctx).pop(),
-                          () async {
-                            Navigator.of(ctx).pop();
-                            // The drawer's context is unmounted by the time we
-                            // get here (we popped it before opening the
-                            // confirm dialog), so routing through it is a
-                            // silent no-op. Use the root navigator instead so
-                            // we always land back on the auth screen.
-                            final rootCtx = globalNavigatorKey.currentContext;
-                            if (rootCtx != null && rootCtx.mounted) {
-                              clearAllUserState(rootCtx);
-                            }
-                            await SharedPreferencesUtil().clear();
-                            await AuthService.instance.signOut();
-                            if (rootCtx != null && rootCtx.mounted) {
-                              routeToPage(rootCtx, const AppShell(), replace: true);
-                            }
-                          },
-                          context.l10n.signOutQuestion,
-                          context.l10n.signOutConfirmation,
-                        );
-                      },
-                    );
-                  },
-                ),
+                      await showDialog(
+                        context: context,
+                        builder: (ctx) {
+                          return getDialog(
+                            ctx,
+                            () => Navigator.of(ctx).pop(),
+                            () async {
+                              Navigator.of(ctx).pop();
+                              // The drawer's context is unmounted by the time we
+                              // get here (we popped it before opening the
+                              // confirm dialog), so routing through it is a
+                              // silent no-op. Use the root navigator instead so
+                              // we always land back on the auth screen.
+                              final rootCtx = globalNavigatorKey.currentContext;
+                              if (rootCtx != null && rootCtx.mounted) {
+                                clearAllUserState(rootCtx);
+                              }
+                              await SharedPreferencesUtil().clear();
+                              await AuthService.instance.signOut();
+                              if (rootCtx != null && rootCtx.mounted) {
+                                routeToPage(rootCtx, const AppShell(), replace: true);
+                              }
+                            },
+                            context.l10n.signOutQuestion,
+                            context.l10n.signOutConfirmation,
+                          );
+                        },
+                      );
+                    },
+                  )
+                else
+                  _buildSettingsItem(
+                    title: context.l10n.connectTo('Omi Cloud'),
+                    icon: const FaIcon(FontAwesomeIcons.cloudArrowUp, color: Color(0xFF8E8E93), size: 20),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      final rootCtx = globalNavigatorKey.currentContext;
+                      if (rootCtx != null && rootCtx.mounted) {
+                        routeToPage(rootCtx, const OnboardingWrapper());
+                      }
+                    },
+                  ),
               ],
             ),
             const SizedBox(height: 32),
