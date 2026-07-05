@@ -17,7 +17,8 @@ enum SttProvider {
   localWhisper,
   custom,
   customLive,
-  onDeviceWhisper;
+  onDeviceWhisper,
+  onDeviceMoonshine;
 
   static SttProvider fromString(String value) {
     return SttProvider.values.firstWhere((e) => e.name == value, orElse: () => SttProvider.omi);
@@ -368,6 +369,22 @@ class SttProviderConfig {
       defaultModel: 'tiny',
       responseSchema: SttResponseSchema.openAI,
     ),
+    SttProvider.onDeviceMoonshine: SttProviderConfig(
+      provider: SttProvider.onDeviceMoonshine,
+      displayName: 'On-Device Moonshine',
+      description: 'Run Moonshine streaming speech recognition locally on your device',
+      icon: FontAwesomeIcons.microchip,
+      requestType: SttRequestType.streaming,
+      supportedLanguages: const ['en'],
+      supportedModels: const [
+        'moonshine-streaming-tiny',
+        'moonshine-streaming-small',
+        'moonshine-streaming-medium',
+      ],
+      defaultLanguage: 'en',
+      defaultModel: 'moonshine-streaming-tiny',
+      responseSchema: const SttResponseSchema(),
+    ),
   };
 
   static SttProviderConfig get(SttProvider provider) => _configs[provider]!;
@@ -527,6 +544,13 @@ class SttProviderConfig {
       case SttProvider.customLive:
         config['url'] = 'wss://your-stt-api.com/stream';
         config['params'] = {'language': lang};
+        break;
+
+      case SttProvider.onDeviceMoonshine:
+        config['params'] = {
+          'language': lang,
+          'model': mdl.isNotEmpty ? mdl : 'moonshine-streaming-tiny',
+        };
         break;
 
       case SttProvider.omiParakeet:
