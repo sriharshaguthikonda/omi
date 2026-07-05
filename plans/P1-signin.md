@@ -124,11 +124,45 @@ Build stamp will read `native-auth` so Sri can confirm he's on the fixed APK. Th
 
 **Codex D verdict (2026-07-04, independent, converges):** ranks native lane (a) as the cheapest test; validated the exact CI change (commit `069536e`). Backend evidence it added: `backend/routers/auth.py:636,645,1010` mints the custom token from backend runtime credentials (not app config), and `backend/deploy/runtime_env.yaml:5,6,61` points the prod backend at project **`based-hardware`** (prod) — so api.omiapi.com likely verifies `based-hardware`(prod) tokens (`backend/dependencies.py:31`), making **Outcome B more likely**. Exact signer needs the `custom_token` JWT `iss`/`sub` decoded (secret-dependent, can't derive from repo). No real prod `google-services.json` is committed (injected at build), so there's **no prod-config shortcut** — Outcome B → own-Firebase.
 
+### P1.1 live test result - Outcome B confirmed (2026-07-05)
+
+Full report: [docs/investigations/2026-07-05-community-build-auth.md](../docs/investigations/2026-07-05-community-build-auth.md).
+
+ADB on Sri's connected phone tested build `v1.0.542+10 · native-auth · main@cbfce78 · run 10` (`com.friend.ios.dev`). Native Google Firebase sign-in succeeded, proving the shared debug SHA path works. The next authenticated backend call, `GET https://api.omiapi.com/v1/users/onboarding`, returned `401 {"detail":"Invalid authorization token"}` even after token refresh, and `makeApiCall` signed the user out.
+
+Root cause is now the broader project mismatch from upstream issue #5939: the app signs into `based-hardware-dev`, while `api.omiapi.com` verifies against `based-hardware`. Native-auth removes the custom-token error, but cannot make the backend accept a token from the wrong Firebase project.
+
+Next P1.2 decision must choose one:
+
+- obtain matching `based-hardware` Firebase config for the app;
+- bring forward own Firebase + minimal backend shim/self-host backend from P7/D7;
+- strip cloud auth/local-only, larger surgery.
+
+Do not keep trying auth flag combinations against `api.omiapi.com`; the live backend token verifier is the blocker.
+
 **Sri must test TWO stages (not just the sign-in screen):**
 1. Google sign-in completes (no browser/custom-token error).
 2. **After sign-in, app data / API calls work — NOT 401/403.**
 
 Option (b) (web-auth + no custom-token) is **skipped** — Codex: it just moves the failure to `firebase-credential` with the same API-token risk. If stage 2 fails, **stop trying flag combos** → P1.2 = Sri's own Firebase + self-hosted `backend/` (guaranteed matched signer/app/backend; `docs/doc/developer/backend/Backend_Setup.mdx`).
+
+### P1.2 — Local-first pivot (2026-07-05, decided)
+
+Outcome B confirmed → the community cloud lane is unwinnable (cross-project token mismatch, #5939 won't-fix). **P1.2 abandons "make cloud sign-in work" and removes the mandatory login gate instead.** Cloud becomes optional; on-device Moonshine STT (P5) is pulled forward. Work branch: `feature/local-first`.
+
+**Won't-fix:** "sideloaded APK signs into `api.omiapi.com`" — structurally impossible for a `based-hardware-dev` build. Re-enable cloud later only via self-host (P7/D7) with a matched Firebase project.
+
+**Phase A — de-mandatory login:**
+- Flip the gate: `app/lib/mobile/mobile_app.dart:20` `else`-branch → local-only Home instead of forcing `DeviceSelectionPage`.
+- Represent no-auth as a **local/guest uid** (not empty) — `SharedPreferencesUtil().uid` is read in 21 files; startup-critical: `main.dart`, `core/app_shell.dart`, `providers/{memories,app,phone_call}_provider.dart`, `services/sockets/transcription_service.dart`, `pages/onboarding/wrapper.dart`. Already no-auth-tolerant: `shared.dart:77` (headers only `if isSignedIn()`), `capture_controller.dart:1478` (guards `!isSignedIn()`).
+- Move Omi-cloud sign-in to an **optional Settings row** (red "Not connected"); gate cloud features (conversations/chat/memories) behind toggles — reuse `preferences.dart` `getBool`/`saveBool` + grey `Color(0xFF8E8E93)` / cloud-off badge.
+- First step: **Codex guest-safety pass** (gpt-5.5 medium, single job) enumerates the exact per-file guards before editing.
+
+**Phase B — on-device Moonshine streaming (D6 closed):** Moonshine Voice native SDK (`ai.moonshine:moonshine-voice` / `moonshine-swift`) + `UsefulSensors/moonshine-streaming-{tiny,small,medium}`, wired as `OnDeviceMoonshineSocket implements IPureSocket` → existing `TranscriptSegment` UI. B0 first: reuse check (FUTO = reference only per license ledger; omi forks = cherry-pick MIT).
+
+**Intelligence:** cloud chat/summaries → user-provided cheap LLM (Gemini Flash-tier or existing free provider chain) behind the same cloud toggle (Sri, Q&A item 12).
+
+**Verify:** dev APK boots with no login → usable local Home; cloud features greyed, no 401 spam; sign-in still reachable in Settings; Moonshine toggle → live transcript segments.
 
 ## Phase exit
 

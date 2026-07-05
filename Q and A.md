@@ -158,5 +158,96 @@ Sri: from i think their github repo somewhere in releases i guess
 10. asshole talk to me at the end of this file. dont wirte stuff in some hole...where i cant find where you have written ?!?! what is the point ot writing a mail if you send it to wrong address 
 
 
+11. you incompetent fucking asshole it is still not working i don't know what can be hosted on oracle cloud lets discuss
+11a . the version says v1.0.542 plus 10 native auth main at the rate of cbfce78 run 10.
+12. or do we need another strategy when we strip down this unnecessary code that uses their cloud and use local transcription, use local gemini model as intelligence. i don't know there is one very good price performance gemini 4 model something and other things, keep it on a separate branch
 
+
+
+
+## agent log 2026-07-04
+
+
+## user comments
+1. i have the official app installed as well.
+2. sorry about it, i will uninstall the official app if you want to collect the debug info from that you can collect, save it somewhere.
+3. and then tell me to uninstall it or i'll uninstall it
+4. see what models are avialabe dont abuse gpt 5.5 extra high for defaults, don't do that, see what other models are available
+5. completely unrelated. - if you have got the changed contents from the q&a file into your context. there were some pre-tool and post-tool hooks that were supposed to run and inject.
+
+## agent log 2026-07-05
+
+> **A:** Investigation done. Do **not** uninstall the official app for this bug; `com.friend.ios.dev` and `com.friend.ios` coexist and I tested the dev package directly over ADB.
+
+> **A:** Live result: native Google sign-in succeeds, then `https://api.omiapi.com/v1/users/onboarding` rejects the Firebase ID token with `401 {"detail":"Invalid authorization token"}` and the app signs itself out. This is a backend/project mismatch, not a button/deep-link/signing failure. Full report: `docs/investigations/2026-07-05-community-build-auth.md`.
+
+> **A:** I checked upstream first. Existing issue `BasedHardware/omi#5939` reports the same dev-Firebase vs prod-backend mismatch and is closed as not planned; I found no merged PR to grab. Issue `#7631` is related auth fallout but not the root cause.
+
+> **A:** Your Q&A hook contents were in context. I also read this file directly and am now writing only at the end. I tried a Codex CLI worker; `gpt-5-mini` was unsupported, and the default picked `gpt-5.5`/xhigh, so I killed it and stopped using that worker path for this run.
+
+
+## user comments
+1. what solutions do you propose then?
+
+## agent answer 2026-07-05
+
+> **A:** Proposed path: stop trying to make the community APK use `api.omiapi.com`; that backend rejects our Firebase project by design. Treat upstream prod backend as closed unless they give us the matching `based-hardware` Firebase config or change their backend.
+
+> **A:** Best practical branch: **own Firebase Auth + own minimal backend shim first**, not full Omi backend. Host the shim on Oracle Cloud/cheap VM if possible. Implement just enough endpoints for login/onboarding/profile/state so the app gets past auth, then add capture/sync endpoints only when the app actually calls them.
+
+> **A:** Parallel branch: **local-only strip**. Remove mandatory cloud auth for the phone-capture path, keep local queue/transcription/summarization behind settings, and use hosted AI only as an optional user-provided API key path. This is more app surgery but fits the privacy goal better.
+
+> **A:** Least useful path: keep chasing native/web/custom-token combinations against `api.omiapi.com`. The logs prove those all converge on the same backend token-verification wall.
+
+
+
+
+
+
+## user comments
+
+
+1. idk how they are saving the files and where because if i start using their original app....i would like to know if all those are importable into out and they dont lock me out if lets say another company buys them out.!etc.....
+
+2. future ideas but...idk if they have transcription accuracy improvement strategies....like custom dictionaries etc that can be generated have i somewhere in roadmap if not
+3. i saw regular agents are you using codex cli agents or not?!
+4. this system has kaggle cli use it but futo has an implementation of this moonshine streaming as well. 
+5. the official app themselves have a stt offline as well.
+6. see if other forks by other community has done similar work and see if we can just pull those changes to ours ..no reinventing the wheels
+7. moonshine streaming is on phone device capable.!
+
+
+---
+
+## agent answer 2026-07-05 (session 2 — local-first pivot)
+
+> Writing at the **end** from now on. Permanently noted.
+
+**Decision locked: we stop fighting their cloud.** Your two-stage test failed exactly as predicted — native sign-in OK, then `api.omiapi.com` 401s the `based-hardware-dev` token (upstream #5939, closed won't-fix). No config/flag combo fixes a cross-project mismatch. So:
+
+- **Mandatory login is being removed.** App boots straight into a usable local-only Home. Omi-cloud sign-in becomes an *optional* Settings row (re-enable later if you self-host — P7/D7). Cloud-only features go behind toggles, greyed + red "needs cloud" marks. → ROADMAP **P1.2 box closed**; detail in `plans/P1-signin.md` P1.2 section.
+- **On-device Moonshine streaming STT pulled forward** (was P5) as the main value path. Engine (your call — whisper can't stream): wrap the **Moonshine Voice native SDK** (Android Maven `ai.moonshine:moonshine-voice`, iOS SPM `moonshine-swift`) with `moonshine-streaming-{tiny,small,medium}` checkpoints — extendable exactly as you said. → ROADMAP **D6 closed to Moonshine**.
+
+**Branch:** all pivot work goes on **`feature/local-first`** (cut fresh, isolated from `feature/phase1-signin`). Your item-12 stack — cloud strip + local transcription + cheap-Gemini intelligence — lives there.
+
+**Your latest notes, answered:**
+
+1. **(Q3) Codex or regular agents?** Both, by role: exploration = cheap Claude read-agents; **design/reuse-research/implementation/review = Codex**; I orchestrate + correct. This session Codex (gpt-5.5 **medium**, not xhigh) produced the Moonshine path. Two infra bugs I fixed: parallel Codex jobs clash on `.codex` sqlite → run one at a time; MCP default `gpt-5.3-codex` is retired → pass your `gpt-5.5`.
+2. **(models)** Not defaulting to gpt-5.5/xhigh — using **medium** reasoning; your account rejects `gpt-5-mini`/`gpt-5.3-codex`, so gpt-5.5 is the working model, kept at low/medium unless a task needs more.
+3. **(reuse — items 4/5/6)** No reinventing: a B0 step checks **FUTO's** moonshine streaming (but license ledger = *reference only, no code copy*) and hunts **omi community forks** (`gh` fork + code search) for login-removal / offline / on-device work to cherry-pick (MIT sources only). Official app's offline STT = the `whisper_flutter_new` already in our pubspec — chunked, not live, which is why Moonshine.
+4. **(item 12 — local intelligence)** Folded in: after the cloud strip, chat/summaries route to a **user-provided cheap LLM** (Gemini Flash-tier, or your existing free provider chain — Cerebras/Groq/OpenRouter) behind the same optional toggle, on `feature/local-first`. Adding to roadmap.
+  - nice!
+5. **(item 2 — accuracy: custom dictionaries/hotwords)** Not in roadmap → **adding** as a backlog item (hotword/dictionary biasing pairs with on-device ASR).
+6. **(item 1 — data portability / lock-in)** Real concern, noted. Before you rely on the official app's storage we should verify export/import so a buyout can't lock you out — adding an "import from official Omi" investigation to the backlog.
+ - i am not exactly useing their official version. it is just a lion in sheep skin not in a good way!
+7. **(item 7 — parallel agents on branches)** Will do once Phase A (de-mandatory login) lands — feature branches per capability, delegated, merged into `feature/local-first`; research docs already feed them.
+
+Kicking off Phase A via Codex now. Beeping you — go do your thing, I keep working and ping each milestone.
+
+
+
+## user comments
+1. unrelated Question -  are my Q and A edits coming through you pretool and post tool hook injections to you ?
+
+> **A (2026-07-05):** Yes — live. A PostToolUse hook injects your `Q and A.md` changes into my context the moment you save; I saw your "nice!", the "lion in sheepskin" note, and this question **without** re-reading the file. So this is a real-time back-channel — write here anytime, I catch it on your next save. On the official app being a "lion in sheepskin, not in a good way": noted — that's *more* reason for the import/portability investigation, so nothing you've already recorded is hostage to it. Right now I'm mid-Phase-A: codex enumerated the guest-safety changes, I caught + fixed a bug in its plan (it would've skipped the mic-permission screen), verifying the boot path before I apply the diff.
 
