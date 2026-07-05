@@ -35,14 +35,14 @@
 ## Increments (ordered so early ones are compile-verifiable in CI; native/device last)
 
 ### B1 — provider enum (compile-safe, inert)
-- [ ] Add `SttProvider.onDeviceMoonshine` (streaming type, label "On-Device Moonshine", models tiny/small/medium, default tiny) in `stt_provider.dart`. Not yet exposed in Settings.
-- [ ] Verify: CI compile. **Commit** `feat(moonshine): add onDeviceMoonshine stt provider enum`.
+- [x] Add `SttProvider.onDeviceMoonshine` (streaming type, label "On-Device Moonshine", models tiny/small/medium, default tiny) in `stt_provider.dart`. Not yet exposed in Settings.
+- [x] Verify: CI compile pending; local Flutter/Dart toolchain is unavailable on this Windows host. **Commit** `feat(moonshine): add onDeviceMoonshine stt provider enum`.
 
 ### B2 — Dart socket + fake-native test (compile + unit-test-safe)
-- [ ] `app/lib/services/sockets/on_device_moonshine_socket.dart` — `OnDeviceMoonshineSocket implements IPureSocket`. `connect()` → native `initialize({model,language,sampleRate})`; `send(bytes)` → `AudioTranscoderFactory.createToRawPcm` → native `appendPcm16`; native transcript callback → `jsonEncode([segment])` → listener (same contract as transcription_service.dart:201).
-- [ ] `TranscriptSocketServiceFactory.createFromCustomConfig(...)`: if `onDeviceMoonshine` → return `TranscriptSegmentSocketService.withSocket(OnDeviceMoonshineSocket(...))` **directly** (no composite).
-- [ ] Dart unit test with a fake MethodChannel: connect → send bytes → receive segment JSON → stop; assert factory does NOT build `CompositeTranscriptionSocket` for Moonshine.
-- [ ] Verify: CI compile + `flutter test`. **Commit** `feat(moonshine): dart OnDeviceMoonshineSocket + factory routing (+test)`.
+- [x] `app/lib/services/sockets/on_device_moonshine_socket.dart` — `OnDeviceMoonshineSocket implements IPureSocket`. `connect()` → native `initialize({model,language,sampleRate})`; `send(bytes)` → `AudioTranscoderFactory.createToRawPcm` → native `appendPcm16`; native transcript callback → `jsonEncode([segment])` → listener (same contract as transcription_service.dart:201).
+- [x] `TranscriptSocketServiceFactory.createFromCustomConfig(...)`: if `onDeviceMoonshine` → return `TranscriptSegmentSocketService.withSocket(OnDeviceMoonshineSocket(...))` **directly** (no composite).
+- [x] Dart unit test with a fake MethodChannel: connect → send bytes → receive segment JSON → stop; assert factory does NOT build `CompositeTranscriptionSocket` for Moonshine.
+- [x] Verify: CI compile + `flutter test` pending; local Flutter/Dart toolchain is unavailable on this Windows host. **Commit** `feat(moonshine): dart OnDeviceMoonshineSocket + factory routing (+test)`.
 
 ### B3 — Android native bridge (device-verified; needs the user's phone)
 - [ ] Android Maven `ai.moonshine:moonshine-voice`; Kotlin `MoonshineSttPlugin` MethodChannel (`initialize`/`appendPcm16`/`stop`/`dispose`) + event channel (partial/final/error) around `moonshine-streaming-tiny`. Model download/bundle strategy (26 MB) decided here.
