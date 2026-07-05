@@ -98,7 +98,9 @@ Future<Map<String, String>> buildHeaders({
     ...fromHeaders,
   };
 
-  if (requireAuthCheck) {
+  // Local-first: a signed-out guest skips auth entirely — no token refresh,
+  // no Authorization header. Omi-cloud calls are best-effort until sign-in.
+  if (requireAuthCheck && AuthService.instance.isSignedIn()) {
     try {
       headers['Authorization'] = await getAuthHeader();
     } on AuthTokenUnavailableException {
@@ -117,6 +119,9 @@ Future<Map<String, String>> buildHeaders({
 }
 
 bool _isRequiredAuthCheck(String url) {
+  // Local-first: a signed-out guest never triggers required-auth handling
+  // (token refresh / 401 sign-out). Cloud calls are best-effort until sign-in.
+  if (!AuthService.instance.isSignedIn()) return false;
   // Agent VM endpoints always hit prod even when app uses dev
   if (url.contains('api.omi.me')) return true;
   if (url.contains(Env.apiBaseUrl!)) {

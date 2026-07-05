@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 
 import 'package:omi/backend/preferences.dart';
 import 'package:omi/pages/home/page.dart';
-import 'package:omi/pages/onboarding/device_selection.dart';
 import 'package:omi/pages/onboarding/permissions/permissions_checker.dart';
 import 'package:omi/pages/onboarding/wrapper.dart';
 import 'package:omi/providers/auth_provider.dart';
@@ -35,7 +34,14 @@ class MobileApp extends StatelessWidget {
             return const OnboardingWrapper();
           }
         } else {
-          return const DeviceSelectionPage();
+          // Local-first: login is no longer mandatory. Unsigned users boot
+          // straight in; Omi-cloud sign-in lives in Settings. Route through the
+          // permissions gate so mic access is still granted for capture.
+          // ponytail: aiConsentGiven is intentionally NOT gated here — no AI
+          // processing runs at guest boot (cloud off, on-device STT not wired
+          // yet). Phase B (Moonshine) must gate capture/transcription start on
+          // consent for signed-out users.
+          return const _PermissionsGate();
         }
       },
     );

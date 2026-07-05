@@ -84,6 +84,8 @@ Phases are ordered by dependency, not by importance. P3 is the flagship user req
 `[custom-token] [firebase_auth/custom-token-mismatch] The custom token corresponds to a different audience.`
 The web-auth OAuth flow works end-to-end (browser → account → `omi://auth/callback` → token exchange succeeds). The **only** failure is the final `FirebaseAuth.signInWithCustomToken` (`app/lib/services/auth_service.dart:362-366`): the app is built for Firebase project **`based-hardware-dev`** (prebuilt `google-services.json`/`firebase_options.dart`, `project_id: based-hardware-dev`), but `api.omiapi.com` mints custom tokens for a **different** project. Repo ships `based-hardware-dev` configs *and* points at `api.omiapi.com` — never a matched pair. **Config bug, not code.** Fix tracked as P1.1 (Codex investigating ranked options; see [plans/P1-signin.md](./plans/P1-signin.md) Post-merge diagnosis).
 
+**LIVE RESULT (2026-07-05, ADB on Sri's phone):** native-auth build `v1.0.542+10 · native-auth · main@cbfce78 · run 10` signs into Firebase, then `GET https://api.omiapi.com/v1/users/onboarding` returns `401 {"detail":"Invalid authorization token"}` after token refresh. This confirms Outcome B: `api.omiapi.com` rejects `based-hardware-dev` ID tokens. Full report: [docs/investigations/2026-07-05-community-build-auth.md](./docs/investigations/2026-07-05-community-build-auth.md).
+
 **Earlier hypotheses (superseded by the confirmed cause above, kept for history):**
 1. Native Google Sign-In SHA-not-registered → `ApiException: 10` (this is the *native* lane; we're on web-auth).
 2. Empty `API_BASE_URL` when `.dev.env` missing — ruled out; the CI build bakes it and the exchange reaches the backend.
@@ -95,18 +97,19 @@ The web-auth OAuth flow works end-to-end (browser → account → `omi://auth/ca
 - [x] Visible **build stamp** (branch + short sha + run number + auth-lane) on sign-in footer + About — done, proven on-device (it's what surfaced the root cause)
 - [x] **Surface real sign-in error + stage** (dev flavor) — done, pinpointed `custom-token-mismatch`
 - [x] Install CI APK → run web-auth flow → confirmed it reaches `api.omiapi.com` and fails only at Firebase custom-token
-- [ ] **P1.1 fix the audience mismatch** (Codex ranking: own Firebase / matching community config / native-lane) → build fix APK → Sri re-tests
-- [ ] Also try native Google Sign-In (shared keystore SHA may be registered in `based-hardware-dev`) — one of the P1.1 options
-- [ ] Document the final working sign-in path in `docs/` once P1.1 lands
+- [x] Try native Google Sign-In — native Firebase sign-in succeeds, but backend API rejects `based-hardware-dev` token with 401
+- [x] **P1.2 — decided 2026-07-05: de-mandatory login + local-first.** The community lane is structurally dead (api.omiapi.com verifies `based-hardware`; app is `based-hardware-dev`; #5939 won't-fix). Instead of chasing a matching config: **remove the mandatory login gate** → app boots local-only; Omi-cloud sign-in → optional Settings row (re-enable later via self-host, P7/D7); cloud-only features gated behind toggles (greyed + red "needs cloud"). **On-device Moonshine STT (P5) pulled forward** as the primary path; **local-Gemini/free-chain LLM** replaces cloud "intelligence" (Sri, Q&A item 12). Work branch `feature/local-first`. Plan: [plans/P1-signin.md](./plans/P1-signin.md) P1.2 section.
+- [ ] Document the local-first + cloud-optional path in `docs/` once P1.2 lands
 
 **Decision D1 — auth lane going forward** ✅ closed 2026-07-04
 - [x] **Community lane now** (upstream dev Firebase + api.omiapi.com), sovereignty deferred to P7 — agreed 2026-07-04
   - 🟢 Claude: working sign-in today with zero infra; the capture/trigger phases (P2–P5) don't care whose backend it is. Accepted tradeoff: captured audio/transcripts transit upstream's dev cloud until P7. Don't speak secrets into it.
   - 🔵 Sri: agreed 2026-07-04.
+  - 2026-07-05 investigation update: community lane is blocked unless the app can use Firebase config matching `api.omiapi.com` or the backend accepts `based-hardware-dev` tokens. See [auth investigation](./docs/investigations/2026-07-05-community-build-auth.md). This reopens the practical P1 path, even though D1 records the original preference.
 - [ ] Own Firebase + self-hosted backend immediately — days of setup before first working APK; blocks the fun parts
 - [ ] Local-only (no auth at all) — biggest surgery; becomes realistic only after P6's local queue exists (revisit inside P7)
 	🔵 Sri: may be weill be able to host this is free oracle cloud in future?!
-	🔵 Sri: the kaggle dataset where we use the data for training the moonshine and asr models can be used as cloud storage as well?!
+	🔵 Sri: the kaggle dataset where we use the data for training the moonshine and other asr models can be used as cloud storage as well?!
 
 ---
 
@@ -127,7 +130,10 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 - [ ] Quick Settings tile (`TileService`) — arm/disarm capture
 - [ ] Explicit-intent entry (Tasker/automation): exported receiver, locked down (signature/token check), documented intent extras
 - [ ] Wire router → existing phone-mic path: `app/lib/providers/capture_provider.dart` / `voice_recorder_provider.dart` / `app/lib/services/capture/capture_controller.dart` (recording state already lives here — reuse, don't duplicate)
-- [ ] Feedback: single soft beep on start, double on stop, optional haptic; **no periodic "still listening" beeps**
+- [ ] Feedback: single soft beep on start, double on stop, optional haptic; 
+ - ambient noise basesd volume and haptics.
+ -  calm settings ...less loud!!! you know
+ -  option to toggle periodic "still listening" low volume beeps-  volume should be adjustable in developer settings
 - [ ] Trigger test matrix from the research report (locked screen, unlocked, after process death)
 
 **Swallow sources:** upstream foreground-service + notification plumbing (already in repo: `OmiBleForegroundService.kt` patterns, `app/lib/services/notifications.dart`); Android `TileService` is ~100 lines of boilerplate (official docs sample).
@@ -174,7 +180,7 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 **Decision D3 — which button mechanism ships first**
 - [x] MediaSession KeyEvents first, BLE GATT second 🟢
   - 🟢 Claude: your existing headsets/earbuds work day one with zero custom hardware; BLE GATT path already exists in-repo for omi wearables so it's a fast follow, not a rewrite.
-  - 🔵 Sri:
+  - 🔵 Sri: we might have to block that input from going to downstream or be able to modify how it reaches other system processes?!
 - [ ] BLE GATT first — only makes sense if your primary trigger device is an omi wearable/custom peripheral today
 - [ ] Both in one milestone — more surface, slower first win
 
@@ -192,6 +198,7 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 
 **Tasks**
 - [ ] 20–30 s **RAM ring buffer** (native Kotlin; PCM from existing `phone_mic_source.dart` framing — 16 kHz PCM16 already flows in 320-byte/10 ms frames)
+	- the duration of buffer should be customizable in settings. but the text transcribed can be continuously saved segmentation based on timepoints or intelligent or hybrid segmentation.... defer details to future phases
 - [ ] **mark-last-buffer**: any trigger can salvage the *previous* N seconds (the "that thought just happened" button)
 - [ ] VAD gate for armed mode (speech starts capture; silence closes segments)
 - [ ] Segment finalization → framed local files: **reuse `OmiBatchAudioWriter.kt`** (length-prefixed `.bin`, rotation, fsync, gap finalization — already written, already tested upstream)
@@ -211,7 +218,9 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 
 ## P5 — On-device ASR
 
-**Goal:** live transcript without cloud round-trip. Cloud STT (upstream backend) remains the fallback until this lands.
+> **Pulled forward 2026-07-05 (P1.2 pivot).** Since the community cloud is dead, on-device ASR is no longer "eventually" — it's the primary near-term path. D6 closed = **Moonshine Voice native SDK** streaming (tiny→small→medium). Cloud STT is now the *optional* fallback (only when the user connects Omi cloud), not the default.
+
+**Goal:** live transcript without cloud round-trip. Cloud STT (upstream backend) is an optional fallback behind the Omi-cloud toggle, not the default.
 
 **Tasks**
 - [ ] Spike A: Moonshine Android (Maven package) — live latency + battery on your actual phone, 15-min session
@@ -220,11 +229,13 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 - [ ] Pick engine (D6), integrate behind an `AsrEngine` interface — must accommodate a **Sri-supplied ONNX model** as a drop-in, not just Moonshine/sherpa.
 - [ ] Confidence score per segment surfaced to the queue (drives retention policy in P6)
 - [ ] Later: whisper.cpp as **batch re-checker** for low-confidence saved clips (never the live path)
+- [ ] Accuracy strategies: custom dictionary / hotword biasing (per-user vocabulary) — pairs with on-device ASR (Sri, Q&A 2026-07-05 item 2)
 
-**Decision D6 — live ASR engine**
-- [ ] Moonshine 🟢
+**Decision D6 — live ASR engine** ✅ closed 2026-07-05 (Sri confirmed Moonshine; pulled forward into P1.2)
+- [x] Moonshine 🟢
   - 🟢 Claude: published streaming latency 34–107 ms vs Whisper-tiny's 277 ms+; Android Maven artifact; one focused SDK. Caveat tracked in license ledger: English models MIT, multilingual models are community-license (non-commercial) — fine for personal use, flagged if this ever ships publicly.
-  - 🔵 Sri:
+  - 🔵 Sri: **Moonshine, yes** — whisper can't do live transcription; Moonshine streams and is phone-capable, extendable tiny→small→medium. Use whichever artifact is least resource-intensive.
+  - **Path (codex research, gpt-5.5):** wrap the **Moonshine Voice native SDK** (Android Maven `ai.moonshine:moonshine-voice`, iOS SPM `moonshine-swift`) + `UsefulSensors/moonshine-streaming-{tiny,small,medium}`; wire at the streaming socket seam (`IPureSocket`), keep the `AsrEngine`-style extensibility so Sri's own ONNX model (Q13) still drops in. sherpa-onnx = fallback only.
 - [ ] sherpa-onnx — broadest toolkit (VAD+KWS+ASR+wake word in one, Apache-2.0); more plumbing, more model-choice burden. **Also the natural host for Sri's own ONNX models (Q13).**
 - [ ] Both permanently behind the interface — costs double maintenance; only if spikes tie
 - 🔵 Sri (Q13): has own ONNX models (Kaggle + FUTO keyboard fork) — wants them usable here. Leans the interface toward an ONNX-Runtime backend that can load Moonshine, sherpa, **or** a Sri-trained model.
@@ -320,11 +331,16 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 
 - [ ] ESP32-C3 as tiny BLE trigger peripheral (button + battery + LED) — only after P3 evidence shows existing BT devices aren't enough
 - [ ] ESP32-S3 if a custom audio front-end ever matters (vector ops for on-edge DSP)
+	- eye glasses which are sleek can be designed with large battery and s3 i think.
+	- large antenna is aslo possible with those glasses
+	- right and left can work alternatively while one side can charge!
+	- wild but .... small solar panels on the sides that can trickle charge
 - [ ] EMG / ear-EEG / "brain-triggered capture": **research-only lane.** Current public results = small command vocabularies, fragile placement, session drift. Revisit yearly; keep the Trigger Router extensible so a future exotic trigger is just another input.
 - Copy the boring parts of omi's BLE protocol when the day comes (battery svc, device-info svc, one custom trigger/audio svc, codec characteristic, packet numbering — documented upstream).
 
 ### Revisit backlog (deferred decisions to reopen later)
 - **APK shape (D0b):** currently arm64-only. Revisit fat/`--split-per-abi` if a non-arm64 target device appears or the release page needs multi-arch (Sri, 2026-07-04).
+- **Data portability / anti-lock-in (Sri, 2026-07-05):** map how the official Omi app stores conversations/audio and whether it's exportable/importable into our local store — before relying on their storage; guards against a buyout locking Sri out.
 
 ---
 

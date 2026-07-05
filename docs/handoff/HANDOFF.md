@@ -1,5 +1,45 @@
 # Session Handoff Log
 
+## 2026-07-04T~15:00Z — P0 merged, P1 shipped, P1.1 native-lane sign-in fix merged + building; awaiting Sri install test
+
+### Where we are
+- **Branch:** `feature/phase1-signin` in the **main repo folder** `C:/Android_software/omi` (NO worktree — Sri hates them; `omi-phase0` removed this session).
+- **Merged to fork main this session:** PR #2 (phase0 CI+roadmap), PR #3 (P1 build stamp + error surfacing), **PR #4 (P1.1 native-lane sign-in fix)**. Regular-merge, fork-only. Standing rule **"merge yourself"**; NEVER upstream `BasedHardware/omi`.
+- Codex CLI = worker (impl + review), Claude = orchestrator + corrector.
+
+### THE LIVE THING — sign-in fix verification (P1.1)
+- **Root cause CONFIRMED** via P1's surfaced error: `[custom-token] firebase_auth/custom-token-mismatch: The custom token corresponds to a different audience.` OAuth flow works end-to-end; only final `signInWithCustomToken` fails — `api.omiapi.com` mints tokens for a project ≠ app's `based-hardware-dev` config. Config bug.
+- **Fix merged (PR #4):** CI `.dev.env` → native lane `USE_WEB_AUTH=false`+`USE_AUTH_CUSTOM_TOKEN=false`. Decisive: shared `debug.keystore` SHA-1 `50f87a68…dab3598` IS a registered Android OAuth cert in `based-hardware-dev`'s `google-services.json` → native sign-in = matching session, no custom token.
+- **BUILDING (re-dispatched):** first native-lane run 28709261639 was **CANCELLED** (concurrency `android-apk-refs/heads/main` — a later direct-to-main commit `cbfce784` "docs R5" by Sri at 15:01Z coincided; docs pushes shouldn't trigger APK but the in-flight run died). apk-latest still = old **P1 web-auth** build (06:52Z). Fix IS on main (`USE_WEB_AUTH=false` confirmed at main HEAD). **Re-dispatched via workflow_dispatch: run 28710779623** (in_progress ~15:26Z). Wait **`bke9s5pw4`** armed. Builds run ~40min on the loaded runner. When apk-latest asset timestamp flips past 06:52Z → PushNotification Sri for the two-stage test. **If it cancels again:** consider removing `cancel-in-progress` for main in the workflow (main builds should complete + publish), or re-dispatch.
+- Note: **Sri commits directly to main** sometimes (e.g. `cbfce784`) — his repo, fine; but his main pushes can cancel in-flight APK runs via the shared concurrency group.
+- **Codex D verdict folded (task `b0nswq6fk`, done):** converges on native lane; backend read (`backend/deploy/runtime_env.yaml`, `auth.py`, `dependencies.py`) says `api.omiapi.com` likely verifies **`based-hardware` (prod)** tokens → **Outcome B (API 401 after native sign-in) is the likely case**. No prod `google-services.json` committed → no shortcut → Outcome B = own-Firebase.
+- **DECISION FORK when Sri tests (in plans/P1-signin.md):** **A** signs in + loads data → done. **B** signs in but API 401 → `api.omiapi.com` not on `based-hardware-dev` → pivot to Sri's own Firebase + self-host backend (P7/D7 auth slice early). Stamp reads `native-auth`.
+
+### Immediate next (in order)
+1. Build 28709261639 green → PushNotification Sri: install apk-latest, confirm stamp `native-auth`, try Google sign-in, report A or B.
+2. Fold **Codex D** verdict (task `b0nswq6fk`; read `…/bfce8b6c-…/scratchpad/codexD-signin-fix.txt`) — may pre-answer A vs B (does `api.omiapi.com` accept `based-hardware-dev` tokens?).
+3. Sri report: A → close P1. B → P1.2 own-Firebase (Codex implements).
+4. **Then Q11 sync-fork** (DEFERRED till sign-in works; upstream +149, 0 conflicts; local `git merge upstream/main` → PR → self-merge). Bundle disabling fork-noise workflows (`trigger-codemagic`, `Auto Release Desktop on Main` — FAIL every main push).
+
+### Also delivered
+- Plans: `plans/{README,P1-signin,P2-triggers-v1,P3-bt-trigger-matrix}.md` (ROADMAP.md = master).
+- Closed: **D0b arm64-only** APK, **D5 Silero VAD**.
+- Research pack `docs/research/{README,R1..R6}.md` (public-safe); Sri running R4→R3→R1→R2→R5→R6, pasting findings back.
+- **Q13 open:** Sri's ONNX models (Kaggle + FUTO keyboard fork) → folded into D6/AsrEngine; need Kaggle link + model type.
+
+### Rules
+- `Q and A.md` (repo root) = live channel; Sri edits mid-session, re-read often, fold scratch → numbered Q&A. Terse, act without asking, self-authorized merges.
+- No local flutter/phone → APK build green = compile check; Sri does real sign-in. main.yml = issue-sync only (no test CI on push).
+- Codex: `codex exec --sandbox read-only|workspace-write --cd <dir> --output-last-message <file> "…"`, background long runs. Quota short-cycles.
+- CI landmines: prebuilt+`.dev.env` before build_runner; `CM_KEYSTORE_*`; `--build-number=run_number`; Flutter 3.41.9/Java 21; APK builds only on `app/**` or workflow-file paths.
+
+### Memory rows (project=omi)
+- `mem_20260704_omi-fork-session-2026-07_78f542` (updated) — session state + rules.
+- `mem_20260704_android-deep-link-intent_c676bc` — hostless `omi://` filter already catches callbacks.
+- `mem_20260704_omi-sign-in-bug-root-cau_6f233b` — custom-token-mismatch root cause + fixes.
+
+---
+
 ## 2026-07-04T04:59:53Z — Phase-0 CI + roadmap landed; merge + sign-in triage pending
 
 ### Current task state
@@ -113,3 +153,111 @@
 - No flutter/dart on PATH locally → cannot run `flutter analyze`/tests/build. CI APK build = the only compile check. Sri exercises real sign-in on device.
 - gh run status can lag; trust fresh `gh run view <id> --json status,conclusion`.
 - Memory `remember`/`update`: no `→`/unicode arrows (charmap encode error); `update` takes `patch` not `content`; `source_ref` must be under raw_logs/context_packs/hardcopy or omitted.
+
+---
+
+## 2026-07-05 10:22 +0530 — Local-first pivot (session 2)
+
+### Current task state
+Pivot from broken Omi-cloud auth to local-first. Planning + all direction docs DONE and
+committed. Boot-local core code DONE, committed, codex-reviewed. Branch `feature/local-first`
+(2 commits ahead). NOT pushed (no local build env; needs Sri's OK). Sign-in is temporarily
+unreachable on the branch until the Settings entry lands (next increment).
+
+### Key decisions
+- Community cloud lane is structurally dead: app=based-hardware-dev, api.omiapi.com verifies
+  based-hardware, so authed calls 401. Upstream #5939 won't-fix. Stop chasing auth configs.
+- P1.2 = remove mandatory login + Omi-cloud-optional-in-settings + gate cloud features (grey).
+- On-device STT engine = Moonshine (D6 closed). Path: Moonshine Voice native SDK
+  (Android Maven ai.moonshine:moonshine-voice, iOS SPM moonshine-swift) +
+  moonshine-streaming-{tiny,small,medium}; wire at IPureSocket streaming seam (NOT ISttProvider).
+- Local intelligence = user-provided cheap LLM (Gemini Flash / free chain), not cloud.
+- Delegation: codex implements (gpt-5.5, medium, ONE job at a time), Claude corrects/reviews.
+
+### Modified files (committed on feature/local-first)
+- 4ead44399 docs: ROADMAP.md, plans/P1-signin.md, plans/README.md, "Q and A.md",
+  docs/investigations/2026-07-05-community-build-auth.md
+- 26ca975cb code: app/lib/mobile/mobile_app.dart (guest branch -> _PermissionsGate, removed
+  device_selection import), app/lib/backend/http/shared.dart (two signed-out guest guards)
+
+### Blockers / open questions
+- CANNOT build/test locally: no flutter/adb/dart/emulator on this Windows box. Verify only via
+  push -> CI (.github/workflows/android_apk_build.yml) -> apk-latest -> Sri's phone.
+- Need Sri's explicit OK to push (AGENTS.md: never push unless asked). Do NOT touch main.
+- Sign-in unreachable on branch until the Settings "Connect Omi Cloud" entry is added.
+
+### Next steps (in order)
+1. Settings "Connect Omi Cloud" sign-in entry: app/lib/pages/settings/settings_drawer.dart,
+   BOTH render paths (searchable list ~L422, section view ~L692). Show when
+   !AuthService.instance.isSignedIn(); onTap -> routeToPage(context, const OnboardingWrapper());
+   hide "Sign Out" for guests. New l10n key connectOmiCloud across 49 locales
+   (skill omi-add-missing-language-keys-l10n; verify flutter gen-l10n = 0 warnings in CI).
+2. Cloud-feature gating: grey conversations/chat/memories when guest + "needs cloud" badge;
+   reuse preferences.dart getBool/saveBool + Color(0xFF8E8E93)/SwitchListTile.enabled.
+3. Widget test for the gate (guest -> _PermissionsGate, not DeviceSelectionPage).
+4. Ask Sri to push -> CI -> verify boot-to-Home + sign-in-from-settings on device.
+5. Phase B Moonshine: OnDeviceMoonshineSocket implements IPureSocket (MethodChannel PCM in /
+   EventChannel transcript out -> TranscriptSegment -> TranscriptSegmentSocketService); add
+   SttProvider.onDeviceMoonshine; + AI-consent-at-capture gate. B0 first: check FUTO
+   (reference-only per license ledger) + omi forks (gh api repos/BasedHardware/omi/forks) to reuse.
+
+### Critical context
+- Gate: app/lib/mobile/mobile_app.dart:18-42 (Consumer<AuthenticationProvider>). _PermissionsGate
+  defined same file :47. app_shell.dart:353-382 already gates cloud provider init behind isSignedIn
+  -> guest boot fires zero cloud calls (why the diff is tiny).
+- Codex flagged HIGH: guest skips aiConsentGiven gate -> deferred to Phase B capture-start (no AI
+  processing runs at guest boot); documented as a ponytail comment in mobile_app.dart guest branch.
+- docs/research/R5-offline-sync-transport.md has pre-existing trailing-whitespace (fails
+  git diff --check) — NOT ours, left unstaged.
+- Codex runtime: MCP defaults to retired gpt-5.3-codex (rejected on ChatGPT account) -> MUST pass
+  model=gpt-5.5. Background codex jobs clash on .codex sqlite if parallel -> sequential only. Fetch
+  detached results: node C:/Users/deletable/.claude/plugins/cache/openai-codex/codex/1.0.5/scripts/codex-companion.mjs status|result <task-id>.
+- Session plan file: C:/Users/deletable/.claude/plans/lets-take-next-steps-noble-popcorn.md
+- Memories: mem_20260705_codex-cli-runtime-facts_2804fa, mem_20260705_omi-fork-dev-box-c-andro_a8c300
+
+### Model summary
+- Sri's on-device test of the native-auth APK failed: Google sign-in ok, then api.omiapi.com 401s
+  the based-hardware-dev ID token. Confirmed Outcome B / upstream #5939 (cross-project mismatch).
+- Sri's directive: remove mandatory login, keep Omi cloud optional in settings, gate cloud features
+  (grey/red), build on-device (Moonshine streaming), resource-aware toggles; no reinventing wheels.
+- Explored via 3 Claude Explore agents (auth gate, investigation/research/plans, STT pipeline).
+- On-device STT seam already exists (whisper_flutter_new wired) but whisper is chunked, not live;
+  Sri confirmed Moonshine streaming instead.
+- Codex (gpt-5.5) chose the Moonshine Voice native SDK path and corrected the streaming seam to
+  IPureSocket (not the batch ISttProvider transcribe()).
+- Updated ROADMAP/plans/Q&A (answered at END of Q&A file — Sri's hard rule); added backlog items
+  (custom-dictionary accuracy, data-portability/import-from-official-app).
+- Codex enumerated guest-safety; Claude corrected (codex would've skipped the mic-permission gate),
+  reduced 5 edits -> 3 root-cause edits, implemented + committed boot-local core.
+- No local build env -> verification is CI + Sri's phone; nothing pushed.
+- Two follow-on increments (settings sign-in entry, cloud gating) then Phase B Moonshine.
+
+### Handoff context
+- On branch feature/local-first, 2 commits ahead (docs + boot-local). Check: git log --oneline -3.
+- Do NOT push without Sri's explicit OK. Do NOT touch main. Commit locally by default.
+- IMMEDIATE next task = Settings sign-in entry (Next steps #1). Without it a guest can't reach
+  sign-in; it MUST land before the branch is pushable.
+- All app UI changes are UNVERIFIABLE locally (no flutter). Write carefully; rely on codex
+  read-only review (model=gpt-5.5) + CI flutter analyze + Sri's device test.
+- Use codex via mcp__codex-cli__codex, model="gpt-5.5", ONE job at a time. Never default to xhigh
+  reasoning (Sri's rule) — medium/low.
+- l10n: add keys via jq to app/lib/l10n/app_en.arb (never read full ARB), translate all 49 locales
+  (skill omi-add-missing-language-keys-l10n), then flutter gen-l10n must emit zero warnings (CI-checked).
+- Cloud calls route through app/lib/backend/http/shared.dart (makeApiCall/buildHeaders); guest guards
+  already in place there.
+- "Q and A.md": Sri appends anytime, a hook injects his edits into context live; ALWAYS answer at the
+  END of the file (he is emphatic — do not write mid-file).
+- Moonshine: start UsefulSensors/moonshine-streaming-tiny; keep AsrEngine extensibility so Sri's own
+  Kaggle ONNX model drops in (Q13 still open — awaiting his Kaggle link).
+- Sri is away; beep milestones via PushNotification. He wants codex delegation visibly announced.
+- Read the session plan file + plans/P1-signin.md P1.2 section before continuing.
+
+---
+
+## 2026-07-05 23:35 +0530 — Settings cloud sign-in row landed
+
+- Added guest-only "Connect to Omi Cloud" entry in `app/lib/pages/settings/settings_drawer.dart`.
+- The entry appears in both Settings search and the normal Settings account section.
+- Guests no longer see "Sign Out"; signed-in users still see the existing sign-out flow.
+- The connect row closes the drawer and routes via the root navigator to `OnboardingWrapper`, preserving local-first boot while keeping cloud sign-in reachable.
+- Local verification remains blocked: no `dart`/`flutter` executable on this Windows host. Static checks only: l10n `connectTo(String appName)` exists, `OnboardingWrapper` import path exists, `git diff --check` clean after removing R5 trailing whitespace.
