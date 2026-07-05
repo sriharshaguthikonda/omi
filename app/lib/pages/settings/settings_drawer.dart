@@ -309,6 +309,9 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
       Navigator.of(context).pop();
       final rootCtx = globalNavigatorKey.currentContext;
       if (rootCtx != null && rootCtx.mounted) {
+        // Guest Home marks onboarding complete; clear it so a fresh cloud
+        // sign-in runs onboarding instead of skipping straight to Home.
+        SharedPreferencesUtil().onboardingCompleted = false;
         routeToPage(rootCtx, const OnboardingWrapper());
       }
     }
@@ -759,6 +762,9 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                       Navigator.of(context).pop();
                       final rootCtx = globalNavigatorKey.currentContext;
                       if (rootCtx != null && rootCtx.mounted) {
+                        // Guest Home marks onboarding complete; clear it so a
+                        // fresh cloud sign-in runs onboarding, not skips to Home.
+                        SharedPreferencesUtil().onboardingCompleted = false;
                         routeToPage(rootCtx, const OnboardingWrapper());
                       }
                     },
