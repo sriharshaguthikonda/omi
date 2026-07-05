@@ -1,5 +1,33 @@
 # Session Handoff Log
 
+## 2026-07-06 ~03:00 IST — P1.2-A merged + LIVE (apk-latest); Phase B Moonshine planned + B1/B2 committed (held)
+
+### Where we are
+- Branch `feature/local-first` in main repo folder `C:/Android_software/omi` (no worktree). Synced to fork main.
+- **P1.2-A MERGED (PR #5)** + main APK build GREEN (run 28750627047) → **apk-latest refreshed** (local-first build, 103 MB, 2026-07-06). Sri notified; awaiting his device report. P1.2-A = boot-to-local-Home for guests + Settings "Connect to Omi Cloud" row (reuses `connectTo` l10n, no new keys) + Sign Out hidden for guests + fix: reset `onboardingCompleted` before guest→cloud sign-in so a fresh cloud account still onboards.
+- **Phase B (on-device Moonshine STT) planned:** `plans/P5-moonshine.md` — seam map (file:line), B0 reuse-check (no fork to cherry-pick; reuse in-repo `IPureSocket` seam), increments B1→B5. Linked from ROADMAP P5 + plans/README.
+- **B1+B2 committed on branch, NOT merged** (holding so apk-latest stays P1.2-A for Sri's test):
+  - `868ad3b6d` B1 — `SttProvider.onDeviceMoonshine` enum (streaming, models tiny/small/medium).
+  - `2d76bca1f` B2 — `OnDeviceMoonshineSocket implements IPureSocket` (MethodChannel `com.omi/moonshine_stt`, PCM16 via `AudioTranscoderFactory.createToRawPcm`) + factory routing that **bypasses** the cloud-coupled `CompositeTranscriptionSocket` + fake-channel unit test.
+  - Claude verified all compile anchors (9 IPureSocket members, `TranscriptSegmentSocketService.withSocket` sig, transcoder API, `PureSocketStatus`, `BleAudioCodec` path) → compiles. Branch build `28756353578` running as CI compile-check (branch build = artifact only, does NOT refresh apk-latest).
+
+### Immediate next (in order)
+1. Branch build `28756353578` green ⇒ B1+B2 compile-verified. If red, fix from the log.
+2. Hold the merge until Sri reports the P1.2-A device test. Then merge accumulated (B1+B2) → apk-latest.
+3. **B3 = Moonshine Android native bridge** (the big can't-verify-without-device chunk): Kotlin plugin on MethodChannel `com.omi/moonshine_stt` (`initialize`/`appendPcm16`/`stop`/`dispose` + transcript events) around Maven `ai.moonshine:moonshine-voice` + `moonshine-streaming-tiny` (26 MB, download/bundle strategy TBD). Do with Codex + Sri device-test.
+4. B4 settings toggle + `aiConsentGiven` capture-gate (new l10n keys OK ARB-only — see l10n fact below).
+5. Deferred: P1.2-B guest cloud-feature gating (grey conversations/chat/memories + "needs cloud"); P2 triggers (planned, gate D2).
+
+### Facts / rules learned this session
+- **l10n unblocked:** pubspec has `generate: true` → CI `flutter build` regenerates `lib/l10n/app_localizations*.dart` from the ARBs. So NEW keys can be added ARB-only (no local flutter needed to regen); still translate all 49 locales via skill `omi-add-missing-language-keys-l10n`. Prefer reusing an existing key (P1.2-A reused `connectTo('Omi Cloud')`).
+- **Compile-verify trick:** push the feature branch → triggers a **branch** APK build (compile check, artifact only). Only a **main** push refreshes apk-latest.
+- Disabled scheduled workflow `Auto Release Desktop on Main` (`gh workflow disable`) — it was the red FAIL spam on the Actions tab (cron, upstream desktop-release, nothing to do with our Android APK).
+- Codex (gpt-5.5, medium) = implementer; **scope-fence it** — it drifted into `Q and A.md`/`HANDOFF.md`/R5 once; split those out of the feature commit. Claude reviews compile anchors (no local flutter/dart on this Windows box).
+- Q13 (Sri's Kaggle ONNX model link) still OPEN — blocks his-own-model-as-STT-engine, not Moonshine.
+- `Q and A.md`: answer at the END only (Sri's hard rule).
+
+---
+
 ## 2026-07-04T~15:00Z — P0 merged, P1 shipped, P1.1 native-lane sign-in fix merged + building; awaiting Sri install test
 
 ### Where we are
