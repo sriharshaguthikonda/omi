@@ -22,7 +22,7 @@
 | Phase | Name | Outcome | Status |
 |---|---|---|---|
 | P0 | CI foundation | Push → installable dev APK | 🔨 this PR |
-| P1 | Sign-in that works | Sideloaded APK signs in via community lane | 🔨 in progress |
+| P1 | Sign-in / local-first pivot | Boots to local Home; Omi cloud optional | 🔨 P1.2-A merged |
 | P2 | Triggers v1 (phone-only) | Record without opening the app | |
 | P3 | **BT multi-device trigger matrix** | Any button on any of your BT devices starts capture | flagship |
 | P4 | Local-first capture core | Ring buffer, VAD, mark-last-buffer salvage | |
@@ -99,6 +99,9 @@ The web-auth OAuth flow works end-to-end (browser → account → `omi://auth/ca
 - [x] Install CI APK → run web-auth flow → confirmed it reaches `api.omiapi.com` and fails only at Firebase custom-token
 - [x] Try native Google Sign-In — native Firebase sign-in succeeds, but backend API rejects `based-hardware-dev` token with 401
 - [x] **P1.2 — decided 2026-07-05: de-mandatory login + local-first.** The community lane is structurally dead (api.omiapi.com verifies `based-hardware`; app is `based-hardware-dev`; #5939 won't-fix). Instead of chasing a matching config: **remove the mandatory login gate** → app boots local-only; Omi-cloud sign-in → optional Settings row (re-enable later via self-host, P7/D7); cloud-only features gated behind toggles (greyed + red "needs cloud"). **On-device Moonshine STT (P5) pulled forward** as the primary path; **local-Gemini/free-chain LLM** replaces cloud "intelligence" (Sri, Q&A item 12). Work branch `feature/local-first`. Plan: [plans/P1-signin.md](./plans/P1-signin.md) P1.2 section.
+- [x] **P1.2-A shipped** (2026-07-06): boot-to-local-Home + optional "Connect to Omi Cloud" Settings entry (both list + search) + Sign Out hidden for guests — merged to fork main via [PR #5](https://github.com/sriharshaguthikonda/omi/pull/5); `apk-latest` rebuilding. Label reuses existing `connectTo` l10n key (no new translations). Fix folded: reset `onboardingCompleted` before guest→cloud sign-in so a fresh cloud account still onboards.
+- [ ] **P1.2-B next:** gate cloud-only surfaces (conversations/chat/memories) for guests — grey + "needs cloud" affordance routing to Connect Omi Cloud.
+- [ ] **Then Phase B — on-device Moonshine streaming STT** (pulled forward, see [P5](#p5--on-device-asr) + [plans/P1-signin.md](./plans/P1-signin.md) Phase B).
 - [ ] Document the local-first + cloud-optional path in `docs/` once P1.2 lands
 
 **Decision D1 — auth lane going forward** ✅ closed 2026-07-04
