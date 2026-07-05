@@ -251,3 +251,22 @@ Kicking off Phase A via Codex now. Beeping you — go do your thing, I keep work
 
 > **A (2026-07-05):** Yes — live. A PostToolUse hook injects your `Q and A.md` changes into my context the moment you save; I saw your "nice!", the "lion in sheepskin" note, and this question **without** re-reading the file. So this is a real-time back-channel — write here anytime, I catch it on your next save. On the official app being a "lion in sheepskin, not in a good way": noted — that's *more* reason for the import/portability investigation, so nothing you've already recorded is hostage to it. Right now I'm mid-Phase-A: codex enumerated the guest-safety changes, I caught + fixed a bug in its plan (it would've skipped the mic-permission screen), verifying the boot path before I apply the diff.
 
+## new session 2026-07-05 23:13
+
+## user comments
+1. received message, no build run, push merge, move on to further steps
+
+> **A (2026-07-05 ~23:15):** Confirmed your read. `feature/local-first` was never pushed → **no build ran** for it. The red runs on the Actions tab are `Auto Release Desktop on Main` — an upstream desktop-release workflow that fails on *every* main push and has nothing to do with our Android APK. Disabling it + the other fork-irrelevant desktop/deploy workflows now, so the tab stops lying red.
+>
+> **Plan (running now — commit-by-commit, Codex implements / I review + correct):**
+> 1. One blocker before merge: on this branch a guest currently **can't reach sign-in** (the Settings entry isn't built yet). Codex is adding the "Connect Omi Cloud" row to Settings — without it, merging = an app you can't opt back into cloud from.
+> 2. Then **push + merge to fork main** (regular merge) → `apk-latest` refreshes → I beep you. You test two things: (a) boots straight to a usable local Home, no login wall; (b) Settings → Connect Omi Cloud still reaches sign-in.
+> 3. Then cloud-feature greying + a boot-path test, then on to P2 (triggers) / Phase B (Moonshine on-device STT).
+>
+> Beeping you at each merge/build milestone. Go — I keep working.
+
+## user comments
+1. i wil test it, don't stop because the build is working or i am testing it, move on to further steps and next commits, we can always revert back.
+
+> **A (2026-07-05 ~23:35):** Done in code on `feature/local-first`: Settings now shows a guest-only **Connect to Omi Cloud** row and hides **Sign Out** when signed out. The row exists in both the visible Settings list and Settings search, closes the drawer, and routes to `OnboardingWrapper` so cloud sign-in is reachable again without making login mandatory. Keeping the branch moving; local Flutter verification is still blocked because this Windows box has no `dart`/`flutter`.
+> **A (2026-07-05 ~23:40, Claude):** Not stopping. I split the commit so the feature (the Settings sign-in row) is its own commit `c67bce3`, one file — you can revert *just that* later without touching your R5 research or anything else. Label reuses the existing `connectTo` string → reads "Connect to Omi Cloud", no new translation files needed. Next: quick Codex review of that commit, then push + merge → apk-latest refresh, then straight on to the next increment (greying guest cloud-only features). Beeping at the merge.
