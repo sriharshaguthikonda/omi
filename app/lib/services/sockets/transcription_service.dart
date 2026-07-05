@@ -11,6 +11,7 @@ import 'package:omi/models/custom_stt_config.dart';
 import 'package:omi/models/stt_provider.dart';
 import 'package:omi/services/notifications.dart';
 import 'package:omi/services/sockets/on_device_apple_provider.dart';
+import 'package:omi/services/sockets/on_device_moonshine_socket.dart';
 import 'package:omi/services/sockets/on_device_whisper_provider.dart';
 import 'package:omi/services/sockets/pure_socket.dart';
 import 'package:omi/services/sockets/transcription_service.dart';
@@ -349,6 +350,24 @@ class TranscriptSocketServiceFactory {
     Logger.debug(
       "[STTFactory] Creating socket: provider=${config.provider.name}, isLive=${config.isLive}, lang=$effectiveLang, model=$effectiveModel",
     );
+
+    if (config.provider == SttProvider.onDeviceMoonshine) {
+      final socket = OnDeviceMoonshineSocket(
+        model: effectiveModel,
+        language: effectiveLang,
+        sampleRate: sampleRate,
+        sourceCodec: codec,
+      );
+      return TranscriptSegmentSocketService.withSocket(
+        sampleRate,
+        codec,
+        effectiveLang,
+        socket,
+        source: source,
+        customSttMode: true,
+        sttConfigId: sttConfigId,
+      );
+    }
 
     // Create primary socket based on isLive/isPolling
     final primarySocket = config.isLive
