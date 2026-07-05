@@ -225,6 +225,8 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 
 **Goal:** live transcript without cloud round-trip. Cloud STT (upstream backend) is an optional fallback behind the Omi-cloud toggle, not the default.
 
+**Execution plan:** [plans/P5-moonshine.md](./plans/P5-moonshine.md) — B0 reuse-check (done), verified seam map (file:line), compile-verifiable-first increments B1→B5. Moonshine wires at the `IPureSocket` streaming seam, bypassing the cloud-coupled composite socket.
+
 **Tasks**
 - [ ] Spike A: Moonshine Android (Maven package) — live latency + battery on your actual phone, 15-min session
 - [ ] Spike B (hedge): sherpa-onnx Android demo with a streaming model — same measurements
