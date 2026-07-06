@@ -530,7 +530,6 @@ class HomeContentPageState extends State<HomeContentPage> with AutomaticKeepAliv
                         initialZoom: 0.6,
                       ),
                     ),
-              ),
             ),
           ),
         ),
