@@ -1,5 +1,17 @@
 # Session Handoff Log
 
+## 2026-07-06 ~22:15 IST — Moonshine R8 crash FIXED (aa42b53, build GREEN, Sri beeped); B5 (local transcript persistence) in-flight via codex exec; merge HELD
+
+**Root causes confirmed on live device (adb, phone I2220/Android 16):**
+- **Moonshine broken on B4 APK:** `NoSuchFieldError: no "name" field in TranscriberOption` — `minifyEnabled true` (both build types, `build.gradle:135/140`) + Moonshine JNI resolves fields by exact name → R8 renamed them. **FIX:** proguard keep rules `-keep class ai.moonshine.** { *; }` in `app/android/app/proguard-rules.pro`, commit **`aa42b53`**, build **`28807197810` GREEN**. Sri beeped ×2 to install from that run's artifact + test (Settings→Transcription→On-Device Moonshine, ~79 MB first-run download). Memory: `mem_20260706_omi-android-bug-fix-2026_85c0e5`.
+- **Sri's "connection failed primary/secondary" logs:** old whisper-local attempts + Play-services noise. Red herring; whisper stays deprioritized.
+- **No transcripts in conversations tab (Sri Q5) — architectural, confirmed:** live segments memory-only (`capture_controller.dart` ~2107-2140); tab merges backend conversations + LocalRecording rows only (`conversations_page.dart:277`, `local_recordings_provider.dart:182/205`). **B5 fix in-flight:** persist finalized guest-mode capture sessions locally, reuse LocalRecording path. Codex exec running in background (spec: scratchpad `b5-spec.md`; do-not-commit; Claude reviews + commits).
+- **Tooling gotcha:** `mcp__codex-cli__codex` MCP tool started DROPPING prompt bodies mid-session ("no implementation task included", wrote confused questions into Q and A.md). Workaround: `codex exec --model gpt-5.5 --full-auto -C <repo> "$(cat spec.md)"` via Bash — works. Memory: `mem_20260706_codex-cli-tooling-bug-20_39c0da`.
+
+**New Sri directives (Q&A):** Q4 Groq whisper presets in STT dropdown → own cherry-pickable branch (BYOK, after B5); unrelated work = separate commits/branches, merge later; compact at phase transitions (transfer state to memory first); he's away — beep MULTIPLE times when needed.
+
+**Merge plan:** Phase B (B3+B4+aa42b53) merge to main HELD until Sri confirms Moonshine works on `28807197810` APK. Then merge (regular merge, self-merge authorized) → apk-latest refresh. B5 lands as its own verified increment after. Then greying (P1.2-B), then Groq presets.
+
 ## 2026-07-06 ~06:15 IST — B4 landed (Moonshine selectable); B3 compile-GREEN; Sri device-verified local-first; awaiting B4 build to merge Phase B
 
 **Sri directives (Q&A end, this session):** (1) Android **16** → Moonshine minSdk-35 fine, NO sherpa pivot. (2) **Full push+self-merge autonomy** — "remove this rule of not pushing, do all this yourself", "dont stop for my inputs, choose best option + fallback and do." (3) Parallel phases on branches, merge+verify. (4) Codex heavy-lifts, Claude orchestrates+corrects. Saved: `mem_20260706_omi-project-2026-07-06-s_d81437` (autonomy), session row `mem_20260704_omi-fork-session-2026-07_78f542` (refreshed).
