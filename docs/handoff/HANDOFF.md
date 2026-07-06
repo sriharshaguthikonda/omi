@@ -380,3 +380,64 @@ unreachable on the branch until the Settings entry lands (next increment).
 - Sri is away — beep milestones/decisions via PushNotification; announce Codex delegation visibly.
 - Write to Sri only at the END of `Q and A.md` (hard rule).
 - Commit-by-commit; Sri tests final APK and reports issues to fix "back again."
+
+---
+
+## 2026-07-06 23:41 IST — B5 + greying shipped; GREYING BUILD FAILED (troubleshoot next); Groq presets codex job running
+
+### Current task state
+- `feature/local-first` HEAD `5f9bb36e8`, all pushed. Commits this session: `aa42b53` (Moonshine proguard fix), `3e55ce2` (B5 local transcript persistence), `70b89ec` (docs), `5f9bb36` (greying Chat+Memories for guests).
+- Builds: `28807197810` GREEN (Moonshine fix), `28810326937` GREEN (Moonshine+B5 — **Sri's test APK, beeped**), **`28812646384` FAILED (greying commit `5f9bb36` — TROUBLESHOOT FIRST, Sri flagged it in Q&A)**.
+- Codex exec job RUNNING in background (task `bua1nz2x0`, output `C:\Users\DELETA~1\AppData\Local\Temp\claude\C--Android-software-omi\18e8858b-a314-417a-80c8-ecf5ac7b60d3\tasks\bua1nz2x0.output`): Groq whisper presets in worktree `C:/Android_software/omi-groq-presets`, branch `feature/groq-whisper-presets` (off origin/main, cherry-pickable). Spec: scratchpad `groq-spec.md`. Investigate-first; do-not-commit; review+commit is orchestrator's job.
+
+### Key decisions
+- Phase B merge to main HELD until Sri device-confirms Moonshine on `28810326937`.
+- Greying scope corrected: only Chat+Memories grey for guests; **Conversations stays enabled** (hosts B5 local transcripts).
+- Reviewer findings triaged: B5 got atomic sidecar write; greying got 3 guards (post-build redirect in memories initState, mounted checks). Deliberate: guest-era transcripts stay visible after sign-in.
+- Codex MCP tool drops prompts → use `codex exec --model gpt-5.5 --full-auto -C <dir> "$(cat spec.md)"` via Bash (memory `mem_20260706_codex-cli-tooling-bug-20_39c0da`).
+
+### Modified files (all committed)
+- `app/android/app/proguard-rules.pro` (+moonshine keep rules)
+- B5: `app/lib/{models/local_recording.dart, providers/local_recordings_provider.dart, services/capture/capture_controller.dart, pages/conversations/*}` + `app/test/providers/local_recordings_provider_test.dart`
+- Greying: `app/lib/{providers/home_provider.dart, pages/home/{page.dart,home_content.dart,guest_cloud_only_guard.dart(new)}, pages/chat/page.dart, pages/memories/page.dart}` + `app/test/providers/home_provider_guest_access_test.dart`
+
+### Blockers / open questions
+- **Greying build `28812646384` failed** — get log: `gh run view 28812646384 -R sriharshaguthikonda/omi --log-failed | grep -iE "error" | head -30`. Likely Dart compile error in `5f9bb36` (page.dart/home_content.dart churn or missing import in guards). Fix → commit → push → new build.
+- Sri device test of `28810326937` pending (Moonshine + transcript-row) — Phase-B merge gate.
+- Q13 (Sri's Kaggle ONNX models) still open.
+
+### Next steps
+1. Troubleshoot greying build failure (above command), fix, commit, push, watch build.
+2. When codex Groq job finishes: review diff in `C:/Android_software/omi-groq-presets` (cavecrew-reviewer), fix findings, commit on `feature/groq-whisper-presets`, push.
+3. On Sri's Moonshine-green report: merge Phase B (`feature/local-first`→main, regular merge, self-merge authorized) → apk-latest refresh → beep Sri.
+4. If Sri reports transcript-row missing (B5): debug via adb logcat (`$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe`, phone I2220 Android 16, works).
+
+### Critical context
+- adb: `"$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe"`; app package `com.friend.ios.dev`; logcat grep tags: `MoonshineSttPlugin`, `flutter`.
+- No local Flutter/dart on this box — compile verification = CI APK build on push (`.github/workflows/android_apk_build.yml`, fork `sriharshaguthikonda/omi`).
+- Sri directives: don't stop, commit-after-commit; beep MULTIPLE times (mobile push inactive — desktop only); compact sooner; answer inline in `Q and A.md` (write only at END).
+- Review loop pattern: codex exec implements (no commit) → cavecrew-reviewer diff pass → Claude triages (reject non-issues with reasons) → minimal guards → commit.
+
+### Model summary
+- Session resumed after crash; B4 build was green, Sri had installed it and reported local STT broken + no transcripts in messages tab.
+- Codex investigation + live adb logcat pinned Moonshine crash: R8 minification broke JNI field lookup (`TranscriberOption.name`); fixed with proguard keep rules (`aa42b53`), build green, Sri beeped.
+- Sri's "connection failed primary/secondary" logs were a red herring (old whisper + Play-services noise).
+- Q5 confirmed architectural: transcripts were memory-only; B5 (codex-implemented, reviewed, hardened with atomic writes) persists guest sessions as JSON sidecars shown in Conversations tab (`3e55ce2`); build `28810326937` GREEN = Sri's combined test APK.
+- Greying shipped (`5f9bb36`): Chat+Memories greyed for guests with sign-in hint, deep links clamp to Conversations; 3 review guards applied; **its build failed — first thing to fix**.
+- Groq whisper presets (Sri Q4): codex exec running in worktree `omi-groq-presets` on branch off main for cherry-pickability; BYOK presets over existing custom-STT path.
+- Codex MCP tool unreliable (drops prompts) — direct `codex exec` CLI is the working path; ONE codex job at a time.
+- Phase-B merge to main gated on Sri's device confirmation of Moonshine.
+
+### Handoff context
+1. Fix greying build: `gh run view 28812646384 -R sriharshaguthikonda/omi --log-failed | grep -iE "error" | head -30`; edit offending file(s) on `feature/local-first`; commit `fix(local-first): ...`; push; `gh run list ... --limit 1` → `gh run watch <id> --exit-status` in background.
+2. Answer Sri item 3 in `Q and A.md` (END of file): acknowledge failure + fix status.
+3. Check codex Groq result: `Read C:\Users\DELETA~1\...\tasks\bua1nz2x0.output` (tail). If PHASE-1-stop (no custom STT on main), re-target: implement presets on `feature/local-first` instead; tell Sri cherry-pick direction reverses.
+4. Review Groq diff with caveman:cavecrew-reviewer agent (same prompt pattern as B5/greying reviews) before committing in the worktree.
+5. Push Groq branch only after review+fix; it triggers its own APK build (app/** paths).
+6. Merge Phase B ONLY on Sri's green Moonshine report (regular merge, no squash; self-merge authorized memory `mem_20260706_omi-project-2026-07-06-s_d81437`).
+7. After merge: apk-latest refreshes from main push; beep Sri ×2+.
+8. Whisper-local STT stays deprioritized (ROADMAP backlog).
+9. Memory rows this session: `mem_20260706_omi-android-bug-fix-2026_85c0e5` (R8/JNI lesson), `mem_20260706_codex-cli-tooling-bug-20_39c0da` (codex MCP workaround).
+10. Worktree cleanup later: `git worktree remove ../omi-groq-presets` after branch merged/pushed.
+11. Sri's phone: I2220, Android 16, adb-visible; package `com.friend.ios.dev`.
+12. All Q&A writes go at the very END of `Q and A.md`; the qa-nudge hook echoes user edits automatically.
