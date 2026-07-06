@@ -1252,36 +1252,38 @@ class _TranscriptionSettingsPageState extends State<TranscriptionSettingsPage> {
               items: [
                 ...SttProviderConfig.allProviders
                     .where(
-                      (config) =>
-                          config.provider != SttProvider.onDeviceWhisper &&
-                          config.provider != SttProvider.onDeviceMoonshine &&
-                          config.provider != SttProvider.omiParakeet,
-                    )
-                    .map(
-                  (config) {
-                    return DropdownMenuItem<SttProvider>(
-                      value: config.provider,
-                      child: Row(
-                        children: [
-                          Expanded(child: Text(config.displayName)),
-                          if (config.isLive)
-                            Container(
-                              margin: const EdgeInsets.only(left: 8),
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.green.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                context.l10n.live,
-                                style: const TextStyle(color: Colors.green, fontSize: 10, fontWeight: FontWeight.w600),
+                  (config) =>
+                      config.provider != SttProvider.onDeviceWhisper &&
+                      config.provider != SttProvider.onDeviceMoonshine &&
+                      config.provider != SttProvider.omiParakeet,
+                )
+                    .map((config) {
+                  return DropdownMenuItem<SttProvider>(
+                    value: config.provider,
+                    child: Row(
+                      children: [
+                        Expanded(child: Text(config.displayName)),
+                        if (config.isLive)
+                          Container(
+                            margin: const EdgeInsets.only(left: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.green.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              context.l10n.live,
+                              style: const TextStyle(
+                                color: Colors.green,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                          ),
+                      ],
+                    ),
+                  );
+                }),
               ],
               onChanged: (provider) async {
                 if (provider != null) {

@@ -477,9 +477,8 @@ class LocalRecordingsProvider extends ChangeNotifier {
     final dir = await _transcriptDir();
     if (!await dir.exists()) await dir.create(recursive: true);
     final recordingName = _matchingRecordingFileName(dir, sessionStartSeconds);
-    final fileName = recordingName == null
-        ? '$_localTranscriptPrefix$sessionStartSeconds.json'
-        : '$recordingName$_transcriptSuffix';
+    final fileName =
+        recordingName == null ? '$_localTranscriptPrefix$sessionStartSeconds.json' : '$recordingName$_transcriptSuffix';
     final file = File('${dir.path}/$fileName');
     final seconds = _transcriptSeconds(cleanSegments);
     // Write via temp+rename so a concurrent refresh never reads a half-written sidecar.
