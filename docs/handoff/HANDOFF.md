@@ -471,3 +471,71 @@ unreachable on the branch until the Settings entry lands (next increment).
 - **PR #6 open, merge HELD**: <https://github.com/sriharshaguthikonda/omi/pull/6> — on Sri's green 3-part report: `gh pr merge 6 -R sriharshaguthikonda/omi --merge` (regular, NO squash) → main build refreshes apk-latest → beep ×2. On red report: adb logcat (`"$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe"`, pkg `com.friend.ios.dev`), root-cause, fix, re-push.
 - Groq branch `feature/groq-whisper-presets` (`b96fe9d`) green standalone — leave for upstream-style cherry-picks; worktree `C:/Android_software/omi-groq-presets` removable after.
 - No watchers running. Nothing unblocked. Next session: read END of `Q and A.md` first for Sri's report.
+
+---
+
+## 2026-07-07 ~04:05 IST — Sri's 7-item report processed; STT id-collapse ROOT-CAUSED + FIXED; new build watching
+
+### Current task state
+- Sri device-tested APK `28815045799` (confirmed via adb: v1.0.542, installed 01:24 IST, device `I2220` connected, adb at `"$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe"`).
+- His report (Q&A lines ~542-553): Moonshine partially works but transcript "only holds last word"; Groq "same issue" + bombarding API; lint workflow red; whisper broken (expected); merge question.
+- All root-caused and fixed; pushed to `feature/local-first` (PR #6 auto-includes). HEAD `e67aa79`; fix `65f176c`, format `d45c581`.
+- **Watchers RUNNING** (task `bgd3ri0vm`): Lint `28827307627` + APK `28827306060` on `d45c581`. NOTE: watcher started before `e67aa79` (docs-only push) — a THIRD run pair on `e67aa79` will exist; check `gh run list --branch feature/local-first` on wake.
+- Codex independent review of fix commits: **CLEAN** (static; local test run impossible — no flutter on box).
+
+### Key decisions
+- Root cause (bug 7 + 6a): locally-produced STT segments carried no `id` → `TranscriptSegment.fromJson` defaults `''` → `updateSegments` (transcript_segment.dart:104, consumed capture_controller.dart:2148) replaces-by-id → whole transcript collapsed into one overwritten segment. Fixed at producers (NOT in fromJson — avoids blast radius on live cloud providers that emit interims relying on current semantics).
+- Moonshine: stable per-line id (`moonshine_<nonce>_<lineIndex>`), native `isFinal` bumps index → partials update in place, finals stick, next line appends. Regression test added (partials-share-id test in on_device_moonshine_socket_test.dart).
+- Polling (Groq/OpenAI/local whisper): unique id per segment (`poll_<nonce>_<seq>`); provider failure (null/throw) now RE-QUEUES audio frames (cap 4MB ≈ 2min) instead of silent drop; cloud batch cadence 5s→10s (Groq rate limits).
+- Lint red root cause: 3 unformatted files; CI formats SHORT-style (pubspec lower bound 3.0). **Gotcha: local dart 3.12 format MUST use `--language-version=3.0 --line-length 120`** or it tall-style-corrupts clean files (burned once, reverted). Dart SDK lives in session scratchpad `dart-sdk/` (re-download per session: dart-archive stable zip).
+- B4b guest consent gate: deliberately SKIPPED (personal fork, single user, engine setup = owner's explicit act). Ponytail note amended in mobile_app.dart:40 — **uncommitted** as of this entry.
+- On-device whisper failure = expected/known (ROADMAP low-prio, Moonshine replaces). Cloud whisper presets silently had the same collapse bug — healed by same fix.
+
+### Modified files (committed)
+- `app/lib/services/sockets/on_device_moonshine_socket.dart` (ids + isFinal)
+- `app/lib/services/sockets/pure_polling.dart` (ids + requeue + cap)
+- `app/lib/services/sockets/transcription_service.dart` (10s cadence)
+- `app/test/unit/on_device_moonshine_socket_test.dart` (id assertions + new regression test)
+- `app/lib/pages/settings/transcription_settings_page.dart`, `app/lib/providers/local_recordings_provider.dart` (format only)
+- `Q and A.md` (all 7 answers at END, `e67aa79`)
+- UNCOMMITTED: `app/lib/mobile/mobile_app.dart` (comment-only note amendment)
+
+### Blockers / open questions
+- Sole gate: Sri's re-test on the NEW green APK (Moonshine transcript must now ACCUMULATE; plus transcript row + greying checks).
+- Watcher results pending (lint + APK on `d45c581`/`e67aa79`).
+
+### Next steps
+1. On watcher wake: green → beep Sri ×2 with new run URL appended at END of `Q and A.md`; red → `gh run view <id> --log-failed`, root-cause, fix, re-push.
+2. Commit `mobile_app.dart` note (ride along with next functional commit or solo before merge).
+3. Sri green report → `gh pr merge 6 -R sriharshaguthikonda/omi --merge` (regular, NO squash) → main build refreshes apk-latest → beep ×2.
+4. Sri red report → adb logcat live repro (`adb logcat -c` then capture during test; app NOT debuggable, no run-as; in-app Settings→debug-logs export is the fallback).
+5. After merge: roadmap essentially drained — dev-theme is last; whisper debug low-prio/superseded.
+
+### Critical context
+- Memory saved: `mem_20260706_omi-bug-fix-lesson-2026_8f30b6` (id-collapse pattern + dart format gotcha). Autonomy: full push/self-merge per `mem_20260706_omi-project-2026-07-06-s_d81437` (regular merge, fork main only, NEVER upstream).
+- RULE going forward: any new STT producer emitting segment JSON MUST set unique (or deliberately stable per-line) `id`.
+- B5 sidecar reload is display-only (no updateSegments) — fix flows through; persisted transcripts now accumulate correctly.
+- Codex charmap: memory MCP rejects `→` unicode — use ASCII in remember() content.
+- Q&A protocol: answers ONLY at END of `Q and A.md`; beep = PushNotification ×2 (mobile push inactive, desktop only).
+
+### Model summary
+- Sri reported 7 items after device-testing definitive APK; all addressed in one session.
+- Diagnosed transcript collapse statically: empty-id replace-by-id merge, confirmed at exact consumption line.
+- Fix at producers only; live cloud provider semantics untouched.
+- Groq additionally suffered silent audio drop on failed requests (non-200 → null → frames already cleared) — now re-queued with cap.
+- Cadence halved request rate to respect Groq free-tier limits.
+- Lint fixed; discovered + survived dart formatter version/style trap; SDK now local.
+- Codex second-opinion review: CLEAN.
+- Q&A answered at end of file, Sri beeped ×2, memory + handoff updated.
+- Merge of PR #6 still gated on Sri's retest of the new build.
+- B4b consent gate consciously deferred with in-code rationale.
+
+### Handoff context (actionable)
+- `cd C:/Android_software/omi` — branch `feature/local-first`, HEAD `e67aa79` pushed; only `app/lib/mobile/mobile_app.dart` dirty (comment).
+- Check runs: `gh run list --repo sriharshaguthikonda/omi --branch feature/local-first --limit 6`.
+- If APK green on latest commit: append pointer at END of `Q and A.md` (install link `https://github.com/sriharshaguthikonda/omi/actions/runs/<id>`), commit, push, beep ×2.
+- Retest list for Sri: (1) Moonshine live transcript accumulates across sentences; (2) stop capture → transcript row in Conversations; (3) guest greying Chat+Memories. Groq: expect ~10s batch steps, needs his API key.
+- Merge command staged: `gh pr merge 6 -R sriharshaguthikonda/omi --merge`.
+- Dart format on this box: download stable SDK zip to scratchpad → `dart format --line-length 120 --language-version=3.0 <files>` (NEVER bare — style trap).
+- adb: `"$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe"`; device `10BF191Z51001DC` (I2220); package `com.friend.ios.dev` (not debuggable).
+- Codex invocation that works here: `codex exec --sandbox read-only -C C:/Android_software/omi "<prompt>"` (one job at a time).

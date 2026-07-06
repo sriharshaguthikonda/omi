@@ -38,9 +38,11 @@ class MobileApp extends StatelessWidget {
           // straight in; Omi-cloud sign-in lives in Settings. Route through the
           // permissions gate so mic access is still granted for capture.
           // ponytail: aiConsentGiven is intentionally NOT gated here — no AI
-          // processing runs at guest boot (cloud off, on-device STT not wired
-          // yet). Phase B (Moonshine) must gate capture/transcription start on
-          // consent for signed-out users.
+          // processing runs at guest boot. Phase B decision (2026-07-07): the
+          // guest consent gate stays deferred on this personal fork — guests
+          // only get STT after explicitly configuring an engine (BYOK key or
+          // on-device model download) in Settings, which is a deliberate act
+          // by the device owner. Revisit before any public distribution.
           return const _PermissionsGate();
         }
       },
