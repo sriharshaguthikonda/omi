@@ -9,6 +9,8 @@ enum SttProvider {
   omiParakeet,
   openai,
   openaiDiarize,
+  groqWhisperLargeV3,
+  groqWhisperLargeV3Turbo,
   deepgram,
   deepgramLive,
   falai,
@@ -253,6 +255,34 @@ class SttProviderConfig {
       apiKeyUrl: 'https://platform.openai.com/api-keys',
       docsUrl: 'https://platform.openai.com/docs/models/gpt-4o-transcribe-diarize',
     ),
+    SttProvider.groqWhisperLargeV3: SttProviderConfig(
+      provider: SttProvider.groqWhisperLargeV3,
+      displayName: 'Groq Whisper Large v3',
+      description: 'Groq Whisper Large v3 - OpenAI-compatible transcription',
+      icon: FontAwesomeIcons.bolt,
+      requiresApiKey: true,
+      requestType: SttRequestType.multipartForm,
+      supportedLanguages: SttLanguages.whisperSupported,
+      supportedModels: const ['whisper-large-v3'],
+      defaultLanguage: 'en',
+      defaultModel: 'whisper-large-v3',
+      responseSchema: SttResponseSchema.openAI,
+      apiKeyUrl: 'https://console.groq.com/keys',
+    ),
+    SttProvider.groqWhisperLargeV3Turbo: SttProviderConfig(
+      provider: SttProvider.groqWhisperLargeV3Turbo,
+      displayName: 'Groq Whisper Large v3 Turbo',
+      description: 'Groq Whisper Large v3 Turbo - OpenAI-compatible transcription',
+      icon: FontAwesomeIcons.boltLightning,
+      requiresApiKey: true,
+      requestType: SttRequestType.multipartForm,
+      supportedLanguages: SttLanguages.whisperSupported,
+      supportedModels: const ['whisper-large-v3-turbo'],
+      defaultLanguage: 'en',
+      defaultModel: 'whisper-large-v3-turbo',
+      responseSchema: SttResponseSchema.openAI,
+      apiKeyUrl: 'https://console.groq.com/keys',
+    ),
     SttProvider.deepgram: SttProviderConfig(
       provider: SttProvider.deepgram,
       displayName: 'Deepgram',
@@ -405,6 +435,8 @@ class SttProviderConfig {
   static const _visibleProviders = [
     SttProvider.openai,
     SttProvider.openaiDiarize,
+    SttProvider.groqWhisperLargeV3,
+    SttProvider.groqWhisperLargeV3Turbo,
     SttProvider.deepgramLive,
     SttProvider.geminiLive,
     SttProvider.localWhisper,
@@ -467,6 +499,19 @@ class SttProviderConfig {
           'language': lang,
           'response_format': 'diarized_json',
           'chunking_strategy': 'auto',
+        };
+        break;
+
+      case SttProvider.groqWhisperLargeV3:
+      case SttProvider.groqWhisperLargeV3Turbo:
+        config['url'] = 'https://api.groq.com/openai/v1/audio/transcriptions';
+        config['audio_field_name'] = 'file';
+        config['headers'] = {'Authorization': 'Bearer ${apiKey ?? ''}'};
+        config['params'] = {
+          'model': mdl.isNotEmpty ? mdl : defaultModel,
+          'language': lang,
+          'response_format': 'verbose_json',
+          'timestamp_granularities[]': 'segment',
         };
         break;
 
