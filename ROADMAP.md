@@ -347,6 +347,7 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 - **APK shape (D0b):** currently arm64-only. Revisit fat/`--split-per-abi` if a non-arm64 target device appears or the release page needs multi-arch (Sri, 2026-07-04).
 - **Data portability / anti-lock-in (Sri, 2026-07-05):** map how the official Omi app stores conversations/audio and whether it's exportable/importable into our local store — before relying on their storage; guards against a buyout locking Sri out.
 - **Dev-build theme / visual distinction (Sri, 2026-07-06, low prio — "roadmap last"):** give the dev flavor a visibly different theme/accent (or a persistent DEV banner) so dev vs prod/official installs stop being confusing side-by-side. Cheapest path: flavor-gated accent/badge behind `F.env == Environment.dev`, no new deps. Brand rule still applies — no purple.
+- **On-device Whisper STT broken (Sri device test, 2026-07-06, low prio):** local Whisper (`SttProvider.onDeviceWhisper`) failed to transcribe on Sri's Android 16 phone though audio recording worked. Debug later — NOT priority (Moonshine is the on-device engine replacing it). Start at `transcription_settings_page.dart` `_checkLocalModel`/`_buildOnDeviceWhisperConfig` + the `whisper_flutter_new` plugin (likely model-download/path or ggml runtime).
 
 ---
 

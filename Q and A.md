@@ -354,3 +354,25 @@ Codex lifts, I review + correct each commit. Beeping only at merge/build milesto
 **When B4 goes green I merge Phase B → main → apk-latest refreshes → I beep you.** Then you can flip Transcription to On-Device Moonshine and test on-device streaming.
 
 Who lifted: Codex (gpt-5.5, medium) implemented B4; I reviewed, added the device guard + removed the premature model pickers, committed. Next after the merge: grey the guest cloud-only tabs (Conversations/Chat/Memories) so local mode stops looking broken.
+
+
+
+
+
+## user comments
+
+2. i was able to get past the sign in scrren from the latest apk - that was built 5 hours ago.!
+3. the whisper local stt didnt work but note in roadmap to debug but not priority now
+4. i was able to record the audios 
+
+---
+
+## agent answer 2026-07-06 (your device test — big validation)
+
+This is exactly the confirmation I couldn't get on this box (no Flutter/phone here):
+
+- **Past sign-in + booted local ✅** — the whole local-first pivot works on a real device: no login wall, straight into a usable app. P1.2-A verified by you, not just "compiles."
+- **Recording audio ✅** — capture path is alive without any cloud account.
+- **Whisper local STT ❌ → logged, not priority.** Added to ROADMAP Revisit-backlog as a low-prio debug item. Don't spend on it — **Moonshine is the on-device engine that replaces Whisper**, and that's what B4 just wired up. So whisper being broken doesn't block the on-device goal; Moonshine is the path.
+
+**So the next apk-latest (Phase B) is the one that matters for you:** it adds *On-Device Moonshine* under **Settings → Transcription → source dropdown**. B4 is compiling now; when green I merge Phase B → apk-latest refreshes → I beep you to install and flip Transcription to On-Device Moonshine. That's the real on-device-STT test.
