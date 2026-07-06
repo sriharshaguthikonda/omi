@@ -498,3 +498,12 @@ Note: transcripts will show **during capture** but still won't land in the conve
 3. first grey cloud only tabs, chat, memories, that particular build has not succeeded, troubleshoot accordingly
 
 > **A (Claude):** troubleshot + fixed. Cause: stray extra `)` in `home_content.dart` (codex's greying edit) broke build_runner. Removed it, bracket-verified all 6 touched files, pushed `38de888` — new build `28813351259` running; I'll beep when green. Note: greying WAS already implemented in that failed build — Chat + Memories grey out for guests with a sign-in hint, deep links bounce to Conversations, which stays fully usable (it's where your local transcripts land per B5). Meanwhile: **your Moonshine + transcript test APK is still the GREEN build `28810326937`** — that one is unaffected, test it whenever.
+
+
+## user comments
+1. do other features and next setps commit after commit! dont stop 
+2. compact sooner.....than way you will output high qualiy 
+3. have this check integrated into your workflow, see if the build is successful or else troubleshoot it.
+> **A (Claude, item 3):** already standard since the greying failure: every push arms a background build watcher (`gh run watch --exit-status`) that wakes me on finish — green ⇒ proceed/beep you, red ⇒ pull `--log-failed`, root-cause, fix, re-push. That loop caught+fixed the greying paren bug in one cycle. Also added: bracket-balance pre-check on every codex-touched Dart file BEFORE pushing (no local flutter here, so this catches syntax slop without burning a CI round).
+
+> **NEW: Groq presets SHIPPED (Q4)** — `b96fe9d` on branch `feature/groq-whisper-presets` (off main, cherry-pickable both ways, build watching): STT dropdown gains **Groq Whisper Large v3** + **Large v3 Turbo**, BYOK (key from <https://console.groq.com/keys>), reuses the custom-STT plumbing main already had. Watchers running: greying-fix build `28813351259` + groq build `28813777139` — will report/beep. Still pending from you: Moonshine + transcript-row test on GREEN APK `28810326937`.
