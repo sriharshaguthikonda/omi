@@ -66,3 +66,8 @@
 -dontwarn lombok.Generated
 -dontwarn lombok.**
 -keep class lombok.** { *; }
+
+# Moonshine on-device STT — JNI looks up TranscriberOption fields by exact name;
+# R8 renaming them crashes init with NoSuchFieldError (seen on device, B4).
+-keep class ai.moonshine.** { *; }
+-dontwarn ai.moonshine.**
