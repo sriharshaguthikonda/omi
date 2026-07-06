@@ -536,3 +536,44 @@ Report all three here (worked / failed + any error text).
 - Your move: the 3-step test list above. Everything else is done and waiting on that.
 
 > **🔔 Definitive test APK GREEN (beeped ×2): run `28815045799`** — <https://github.com/sriharshaguthikonda/omi/actions/runs/28815045799>. Install this one; it has ALL of it (Moonshine + transcript rows + greying + Groq presets). Run the 3-step test above; your green report = one-click merge of PR #6 → apk-latest refresh.
+
+
+
+## user comments
+1. do other features and next setps commit after commit! dont stop 
+2. compact sooner.....than way you will output high qualiy 
+
+
+3. next to the debug device adb you can check what is going on, which particular version of app i am using. i am able to see the groq connection, i put in api key as well.
+
+4. if this has to be merged with other branches or whatever 
+5. other thing is there have been a failures in the workflow regarding linting or something
+6. whisper thing didnt work on this branch idk if we expect that failure. 
+6a. groq appears to have same issue as well. optimise not to bombard groq api 
+7. moonshine is partially working but the transcript i think it only holds last word. it does not hold whatever it has been hearing. i am sure you can find out more from the logs.
+
+
+## agent update 2026-07-07 ~03:50 am IST — all 7 items answered, fixes pushed
+
+> **A3 (adb / your version):** adb works, phone `I2220` connected. You're on **1.0.542, installed 01:24 IST = the definitive APK `28815045799`** — correct build, has everything. (App isn't debuggable so I can't pull its internal logs over adb; if a future build misbehaves, use Settings → debug logs → share/export and drop the file anywhere in this repo folder.)
+>
+> **A7 (Moonshine only holds last word) — ROOT CAUSE FOUND + FIXED:** Moonshine sends its transcript as it refines it (partial → partial → final), and our segments carried **no id**. The app's transcript merger replaces segments *by id*, and every id defaulted to the same empty string — so every update **overwrote the whole transcript** instead of appending. Exactly "only holds the last thing heard". Fix (`65f176c`): each spoken line gets a stable id (partials update that line in place — you'll see it refine live), a finished line stays, next line appends. Unit test added for exactly this regression.
+>
+> **A6a (Groq "same issue" + bombarding) — same root cause + 2 more:** (1) Groq segments also had no id → same overwrite collapse. (2) When a Groq request failed (e.g. rate limit), the audio chunk was **silently thrown away** — fixed, it now retries with the next batch. (3) Request rate halved: 5s → 10s chunks (~6 requests/min, friendlier to Groq free-tier limits). Transcript appears in ~10s steps in Groq mode — that's by design for batch mode.
+>
+> **A6 (whisper didn't work):** expected — on-device Whisper was already known-broken on this branch (logged low-prio in ROADMAP; Moonshine is its replacement). Not a new failure, nothing to fix there. Note: the fixes above also repair the *cloud* whisper presets (OpenAI etc.) which silently had the same collapse bug.
+>
+> **A5 (workflow lint failures):** root-caused — 3 Dart files were unformatted and the Lint Check workflow fails hard on that. Formatted + pushed (`d45c581`). Also installed a local Dart SDK on this box so formatting slop gets caught before pushing from now on.
+>
+> **A4 (merge):** PR #6 is the same branch, so it now automatically includes tonight's fixes. Plan: new build goes green → I beep → you re-run the same 3-step test (Moonshine live transcript should now ACCUMULATE) → your green report = I merge PR #6 → apk-latest refresh. Build watchers armed; codex is doing an independent review pass of the fix in parallel.
+
+
+
+
+
+
+
+
+
+
+
