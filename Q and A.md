@@ -337,3 +337,20 @@ Codex lifts, I review + correct each commit. Beeping only at merge/build milesto
 
 
 
+## user comments
+
+1. think we need a theme option that can be changed for dev version because it is getting confusing - keep it in roadmap last
+
+---
+
+## agent answer 2026-07-06 (B3 compiles; B4 landed; theme logged)
+
+**Theme option → logged as "roadmap last."** Added to ROADMAP Revisit-backlog: dev flavor gets a visibly different accent/DEV badge (flavor-gated on `Environment.dev`, no purple). Low prio as you said.
+
+**Phase B is basically done and compiling:**
+- **B3** (Moonshine Android native bridge) — **compiles green** (branch build `28759379198`). That was the big unverified chunk: the Kotlin bridge + `ai.moonshine:moonshine-voice` Maven dep + minSdk-35 override all build. First real proof it's sound.
+- **B4** (select Moonshine as the STT engine) — **committed** `553838ecd`, build `28759840329` running. Where you'll find it: **Settings → Transcription → source dropdown → "On-Device Moonshine."** It persists the engine choice; capture then routes to the on-device Moonshine socket automatically. I hid the model/language pickers (only tiny-en is wired) and added an Android-15+/Android-only guard so wrong devices get a clear message instead of a dead engine.
+
+**When B4 goes green I merge Phase B → main → apk-latest refreshes → I beep you.** Then you can flip Transcription to On-Device Moonshine and test on-device streaming.
+
+Who lifted: Codex (gpt-5.5, medium) implemented B4; I reviewed, added the device guard + removed the premature model pickers, committed. Next after the merge: grey the guest cloud-only tabs (Conversations/Chat/Memories) so local mode stops looking broken.
