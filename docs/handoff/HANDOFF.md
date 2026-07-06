@@ -441,3 +441,23 @@ unreachable on the branch until the Settings entry lands (next increment).
 10. Worktree cleanup later: `git worktree remove ../omi-groq-presets` after branch merged/pushed.
 11. Sri's phone: I2220, Android 16, adb-visible; package `com.friend.ios.dev`.
 12. All Q&A writes go at the very END of `Q and A.md`; the qa-nudge hook echoes user edits automatically.
+
+---
+
+## 2026-07-07 ~00:30 IST — delta since 23:41 entry (pre-compaction snapshot)
+
+### State
+- `feature/local-first` HEAD `a03459e71`, all pushed. New commits: `38de888` (paren fix in home_content.dart — greying build failure root-caused: extra `)` at :537 broke build_runner), `7cc35ce`/`dd181e5`/`a03459e` (Q&A docs), `06e53f5` (handoff).
+- **Builds: greying-fix `28813351259` GREEN** → best all-features test APK (Moonshine fix + B5 transcripts + greying). Sri beeped ×2, 3-step test list at END of `Q and A.md`. Supersedes `28810326937`.
+- **Groq presets SHIPPED `b96fe9d`** on branch `feature/groq-whisper-presets` (worktree `C:/Android_software/omi-groq-presets`, off origin/main, cherry-pickable). +45-line diff reviewed clean (presets over existing SttProviderConfig pattern in `app/lib/models/stt_provider.dart`; main already had custom-STT plumbing). Build `28813777139` — watcher `b1qa27ja8` RUNNING, check on wake: green ⇒ tell Sri; red ⇒ `gh run view 28813777139 -R sriharshaguthikonda/omi --log-failed`.
+
+### Workflow now standard (Sri item 3, answered)
+- Every push → background `gh run watch <id> --exit-status` → wake → green: proceed/beep; red: `--log-failed` → root-cause → fix → re-push.
+- Before push of codex-touched Dart: `python <scratchpad>/balance.py <files>` (bracket balance; scratchpad = `C:\Users\DELETA~1\AppData\Local\Temp\claude\C--Android-software-omi\18e8858b-a314-417a-80c8-ecf5ac7b60d3\scratchpad`).
+
+### Next (in order)
+1. Groq build watcher result (`b1qa27ja8`) — handle green/red as above.
+2. Sri's 3-part device report on `28813351259` (Moonshine live transcript / transcript row in Conversations / greyed Chat+Memories) → gates Phase B merge: `feature/local-first`→main, REGULAR merge (no squash), self-merge authorized → apk-latest refreshes → beep ×2.
+3. If Sri reports B5 row missing: adb logcat (`"$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe"`, package `com.friend.ios.dev`) around capture stop; sidecar files land next to batch audio dir (`local_transcript_<start>.json`).
+4. After Phase B merge: cherry-pick direction for groq branch is INTO feature/local-first or main per Sri; ROADMAP next items in handoff 23:41 section.
+5. Beeps: PushNotification ×2 minimum (mobile push inactive — desktop only). All Sri messages at END of `Q and A.md` only.
