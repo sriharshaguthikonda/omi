@@ -507,3 +507,11 @@ Note: transcripts will show **during capture** but still won't land in the conve
 > **A (Claude, item 3):** already standard since the greying failure: every push arms a background build watcher (`gh run watch --exit-status`) that wakes me on finish — green ⇒ proceed/beep you, red ⇒ pull `--log-failed`, root-cause, fix, re-push. That loop caught+fixed the greying paren bug in one cycle. Also added: bracket-balance pre-check on every codex-touched Dart file BEFORE pushing (no local flutter here, so this catches syntax slop without burning a CI round).
 
 > **NEW: Groq presets SHIPPED (Q4)** — `b96fe9d` on branch `feature/groq-whisper-presets` (off main, cherry-pickable both ways, build watching): STT dropdown gains **Groq Whisper Large v3** + **Large v3 Turbo**, BYOK (key from <https://console.groq.com/keys>), reuses the custom-STT plumbing main already had. Watchers running: greying-fix build `28813351259` + groq build `28813777139` — will report/beep. Still pending from you: Moonshine + transcript-row test on GREEN APK `28810326937`.
+
+## 🔔 2026-07-07 — greying build GREEN; new best test APK (beeped ×2)
+
+**Install from run `28813351259`:** <https://github.com/sriharshaguthikonda/omi/actions/runs/28813351259> — supersedes `28810326937`; has everything: Moonshine R8 fix + B5 local transcripts + guest tab greying. Test list:
+1. Settings → Transcription → **On-Device Moonshine** (~79 MB first download) → speak → live transcript.
+2. Stop capture → **Conversations tab** → transcript row appears, readable on tap.
+3. As guest: **Chat + Memories look greyed**, tapping shows sign-in hint; Conversations stays normal.
+Report all three here (worked / failed + any error text).
