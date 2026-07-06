@@ -32,6 +32,7 @@ import 'package:omi/pages/conversations/auto_sync_page.dart';
 import 'package:omi/pages/conversations/sync_page.dart';
 import 'package:omi/pages/action_items/widgets/task_selection_action_bar.dart';
 import 'package:omi/pages/conversations/widgets/merge_action_bar.dart';
+import 'package:omi/pages/home/guest_cloud_only_guard.dart';
 import 'package:omi/pages/home/home_content.dart';
 import 'package:omi/pages/memories/page.dart';
 import 'package:omi/pages/phone_calls/active_call_banner.dart';
@@ -45,6 +46,7 @@ import 'package:omi/pages/settings/task_integrations_page.dart';
 import 'package:omi/pages/settings/wrapped_2025_page.dart';
 import 'package:omi/providers/action_items_provider.dart';
 import 'package:omi/providers/app_provider.dart';
+import 'package:omi/providers/auth_provider.dart';
 import 'package:omi/providers/capture_provider.dart';
 import 'package:omi/providers/connectivity_provider.dart';
 import 'package:omi/providers/conversation_provider.dart';
@@ -169,7 +171,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, Ticker
   }
 
   void _addGoal() {
-    context.read<HomeProvider>().setIndex(1);
+    context.read<HomeProvider>().setIndex(HomeProvider.conversationsTabIndex);
     final conversationsState = _conversationsPageKey.currentState;
     if (conversationsState != null) {
       (conversationsState as dynamic).addGoal();
@@ -288,6 +290,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, Ticker
           break;
       }
     }
+    if (isGuestUser(context) && HomeProvider.isGuestCloudOnlyRoute(pageAlias)) {
+      homePageIdx = HomeProvider.conversationsTabIndex;
+    }
 
     // Home controller
     context.read<HomeProvider>().selectedIndex = homePageIdx;
@@ -335,6 +340,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, Ticker
           }
           break;
         case "chat":
+          if (guardGuestCloudOnlyAccess(context, clampToConversations: true)) break;
           Logger.debug('inside chat alias $detailPageId');
           if (detailPageId != null && detailPageId.isNotEmpty) {
             var appId = detailPageId != "omi" ? detailPageId : ''; // omi ~ no select
@@ -376,6 +382,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, Ticker
           break;
         case "memories":
         case "facts":
+          if (guardGuestCloudOnlyAccess(context, clampToConversations: true)) break;
           globalNavigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => const MemoriesPage()));
           break;
         case "conversation":
@@ -684,12 +691,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, Ticker
           }
           return child!;
         },
-        child: Consumer<HomeProvider>(
-          builder: (context, homeProvider, _) {
+        child: Consumer2<HomeProvider, AuthenticationProvider>(
+          builder: (context, homeProvider, authProvider, _) {
+            final isGuest = !authProvider.isSignedIn();
+            final selectedIndex =
+                isGuest ? HomeProvider.clampGuestSelectedIndex(homeProvider.selectedIndex) : homeProvider.selectedIndex;
+            if (selectedIndex != homeProvider.selectedIndex) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) homeProvider.setIndex(selectedIndex);
+              });
+            }
             return Scaffold(
               backgroundColor: Theme.of(context).colorScheme.primary,
               resizeToAvoidBottomInset: false,
-              appBar: homeProvider.selectedIndex == 5 ? null : _buildAppBar(context),
+              appBar: selectedIndex == HomeProvider.chatTabIndex ? null : _buildAppBar(context),
               body: GestureDetector(
                 onTap: () {
                   primaryFocus?.unfocus();
@@ -701,9 +716,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, Ticker
                     Column(
                       children: [
                         // Show slim green call bar on non-home/conversations tabs when a call is active
-                        if (homeProvider.selectedIndex > 1) const ActiveCallTopBar(),
+                        if (selectedIndex > HomeProvider.conversationsTabIndex) const ActiveCallTopBar(),
                         Expanded(
-                          child: IndexedStack(index: context.watch<HomeProvider>().selectedIndex, children: _pages),
+                          child: IndexedStack(index: selectedIndex, children: _pages),
                         ),
                       ],
                     ),
@@ -731,18 +746,23 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, Ticker
                                 }
                               },
                             ),
-                            if (home.selectedIndex == 0)
-                              Positioned(left: 16, right: 16, bottom: 78, child: _buildChatBar(context)),
+                            if (home.selectedIndex == HomeProvider.homeTabIndex)
+                              Positioned(
+                                left: 16,
+                                right: 16,
+                                bottom: 78,
+                                child: _buildChatBar(context, isGuest: isGuest),
+                              ),
                           ],
                         );
                       },
                     ),
                     // Merge action bar - floats above bottom nav when in selection mode
-                    if (homeProvider.selectedIndex == 1)
+                    if (selectedIndex == HomeProvider.conversationsTabIndex)
                       const Positioned(left: 0, right: 0, bottom: 0, child: MergeActionBar()),
                     // Task selection action bar - floats above bottom nav on the
                     // tasks tab when selection mode is active in ActionItemsProvider.
-                    if (homeProvider.selectedIndex == 2)
+                    if (selectedIndex == HomeProvider.actionItemsTabIndex)
                       const Positioned(left: 0, right: 0, bottom: 0, child: TaskSelectionActionBar()),
                   ],
                 ),
@@ -754,63 +774,82 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, Ticker
     );
   }
 
-  Widget _buildChatBar(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        PlatformManager.instance.analytics.bottomNavigationTabClicked('Chat');
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatPage(isPivotBottom: false)));
-      },
-      child: Container(
-        height: 62,
-        decoration: BoxDecoration(
-          color: const Color(0xFF1F1F25),
-          borderRadius: BorderRadius.circular(32),
-          border: Border.all(color: const Color(0xFF35343B), width: 1),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.65),
-              blurRadius: 60,
-              spreadRadius: 14,
-              offset: const Offset(0, -16),
+  Widget _buildChatBar(BuildContext context, {required bool isGuest}) {
+    return Opacity(
+      opacity: isGuest ? 0.45 : 1,
+      child: GestureDetector(
+        onTap: () {
+          if (isGuest) {
+            HapticFeedback.lightImpact();
+            guardGuestCloudOnlyAccess(context, clampToConversations: true);
+            return;
+          }
+          HapticFeedback.lightImpact();
+          PlatformManager.instance.analytics.bottomNavigationTabClicked('Chat');
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatPage(isPivotBottom: false)));
+        },
+        child: Semantics(
+          button: true,
+          enabled: !isGuest,
+          child: Container(
+            height: 62,
+            decoration: BoxDecoration(
+              color: const Color(0xFF1F1F25),
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(color: const Color(0xFF35343B), width: 1),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.65),
+                  blurRadius: 60,
+                  spreadRadius: 14,
+                  offset: const Offset(0, -16),
+                ),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.45),
+                  blurRadius: 32,
+                  spreadRadius: 6,
+                  offset: const Offset(0, -8),
+                ),
+                BoxShadow(color: Colors.black.withValues(alpha: 0.25), blurRadius: 10, offset: const Offset(0, 2)),
+              ],
             ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.45),
-              blurRadius: 32,
-              spreadRadius: 6,
-              offset: const Offset(0, -8),
+            child: Row(
+              children: [
+                const SizedBox(width: 18),
+                Expanded(
+                  child: Text(
+                    'Ask Omi anything about your life...',
+                    style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 15),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    if (isGuest) {
+                      HapticFeedback.lightImpact();
+                      guardGuestCloudOnlyAccess(context, clampToConversations: true);
+                      return;
+                    }
+                    HapticFeedback.lightImpact();
+                    PlatformManager.instance.analytics.bottomNavigationTabClicked('Chat Voice');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ChatPage(isPivotBottom: false, autoStartVoice: true),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    width: 42,
+                    height: 42,
+                    margin: const EdgeInsets.only(right: 6),
+                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                    child: const Icon(FontAwesomeIcons.microphone, size: 15, color: Colors.black),
+                  ),
+                ),
+              ],
             ),
-            BoxShadow(color: Colors.black.withValues(alpha: 0.25), blurRadius: 10, offset: const Offset(0, 2)),
-          ],
-        ),
-        child: Row(
-          children: [
-            const SizedBox(width: 18),
-            Expanded(
-              child: Text(
-                'Ask Omi anything about your life...',
-                style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 15),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                HapticFeedback.lightImpact();
-                PlatformManager.instance.analytics.bottomNavigationTabClicked('Chat Voice');
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ChatPage(isPivotBottom: false, autoStartVoice: true)),
-                );
-              },
-              child: Container(
-                width: 42,
-                height: 42,
-                margin: const EdgeInsets.only(right: 6),
-                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                child: const Icon(FontAwesomeIcons.microphone, size: 15, color: Colors.black),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

@@ -485,6 +485,10 @@ Note: transcripts will show **during capture** but still won't land in the conve
 
 > **A (Claude):** on it — pipeline is commit-after-commit now: **B5 is implemented** (codex, 7 files: transcripts persist locally as sidecar JSON, show in conversations tab + detail sheet, guest-only so cloud flow untouched) → independent review running → fix findings → commit+push (CI compile-checks it) → then **greying of cloud tabs for guests** → then **Groq whisper presets** on its own cherry-pickable branch. Your Moonshine test on APK `28807197810` is still the merge gate for Phase B — everything else keeps moving without it.
 
+> **🔔 BUILD `28810326937` IS GREEN (beeped ×2) — install this one:** <https://github.com/sriharshaguthikonda/omi/actions/runs/28810326937>. Test: (1) Settings → Transcription → On-Device Moonshine (~79 MB first download) → speak → live transcript appears; (2) stop capture → Conversations tab → your transcript shows as a row, readable on tap. Report both results here.
+
+> **UPDATE (B5 shipped `3e55ce2`, build `28810326937` running):** review done — 1 hardening fix applied (atomic sidecar writes), rest were non-issues (persist is idempotent by filename; capture path guest-gated). **Better test for you:** once build `28810326937` is green (I'll beep), install THAT one instead — it has the Moonshine fix **plus** B5, so you can verify both at once: (1) live transcript during capture, (2) after stopping, the transcript appears as a row in the Conversations tab. **Greying** now in progress via codex — scope corrected: only **Chat + Memories** grey out for guests; **Conversations stays enabled** since B5 made it home for your local transcripts.
+
 
 ## user comments
 1. do other features and next setps commit after commit! dont stop 

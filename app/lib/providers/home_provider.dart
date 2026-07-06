@@ -34,6 +34,23 @@ const multiLanguageSupported = {
 };
 
 class HomeProvider extends ChangeNotifier {
+  static const int homeTabIndex = 0;
+  static const int conversationsTabIndex = 1;
+  static const int actionItemsTabIndex = 2;
+  static const int appsTabIndex = 3;
+  static const int memoriesTabIndex = 4;
+  static const int chatTabIndex = 5;
+  static const Set<int> _guestCloudOnlyTabIndexes = {memoriesTabIndex, chatTabIndex};
+  static const Set<String> _guestCloudOnlyRoutes = {'chat', 'memories', 'facts'};
+
+  static bool isGuestCloudOnlyTab(int index) => _guestCloudOnlyTabIndexes.contains(index);
+
+  static int clampGuestSelectedIndex(int index) {
+    return isGuestCloudOnlyTab(index) ? conversationsTabIndex : index;
+  }
+
+  static bool isGuestCloudOnlyRoute(String route) => _guestCloudOnlyRoutes.contains(route);
+
   int selectedIndex = 0;
   Function(int idx)? onSelectedIndexChanged;
   final FocusNode chatFieldFocusNode = FocusNode();
