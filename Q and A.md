@@ -478,3 +478,14 @@ Build green: <https://github.com/sriharshaguthikonda/omi/actions/runs/2880719781
 Note: transcripts will show **during capture** but still won't land in the conversations tab yet — that's B5, codex is building it now. Test only the live-transcription part.
 
 2. 
+
+
+## user comments
+1. do other features and next setps commit after commit!
+
+> **A (Claude):** on it — pipeline is commit-after-commit now: **B5 is implemented** (codex, 7 files: transcripts persist locally as sidecar JSON, show in conversations tab + detail sheet, guest-only so cloud flow untouched) → independent review running → fix findings → commit+push (CI compile-checks it) → then **greying of cloud tabs for guests** → then **Groq whisper presets** on its own cherry-pickable branch. Your Moonshine test on APK `28807197810` is still the merge gate for Phase B — everything else keeps moving without it.
+
+
+## user comments
+1. do other features and next setps commit after commit! dont stop 
+2. compact sooner.....than way you will output high qualiy 
