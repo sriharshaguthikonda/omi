@@ -434,3 +434,47 @@ Once I have logs I can confirm the socket failure root cause on-device.
 
 8. if there are other work that is not related to this that can be implemented in other commits, then do it and later merge them.
 
+9.iam going away you need to beep me multiple times to get my attention.
+
+## agent answer 2026-07-06 (late — ROOT CAUSES CONFIRMED, FIX PUSHED)
+
+Phone showed up on adb (item 1 — good) — pulled logcat, verified everything live.
+
+**Moonshine failure — found and FIXED (not a network problem):** logcat shows `NoSuchFieldError: no "name" field in TranscriberOption` at init. The R8 code-shrinker (minify is on even in debug builds) renamed fields Moonshine's native JNI library looks up by exact name → instant crash when the STT socket starts. Fix = 2 proguard keep-rules, pushed `aa42b53`, new APK building (run `28807197810`). **I'll beep (repeatedly, per item 9) when ready — install, flip Settings → Transcription → On-Device Moonshine, speak, report here.** First run downloads the ~79 MB model — leave it a minute on wifi.
+
+**Your "connection failed primary: true, secondary: false" lines (3a):** old whisper-local attempts + unrelated Google Play services noise — red herring. Whisper stays deprioritized; Moonshine is the path.
+
+**Q5 — your hypothesis CONFIRMED:** conversations tab = backend-fetched conversations + local *recordings* only. Live transcript segments are memory-only; in local-first mode they have nowhere to land. Codex is implementing B5 now: finished capture sessions persist locally and appear in the tab, no backend needed. Cloud-user flow untouched.
+
+**7 (compact at phase transitions):** yes — will compact when Phase B closes, after transferring state to memory.
+
+**8 (unrelated work in separate commits):** agreed — that's already the shape: Groq presets (Q4) goes on its own cherry-pickable branch; B5 is its own commit(s) on feature/local-first.
+
+**Merge plan:** Phase B merge held until you confirm Moonshine works on the new APK; then B3+B4+proguard fix merges, B5 follows as its own tested increment.
+
+## agent question 2026-07-06 (Codex)
+
+I have the constraints, but the implementation target is missing from the chat message.
+
+**Need from you:** what exact new app code should I implement under `app/` now?
+
+I will not touch `app/android/app/proguard-rules.pro`.
+
+## user comments
+1. you need to cooordinate with claude who started your sessiosn for those details! i am harsha!
+
+> **A (Claude):** handled — codex session had gone stale and lost the spec; re-dispatched it with a fresh session and the full B5 spec. Not your problem, ignore codex questions in this file; it's been told to talk to me, not you.
+
+## 🔔 ACTION FOR SRI 2026-07-06 (beeped ×2) — Moonshine fix APK is READY
+
+Build green: <https://github.com/sriharshaguthikonda/omi/actions/runs/28807197810> — grab the APK artifact from that run (same way you installed the last one), then:
+
+1. Install over the old one.
+2. Settings → Transcription → **On-Device Moonshine**.
+3. First use downloads the ~79 MB model — stay on wifi, give it a minute.
+4. Speak → watch for live transcript during capture.
+5. Report here: worked / failed + any red error text.
+
+Note: transcripts will show **during capture** but still won't land in the conversations tab yet — that's B5, codex is building it now. Test only the live-transcription part.
+
+2. 
