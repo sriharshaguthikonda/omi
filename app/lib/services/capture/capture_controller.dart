@@ -30,6 +30,7 @@ import 'package:omi/env/env.dart';
 import 'package:omi/models/custom_stt_config.dart';
 import 'package:omi/models/stt_provider.dart';
 import 'package:omi/providers/device_onboarding_provider.dart';
+import 'package:omi/providers/local_recordings_provider.dart';
 import 'package:omi/services/capture/capture_external_actions.dart';
 import 'package:omi/services/capture/capture_metrics_tracker.dart';
 import 'package:omi/services/capture/freemium_threshold_tracker.dart';
@@ -391,6 +392,8 @@ class CaptureController extends ChangeNotifier
   /// can await it before querying disk WALs. Prevents race when backend responds fast.
   Future<void>? _pendingFinalizeAndStamp;
 
+  int? _lastPersistedLocalTranscriptSessionStart;
+
   /// Set in onClosed() when the socket drops during active device recording.
   /// Consumed in _initiateWebsocket() to trigger onNetworkSocketReconnected()
   /// on the device connection (e.g. Limitless re-sends enable-data-stream).
@@ -494,6 +497,7 @@ class CaptureController extends ChangeNotifier
   }
 
   Future _resetStateVariables() async {
+    await _persistLocalTranscriptIfNeeded();
     _stopInProgressConversationRefresh();
     segments = [];
     photos = [];
@@ -502,6 +506,7 @@ class CaptureController extends ChangeNotifier
     _conversation = null;
     taggingSegmentIds = [];
     _sessionStartSeconds = 0;
+    _lastPersistedLocalTranscriptSessionStart = null;
     _endOfflineSession();
     notifyListeners();
   }
@@ -940,6 +945,19 @@ class CaptureController extends ChangeNotifier
     await _closeBleStream(disableNativeBackground: disableNativeBackground);
     _activeSource = null;
     notifyListeners();
+  }
+
+  Future<void> _persistLocalTranscriptIfNeeded() async {
+    if (AuthService.instance.isSignedIn()) return;
+    if (_sessionStartSeconds <= 0 || _lastPersistedLocalTranscriptSessionStart == _sessionStartSeconds) return;
+    final transcriptSegments = segments.where((s) => s.text.trim().isNotEmpty).toList();
+    if (transcriptSegments.isEmpty) return;
+
+    _lastPersistedLocalTranscriptSessionStart = _sessionStartSeconds;
+    await LocalRecordingsProvider.persistTranscriptSession(
+      sessionStartSeconds: _sessionStartSeconds,
+      segments: transcriptSegments,
+    );
   }
 
   Future<BleAudioCodec> _getAudioCodec(String deviceId) async {
@@ -1393,6 +1411,7 @@ class CaptureController extends ChangeNotifier
     ServiceManager.instance().mic.stop();
     updateRecordingState(RecordingState.stop);
     await _socket?.stop(reason: 'stop stream recording');
+    await _persistLocalTranscriptIfNeeded();
   }
 
   Future streamDeviceRecording({BtDevice? device}) async {
@@ -1422,6 +1441,7 @@ class CaptureController extends ChangeNotifier
     }
     updateRecordingState(RecordingState.stop);
     await _socket?.stop(reason: 'stop stream device recording');
+    await _persistLocalTranscriptIfNeeded();
   }
 
   @override

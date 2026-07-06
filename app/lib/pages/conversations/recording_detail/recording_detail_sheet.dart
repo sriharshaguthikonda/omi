@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:omi/backend/schema/transcript_segment.dart';
 import 'package:omi/models/local_recording.dart';
 import 'package:omi/providers/local_recordings_provider.dart';
 import 'package:omi/widgets/omi_confirm_dialog.dart';
@@ -98,6 +99,7 @@ class _RecordingDetailSheetState extends State<_RecordingDetailSheet> {
       child: Container(
         margin: const EdgeInsets.all(8),
         clipBehavior: Clip.antiAlias,
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9),
         decoration: BoxDecoration(color: const Color(0xFF1F1F25), borderRadius: BorderRadius.circular(28)),
         child: SafeArea(
           top: false,
@@ -114,7 +116,7 @@ class _RecordingDetailSheetState extends State<_RecordingDetailSheet> {
 
               return Stack(
                 children: [
-                  Padding(
+                  SingleChildScrollView(
                     padding: const EdgeInsets.fromLTRB(24, 14, 24, 30),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -148,83 +150,89 @@ class _RecordingDetailSheetState extends State<_RecordingDetailSheet> {
                             _buildMenu(context, provider, rec),
                           ],
                         ),
-                        const SizedBox(height: 36),
-                        SizedBox(height: 60, child: _buildWaveform(provider, rec, isPlaying, canPlay, total, progress)),
-                        const SizedBox(height: 14),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(_fmt(position), style: _timeStyle),
-                            Text(_fmt(total), style: _timeStyle),
-                          ],
-                        ),
-                        const SizedBox(height: 28),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IconButton(
-                              iconSize: 28,
-                              color: Colors.white,
-                              disabledColor: Colors.grey.shade700,
-                              onPressed: canPlay && isPlaying ? () => provider.skipBackward() : null,
-                              icon: const Icon(Icons.replay_10_rounded),
-                            ),
-                            const SizedBox(width: 28),
-                            GestureDetector(
-                              onTap: canPlay ? () => provider.togglePlayback(rec) : null,
-                              child: Container(
-                                width: 66,
-                                height: 66,
-                                decoration: BoxDecoration(
-                                  color: canPlay ? Colors.white : const Color(0xFF35343B),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  provider.isProcessingAudio && isPlaying
-                                      ? Icons.hourglass_empty_rounded
-                                      : (isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded),
-                                  color: canPlay ? Colors.black : Colors.grey.shade600,
-                                  size: 36,
+                        if (rec.hasAudio) ...[
+                          const SizedBox(height: 36),
+                          SizedBox(
+                            height: 60,
+                            child: _buildWaveform(provider, rec, isPlaying, canPlay, total, progress),
+                          ),
+                          const SizedBox(height: 14),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(_fmt(position), style: _timeStyle),
+                              Text(_fmt(total), style: _timeStyle),
+                            ],
+                          ),
+                          const SizedBox(height: 28),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                iconSize: 28,
+                                color: Colors.white,
+                                disabledColor: Colors.grey.shade700,
+                                onPressed: canPlay && isPlaying ? () => provider.skipBackward() : null,
+                                icon: const Icon(Icons.replay_10_rounded),
+                              ),
+                              const SizedBox(width: 28),
+                              GestureDetector(
+                                onTap: canPlay ? () => provider.togglePlayback(rec) : null,
+                                child: Container(
+                                  width: 66,
+                                  height: 66,
+                                  decoration: BoxDecoration(
+                                    color: canPlay ? Colors.white : const Color(0xFF35343B),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    provider.isProcessingAudio && isPlaying
+                                        ? Icons.hourglass_empty_rounded
+                                        : (isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded),
+                                    color: canPlay ? Colors.black : Colors.grey.shade600,
+                                    size: 36,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 28),
-                            IconButton(
-                              iconSize: 28,
-                              color: Colors.white,
-                              disabledColor: Colors.grey.shade700,
-                              onPressed: canPlay && isPlaying ? () => provider.skipForward() : null,
-                              icon: const Icon(Icons.forward_10_rounded),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 32),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: ElevatedButton.icon(
-                            onPressed: rec.isBusy ? null : () => _handleTranscribe(provider, rec),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF35343B),
-                              disabledBackgroundColor: const Color(0xFF2A2A2E),
-                              foregroundColor: Colors.white,
-                              disabledForegroundColor: Colors.grey.shade600,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                            ),
-                            icon: rec.isBusy
-                                ? SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.grey.shade500),
-                                  )
-                                : const Icon(Icons.cloud_upload_outlined, size: 20),
-                            label: Text(
-                              rec.isBusy ? context.l10n.syncStatusUploaded : context.l10n.processNow,
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                              const SizedBox(width: 28),
+                              IconButton(
+                                iconSize: 28,
+                                color: Colors.white,
+                                disabledColor: Colors.grey.shade700,
+                                onPressed: canPlay && isPlaying ? () => provider.skipForward() : null,
+                                icon: const Icon(Icons.forward_10_rounded),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 32),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: ElevatedButton.icon(
+                              onPressed: rec.isBusy ? null : () => _handleTranscribe(provider, rec),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF35343B),
+                                disabledBackgroundColor: const Color(0xFF2A2A2E),
+                                foregroundColor: Colors.white,
+                                disabledForegroundColor: Colors.grey.shade600,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              ),
+                              icon: rec.isBusy
+                                  ? SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.grey.shade500),
+                                    )
+                                  : const Icon(Icons.cloud_upload_outlined, size: 20),
+                              label: Text(
+                                rec.isBusy ? context.l10n.syncStatusUploaded : context.l10n.processNow,
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                              ),
                             ),
                           ),
-                        ),
+                        ],
+                        if (rec.hasTranscript) _buildTranscript(context, rec),
                       ],
                     ),
                   ),
@@ -288,6 +296,37 @@ class _RecordingDetailSheetState extends State<_RecordingDetailSheet> {
     );
   }
 
+  Widget _buildTranscript(BuildContext context, LocalRecording rec) {
+    final text = TranscriptSegment.segmentsAsString(
+      rec.transcriptSegments,
+      includeTimestamps: true,
+      speakerLabelBuilder: (speakerId) => context.l10n.speakerWithId(speakerId),
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 28),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            context.l10n.transcript,
+            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(color: const Color(0xFF17171C), borderRadius: BorderRadius.circular(14)),
+          child: SelectableText(
+            text,
+            style: TextStyle(color: Colors.grey.shade200, fontSize: 14, height: 1.45),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _preparingOverlay(BuildContext context) {
     return Positioned.fill(
       child: GestureDetector(
@@ -323,7 +362,7 @@ class _RecordingDetailSheetState extends State<_RecordingDetailSheet> {
       onSelected: (v) {
         switch (v) {
           case 'share':
-            provider.share(rec);
+            if (rec.hasAudio) provider.share(rec);
           case 'info':
             _showFileDetailsDialog(context, rec);
           case 'delete':
@@ -331,7 +370,7 @@ class _RecordingDetailSheetState extends State<_RecordingDetailSheet> {
         }
       },
       itemBuilder: (_) => [
-        _menuItem('share', Icons.ios_share_rounded, context.l10n.shareRecording, Colors.white),
+        if (rec.hasAudio) _menuItem('share', Icons.ios_share_rounded, context.l10n.shareRecording, Colors.white),
         _menuItem('info', Icons.info_outline_rounded, context.l10n.recordingInfo, Colors.white),
         if (!rec.isBusy) _menuItem('delete', Icons.delete_outline_rounded, context.l10n.delete, Colors.redAccent),
       ],
@@ -395,8 +434,8 @@ class _RecordingDetailSheetState extends State<_RecordingDetailSheet> {
             children: [
               _detailRow(context.l10n.dateTimeLabel, dateTimeFormat('MMM dd, yyyy h:mm:ss a', rec.startedAt)),
               _detailRow(context.l10n.durationLabel, secondsToHumanReadable(rec.seconds, context)),
-              _detailRow(context.l10n.audioFormatLabel, rec.codec.toFormattedString()),
-              _detailRow(context.l10n.estimatedSizeLabel, _formatBytes(rec.sizeBytes)),
+              if (rec.hasAudio) _detailRow(context.l10n.audioFormatLabel, rec.codec.toFormattedString()),
+              if (rec.hasAudio) _detailRow(context.l10n.estimatedSizeLabel, _formatBytes(rec.sizeBytes)),
             ],
           ),
         ),
