@@ -580,6 +580,25 @@ Report all three here (worked / failed + any error text).
 
 
 
+## 🔔 2026-07-07 ~04:30 — STT-FIX APK GREEN (beeped ×2) — install + retest
+
+**Install from run `28827747244`:** <https://github.com/sriharshaguthikonda/omi/actions/runs/28827747244> — supersedes `28815045799`. Contains the transcript-accumulation fix (Moonshine + Groq + cloud whisper presets), Groq rate-limit easing (10s batches), and no-more-dropped-audio-on-failure.
+
+Retest (same 3 steps, new expectation on #1):
+1. Moonshine live transcript — should now **ACCUMULATE sentence after sentence** (current line refines in place, finished lines stay).
+2. Stop capture → Conversations tab → transcript row appears, readable, full text.
+3. Groq (your key): transcript arrives in ~10s steps and accumulates; watch for any error banner.
+
+Report all three here → green = I merge PR #6 → apk-latest refresh → beep.
+
+## user comments
+1. do parallel implementation of other features. 
+2. later we can merge them.
+3. codex heavy lifting.
+
+> **A (Claude):** already running that way — **P2 triggers is in its own worktree/branch (`feature/p2-triggers`) with codex lifting right now**, PR #6 stays frozen for your retest, and they merge independently later. One constraint I respect: codex handles **one job at a time** on this box (its session DB clashes when doubled), so parallelism = separate branches with codex jobs queued back-to-back: P2.1 (router + notification buttons, running) → P2.2 (Quick Settings tile) → P2.3 (Tasker intent). Each lands commit-by-commit with CI checks. When a lane needs device testing you'll get a beep + branch APK link.
+
+
 
 
 
