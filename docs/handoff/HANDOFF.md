@@ -461,3 +461,13 @@ unreachable on the branch until the Settings entry lands (next increment).
 3. If Sri reports B5 row missing: adb logcat (`"$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe"`, package `com.friend.ios.dev`) around capture stop; sidecar files land next to batch audio dir (`local_transcript_<start>.json`).
 4. After Phase B merge: cherry-pick direction for groq branch is INTO feature/local-first or main per Sri; ROADMAP next items in handoff 23:41 section.
 5. Beeps: PushNotification ×2 minimum (mobile push inactive — desktop only). All Sri messages at END of `Q and A.md` only.
+
+---
+
+## 2026-07-07 ~01:15 IST — ALL GREEN, PR #6 staged; sole blocker = Sri device report
+
+- `feature/local-first` HEAD `9813c538f`, pushed. New since last entry: `e36d340` (groq cherry-pick, clean), Q&A docs (`bee03a1`, `9813c53`).
+- **Definitive test APK: run `28815045799` GREEN** (Moonshine fix + B5 transcripts + greying + Groq presets). Sri beeped ×2; 3-step test list at END of `Q and A.md`.
+- **PR #6 open, merge HELD**: <https://github.com/sriharshaguthikonda/omi/pull/6> — on Sri's green 3-part report: `gh pr merge 6 -R sriharshaguthikonda/omi --merge` (regular, NO squash) → main build refreshes apk-latest → beep ×2. On red report: adb logcat (`"$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe"`, pkg `com.friend.ios.dev`), root-cause, fix, re-push.
+- Groq branch `feature/groq-whisper-presets` (`b96fe9d`) green standalone — leave for upstream-style cherry-picks; worktree `C:/Android_software/omi-groq-presets` removable after.
+- No watchers running. Nothing unblocked. Next session: read END of `Q and A.md` first for Sri's report.
