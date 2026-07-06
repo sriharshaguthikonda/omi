@@ -534,3 +534,5 @@ Report all three here (worked / failed + any error text).
 - **Groq presets build GREEN** (`28813777139`) on its own branch, and **cherry-picked into `feature/local-first`** (`e36d340`, clean merge, build `28815045799` watching) — so your NEXT local-first APK will have the Groq dropdown entries too (needs your Groq API key from <https://console.groq.com/keys>).
 - **Phase-B PR is open and staged: <https://github.com/sriharshaguthikonda/omi/pull/6>** — everything bundled (Moonshine + B5 transcripts + greying + Groq presets). It does NOT merge until your 3-part test report on APK `28813351259` (or the newer `28815045799` once green — same content + Groq) comes back good. Then one click → apk-latest refreshes.
 - Your move: the 3-step test list above. Everything else is done and waiting on that.
+
+> **🔔 Definitive test APK GREEN (beeped ×2): run `28815045799`** — <https://github.com/sriharshaguthikonda/omi/actions/runs/28815045799>. Install this one; it has ALL of it (Moonshine + transcript rows + greying + Groq presets). Run the 3-step test above; your green report = one-click merge of PR #6 → apk-latest refresh.
