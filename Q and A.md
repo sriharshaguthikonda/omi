@@ -570,7 +570,13 @@ Report all three here (worked / failed + any error text).
 
 
 
+## user comments
+1. dont stop go on with further things in the roadmap
+2. commit by commit
+3. you orchestrate correct codex cli does heavy lifting
+4. compact sooner after one feature is pushed!
 
+> **A (Claude):** all four in effect. **P2 Triggers v1 started** — your D2 checkbox in ROADMAP ("all of the above, big-red-button redesign deferred") is the decision, so no re-litigating. Codex is implementing P2.1 right now on new branch `feature/p2-triggers` (own worktree, won't disturb PR #6): trigger-router seam + start/stop buttons on the recording notification, two commits, CI-checked per commit. QS tile and Tasker intent receiver are the next codex jobs after. Meanwhile the **STT-fix build on `24fe8e8` is running** — beep + install link the moment it's green; your Moonshine retest still gates PR #6 merge. Compacting right after this (handoff + memory already written).
 
 
 
