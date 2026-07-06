@@ -493,3 +493,8 @@ Note: transcripts will show **during capture** but still won't land in the conve
 ## user comments
 1. do other features and next setps commit after commit! dont stop 
 2. compact sooner.....than way you will output high qualiy 
+
+
+3. first grey cloud only tabs, chat, memories, that particular build has not succeeded, troubleshoot accordingly
+
+> **A (Claude):** troubleshot + fixed. Cause: stray extra `)` in `home_content.dart` (codex's greying edit) broke build_runner. Removed it, bracket-verified all 6 touched files, pushed `38de888` — new build `28813351259` running; I'll beep when green. Note: greying WAS already implemented in that failed build — Chat + Memories grey out for guests with a sign-in hint, deep links bounce to Conversations, which stays fully usable (it's where your local transcripts land per B5). Meanwhile: **your Moonshine + transcript test APK is still the GREEN build `28810326937`** — that one is unaffected, test it whenever.
