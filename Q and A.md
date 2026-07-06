@@ -272,3 +272,68 @@ Kicking off Phase A via Codex now. Beeping you — go do your thing, I keep work
 > **A (2026-07-05 ~23:40, Claude):** Not stopping. I split the commit so the feature (the Settings sign-in row) is its own commit `c67bce3`, one file — you can revert *just that* later without touching your R5 research or anything else. Label reuses the existing `connectTo` string → reads "Connect to Omi Cloud", no new translation files needed. Next: quick Codex review of that commit, then push + merge → apk-latest refresh, then straight on to the next increment (greying guest cloud-only features). Beeping at the merge.
 > **A (2026-07-06 ~00:15, Claude):** ✅ **MERGED + BUILT + LIVE.** PR #5 merged to fork main (regular merge); main APK build went **green** (run 28750627047) and **apk-latest is refreshed** (103 MB, 2026-07-06) — <https://github.com/sriharshaguthikonda/omi/releases/tag/apk-latest>. That green build is the compile-proof I can't get on this Windows box: the whole local-first path compiles. **When you install, check:** (1) opens straight to a usable local Home — no login screen; (2) Settings shows **"Connect to Omi Cloud"** (not "Sign Out"); tapping it reaches sign-in. Heads-up so it doesn't look broken: **Conversations/Chat/Memories will be empty in local mode** (they need cloud) — greying them with a "needs cloud" label is a queued follow-up, not a bug. Also disabled the `Auto Release Desktop on Main` scheduled workflow — that was the red spam on the Actions tab, unrelated to our APK.
 > Meanwhile on **Phase B (on-device Moonshine)**: Codex mapped the exact seam — wire Moonshine as `OnDeviceMoonshineSocket` at the streaming-socket layer, bypassing the cloud-coupled `CompositeTranscriptionSocket`. Fleshing the increment plan now. One real blocker on *your* side: the **Kaggle ONNX link (Q13)** — that's what lets your own model drop in as an STT engine beside Moonshine. Drop it whenever and I'll wire it in.
+> **A (2026-07-06 ~03:30, Claude):** B1+B2 (the Moonshine Dart seam — `onDeviceMoonshine` provider + `OnDeviceMoonshineSocket` + factory routing that bypasses the cloud path) **compile-verified**: branch build `28756353578` green. Kept off `apk-latest` so the build you're installing stays P1.2-A. Standing by for your device result. Queued and ready on your word: **B3** (Moonshine Android native bridge — the on-device transcription itself), guest cloud-feature greying, and P2 triggers. Tell me which to push on, or I'll take B3 next.
+
+
+
+## user comments
+
+1. continue your time i'll test the final version and i'll tell you the issues you can later correct them back again go commit by commit
+
+---
+
+## agent answer 2026-07-06 (B3 — on-device Moonshine Android bridge)
+
+**Committed** `a9c253c43` on `feature/local-first`. Not in apk-latest — your installed **v1.0.542+10** is still P1.2-A, so nothing to reinstall yet. Codex wrote the Kotlin; I decompiled the real Moonshine AAR to verify every call and fixed its drift (bottom).
+
+**⚠️ One decision only you can make — Moonshine needs Android 15.**
+The `ai.moonshine:moonshine-voice:0.0.65` SDK's own manifest is `minSdkVersion=35` (Android 15) — confirmed straight from the AAR. So **on-device Moonshine STT only runs on an Android-15+ phone.** Below 15 the app still installs and runs fine (we keep minSdk 29); this one feature just refuses with a clear "needs Android 15" message.
+
+→ **What Android version is your test phone?** (Settings → About phone → Android version.)
+- **15 or newer:** we're good, Moonshine stays the path.
+- **Older than 15:** better to switch the engine to **sherpa-onnx** (streaming ASR, runs Android 5+ / API 21). One move solves two problems at once — it works on your phone **and** it's exactly the ONNX-Runtime backend that drops in **your own Kaggle model (Q13)**. Moonshine ships ONNX weights too, so we don't lose Moonshine — we just load it through sherpa instead of their API-35 SDK. This is probably the better long-term call regardless.
+
+Not blocking — I keep moving (see "next"). Just drop your Android version here.
+
+**Model load:** tiny-streaming-en (~79 MB) downloads once at runtime from Moonshine's CDN into app storage (same idea as the existing Whisper path) — not baked into the APK or committed to git. arm64 phones only (real devices fine; won't run on an x86 emulator).
+
+**Compile gate:** I verified the API against the real 0.0.65 AAR by decompiling it (Transcriber / addAudio / listener / model-arch constants / TranscriptLine fields all real; your compileSdk 36 covers API 35). But I have no Flutter toolchain on this Windows box, so the only true compile proof is a CI branch build. **Push `feature/local-first` to run that compile-check?** (keeps apk-latest untouched, same as B1/B2.)
+
+**Codex + my corrections (visible who lifted):** Codex implemented the plugin and even guessed the real CDN URL correctly. It drifted twice: (1) it wired the 79 MB download into *every* build's preBuild — one CDN hiccup would turn every CI APK build red; I moved it to runtime download. (2) duplicate INTERNET permission + a shadowed catch variable — cleaned both.
+
+**Next while you're away:** B4 (the Settings toggle to switch STT to Moonshine) depends on the engine decision above, so I'm parking Moonshine there and picking up the **independent** queued item — greying the guest cloud-only tabs (Conversations / Chat / Memories) with a "needs cloud" label so local mode doesn't look broken. Beeping you.
+
+
+
+
+
+## user comments
+
+1. i have android 16 so no worries.
+2. you remove this rule of not pushing. and do all this yourself. you can manage. i am not that intelligent to verify your work and push!
+3. go on do commit by commit dont stop for my inputs choose best options in case i am not there and have fallback and do!
+4. parallelly implement other phases in other branches and merge and verify. 
+5. codex cli does heavy lifting . 
+6. you orchestrate and correct!!
+
+7. i am here beep me if you want anything from me!
+
+---
+
+## agent answer 2026-07-06 (Android 16 confirmed — Moonshine stays; full autonomy)
+
+**Android 16 → Moonshine stays.** Its minSdk-35 (Android 15) floor is satisfied on your phone, so no sherpa pivot. B4 (the Settings toggle that actually turns Moonshine on) is unblocked.
+
+**Autonomy accepted.** Dropping the ask-before-push rule for this project: I push feature branches and self-merge to fork main myself (regular merge, never upstream), commit-by-commit, pick the best option with a fallback when you're away. Safety I keep: apk-latest only refreshes from a **green** compile build, so the APK on your phone never lands broken.
+
+**Doing now (not stopping):**
+1. ✅ Pushed `feature/local-first` (B3) → branch CI compile-check running — first real build of the Moonshine Kotlin bridge + Maven dep + minSdk override.
+2. **B4** on this branch (Codex): Settings STT toggle to select on-device Moonshine + `aiConsentGiven` capture-gate. This is what makes Moonshine reachable for you to test.
+3. **Parallel branch** `feature/guest-cloud-gating` (Codex): grey Conversations/Chat/Memories with a "needs cloud" label so local mode stops looking broken.
+4. B4 green → merge Phase B to main → apk-latest gets testable on-device Moonshine → I beep you.
+
+Codex lifts, I review + correct each commit. Beeping only at merge/build milestones — nothing needed from you right now.
+
+
+
+

@@ -1,5 +1,21 @@
 # Session Handoff Log
 
+## 2026-07-06 ~05:40 IST — Android 16 confirmed (Moonshine stays); full push/merge autonomy granted; B3 pushed for compile-check
+
+**Sri directives (Q&A end):** (1) Android **16** → Moonshine minSdk-35 fine, NO sherpa pivot, B4 unblocked. (2) **Drop the ask-before-push rule** — push + self-merge to fork main autonomously, commit-by-commit, "dont stop for my inputs, choose best option + fallback." (3) Parallel phases on other branches, merge + verify. (4) Codex heavy-lifts, Claude orchestrates + corrects.
+
+**State:** `feature/local-first` HEAD `a9c253c43` (B3) **pushed** → branch build **`28759379198`** running (first real compile of B3 Kotlin bridge + `ai.moonshine:moonshine-voice:0.0.65` + minSdk override). apk-latest still P1.2-A (108 MB, 2026-07-05) — B3 not merged (dormant until B4 toggle).
+
+**Next (in order):**
+1. Branch build `28759379198` green ⇒ B3 compiles. If red, fix from log.
+2. **B4** on `feature/local-first` (Codex): STT engine toggle → `SttProvider.onDeviceMoonshine` in `transcription_settings_page.dart` + `aiConsentGiven` capture-gate. Makes Moonshine user-reachable.
+3. B4 green → merge Phase B (B1..B4) to main → apk-latest testable on-device Moonshine → beep Sri.
+4. **Parallel** `feature/guest-cloud-gating` (Codex): grey Conversations/Chat/Memories + "needs cloud" label. Merge when green.
+
+**Safety kept:** apk-latest only refreshes from green compile builds. Codex jobs SEQUENTIAL (sqlite clash on parallel). Answer Sri at END of Q&A only.
+
+---
+
 ## 2026-07-06 ~03:00 IST — P1.2-A merged + LIVE (apk-latest); Phase B Moonshine planned + B1/B2 committed (held)
 
 ### Where we are
@@ -289,3 +305,60 @@ unreachable on the branch until the Settings entry lands (next increment).
 - Guests no longer see "Sign Out"; signed-in users still see the existing sign-out flow.
 - The connect row closes the drawer and routes via the root navigator to `OnboardingWrapper`, preserving local-first boot while keeping cloud sign-in reachable.
 - Local verification remains blocked: no `dart`/`flutter` executable on this Windows host. Static checks only: l10n `connectTo(String appName)` exists, `OnboardingWrapper` import path exists, `git diff --check` clean after removing R5 trailing whitespace.
+
+---
+
+## 2026-07-06 05:10 +0530 — B3 Moonshine Android native bridge landed (+ minSdk 35 blocker)
+
+**Task state:** Phase B **B3 committed** `a9c253c43` on `feature/local-first` (not pushed, not in apk-latest). B1/B2 (Dart socket) already merged. B4 (Settings STT toggle) is BLOCKED pending Sri's Android-version answer.
+
+**Key decisions:**
+- Use plain `Transcriber` + `addAudio(float[],int)` (feed app-owned PCM16→float), NOT `MicTranscriber` (would open a 2nd mic stream, can't do BLE audio).
+- Model provisioning = **runtime download** of tiny-streaming-en (~79 MB, 8 files) from `https://download.moonshine.ai/model/<id>/quantized/<file>` into `filesDir` (mirrors existing `whisper_flutter_new` pattern). NO Git LFS, NOT bundled in APK/git.
+- `moonshine-voice:0.0.65` AAR requires **minSdk 35 / Android 15** (verified via javap on the AAR manifest) + ships **arm64-v8a only**. Kept app installable on minSdk 29 via `<uses-sdk tools:overrideLibrary="ai.moonshine.voice"/>` + runtime API-35 gate that returns a clear error below 35.
+- If Sri's phone is <15: pivot engine to **sherpa-onnx** (API 21+ streaming) — same seam, also serves his Kaggle ONNX model (Q13).
+
+**Modified files (staged into `a9c253c43`):**
+- `app/android/app/src/main/kotlin/com/friend/ios/MoonshineSttPlugin.kt` (NEW — channel `com.omi/moonshine_stt`)
+- `app/android/app/src/main/kotlin/com/example/my_project/MainActivity.kt` (registers plugin)
+- `app/android/app/build.gradle` (added `implementation 'ai.moonshine:moonshine-voice:0.0.65'`)
+- `app/android/app/src/main/AndroidManifest.xml` (uses-sdk overrideLibrary)
+- `Q and A.md` (agent answer at END — unstaged; separate docs commit)
+
+**Blockers / open questions:**
+- **Sri's Android version** (gates Moonshine-vs-sherpa + B4).
+- Push `feature/local-first` to CI for compile-proof? (asked in Q&A; not done — "never push unless asked").
+- Q13 Kaggle ONNX link still open.
+
+**Next steps:**
+1. Wait on Sri's Android version → keep Moonshine (15+) or pivot to sherpa-onnx.
+2. Guest cloud-greying (independent, unblocked): grey Conversations/Chat/Memories for guests with a "needs cloud" label. Seam = `mobile_app.dart` tabs gated on `AuthenticationProvider.isSignedIn()` ([app_shell.dart:355](app/lib/core/app_shell.dart) delegates to `MobileApp`). Needs 1 new l10n key → 49 locales (skill `omi-add-missing-language-keys-l10n`).
+3. Then B4 (Settings toggle in `transcription_settings_page.dart`) + consent gate on `aiConsentGiven`.
+
+**Critical context:**
+- No Flutter/dart toolchain on this Windows host → only compile gate is a CI branch build (like B1/B2 `28756353578`). Static verified: braces/parens balanced, compileSdk 36 covers API 35, `mavenCentral()` present, okhttp 4.12.0 already a dep.
+- AAR decompiled to `…/scratchpad/aar/` via `curl https://repo1.maven.org/maven2/ai/moonshine/moonshine-voice/0.0.65/moonshine-voice-0.0.65.aar` + javap at `/c/Program Files/Android/Android Studio/jbr/bin/javap.exe`.
+- Codex (gpt-5.5 medium via `mcp__codex-cli__codex`) implemented; it drifted (build-time preBuild download → CI risk; dup INTERNET perm; shadowed catch var) — all corrected by Claude.
+
+**Model summary:**
+- Read full `Q and A.md`; Sri: "continue, I'll test the final version, go commit by commit."
+- Confirmed B3 seam from `plans/P5-moonshine.md` + the merged `on_device_moonshine_socket.dart` Dart contract.
+- Web-verified `ai.moonshine:moonshine-voice` real on Maven (0.0.65); fetched README + Android example via ctx tools.
+- Found official example uses `MicTranscriber` (wrong for us) → chose plain `Transcriber` manual-feed.
+- Delegated B3 Kotlin to Codex with a drift-proof brief; Codex implemented.
+- Reviewed Codex output; decompiled the AAR to verify every symbol against real 0.0.65.
+- Discovered AAR minSdk=35 + arm64-only — the decision-critical blocker.
+- Corrected provisioning (runtime download), removed CI-breaking gradle task, cleaned dup perm + shadowed var.
+- Committed `a9c253c43`; updated Q&A at END; beeped Sri; saved memory `mem_20260705_omi-moonshine-on-device_2f1376`.
+
+**Handoff context (actionable):**
+- `git -C C:/Android_software/omi log --oneline -3` → top should be `a9c253c43`.
+- Branch `feature/local-first`; do NOT switch branches; do NOT push/merge to main without explicit go.
+- To compile-verify B3: push branch → CI runs `flutter build apk` (`compileDevDebugKotlin`). ONLY after Sri says push.
+- If Sri's phone <15: swap engine to sherpa-onnx; keep the `com.omi/moonshine_stt` channel + Dart socket unchanged, replace the Kotlin `Transcriber` internals.
+- Dart socket contract (do not edit): `app/lib/services/sockets/on_device_moonshine_socket.dart` — `initialize{model,language,sampleRate}`→bool, `appendPcm16{pcm16:ByteArray LE PCM16}`, `stop`; native→Dart `onTranscript{text,start,end}`/`onError`/`onClosed`.
+- Model download files: adapter.ort, cross_kv.ort, decoder_kv.ort, decoder_kv_with_attention.ort, encoder.ort, frontend.ort, streaming_config.json, tokenizer.bin.
+- Codex rules: model `gpt-5.5`, reasoning medium (NOT xhigh), ONE job at a time (sqlite clash on parallel).
+- Sri is away — beep milestones/decisions via PushNotification; announce Codex delegation visibly.
+- Write to Sri only at the END of `Q and A.md` (hard rule).
+- Commit-by-commit; Sri tests final APK and reports issues to fix "back again."
