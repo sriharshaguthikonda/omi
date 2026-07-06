@@ -28,7 +28,7 @@ import 'package:omi/utils/l10n_extensions.dart';
 import 'package:omi/utils/logger.dart';
 
 /// Top-level transcription source the user picks from the single dropdown.
-enum TranscriptionMode { omi, onDevice, cloudProvider, omiParakeet }
+enum TranscriptionMode { omi, onDevice, onDeviceMoonshine, cloudProvider, omiParakeet }
 
 class TranscriptionSettingsPage extends StatefulWidget {
   const TranscriptionSettingsPage({super.key});
@@ -834,7 +834,34 @@ class _TranscriptionSettingsPageState extends State<TranscriptionSettingsPage> {
     );
   }
 
-  Future<void> _switchToOnDevice() async {
+  Future<void> _switchToOnDevice({SttProvider provider = SttProvider.onDeviceWhisper}) async {
+    // On-Device Moonshine is an Android-15+ (API 35), arm64-only native engine. Guard here so
+    // iOS / older Android don't select a non-functional engine and silently break capture.
+    if (provider == SttProvider.onDeviceMoonshine) {
+      final int sdkInt = Platform.isAndroid ? (await DeviceInfoPlugin().androidInfo).version.sdkInt : 0;
+      if (!Platform.isAndroid || sdkInt < 35) {
+        if (!mounted) return;
+        await showDialog<void>(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: const Color(0xFF1A1A1A),
+            title: const Text('Not supported on this device', style: TextStyle(color: Colors.white)),
+            content: const Text(
+              'On-Device Moonshine runs the speech model locally and needs an Android 15 (API 35) '
+              'or newer phone. Pick another transcription source on this device.',
+              style: TextStyle(color: Colors.white70),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK', style: TextStyle(color: Colors.blue)),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+    }
     bool isLowSpec = false;
     String specDetails = '';
     bool isIOS = Platform.isIOS;
@@ -1023,12 +1050,17 @@ class _TranscriptionSettingsPageState extends State<TranscriptionSettingsPage> {
 
     setState(() {
       _useCustomStt = true;
-      _selectedProvider = SttProvider.onDeviceWhisper;
-      if (!isIOS) {
+      _omiParakeet = false;
+      _selectedProvider = provider;
+      if (!isIOS && provider == SttProvider.onDeviceWhisper) {
         _checkLocalModel();
       }
       PlatformManager.instance.analytics.transcriptionSourceSelected(
-        source: isIOS ? 'custom_on_device_ios' : 'custom_on_device',
+        source: provider == SttProvider.onDeviceMoonshine
+            ? 'custom_on_device_moonshine'
+            : isIOS
+                ? 'custom_on_device_ios'
+                : 'custom_on_device',
       );
     });
   }
@@ -1037,6 +1069,7 @@ class _TranscriptionSettingsPageState extends State<TranscriptionSettingsPage> {
   TranscriptionMode get _currentMode {
     if (!_useCustomStt) return _omiParakeet ? TranscriptionMode.omiParakeet : TranscriptionMode.omi;
     if (_selectedProvider == SttProvider.onDeviceWhisper) return TranscriptionMode.onDevice;
+    if (_selectedProvider == SttProvider.onDeviceMoonshine) return TranscriptionMode.onDeviceMoonshine;
     return TranscriptionMode.cloudProvider;
   }
 
@@ -1046,6 +1079,8 @@ class _TranscriptionSettingsPageState extends State<TranscriptionSettingsPage> {
         return context.l10n.transcriptionSourceOmi;
       case TranscriptionMode.onDevice:
         return context.l10n.onDevice;
+      case TranscriptionMode.onDeviceMoonshine:
+        return SttProviderConfig.get(SttProvider.onDeviceMoonshine).displayName;
       case TranscriptionMode.cloudProvider:
         return context.l10n.cloudProvider;
       case TranscriptionMode.omiParakeet:
@@ -1065,12 +1100,15 @@ class _TranscriptionSettingsPageState extends State<TranscriptionSettingsPage> {
       case TranscriptionMode.onDevice:
         _switchToOnDevice();
         break;
+      case TranscriptionMode.onDeviceMoonshine:
+        _switchToOnDevice(provider: SttProvider.onDeviceMoonshine);
+        break;
       case TranscriptionMode.cloudProvider:
         setState(() {
           _useCustomStt = true;
           _omiParakeet = false;
           // Leaving on-device: fall back to a real BYO cloud provider.
-          if (_selectedProvider == SttProvider.onDeviceWhisper) {
+          if (_selectedProvider == SttProvider.onDeviceWhisper || _selectedProvider == SttProvider.onDeviceMoonshine) {
             _selectedProvider = SttProvider.openai;
           }
         });
@@ -1145,6 +1183,11 @@ class _TranscriptionSettingsPageState extends State<TranscriptionSettingsPage> {
           )
         else if (mode == TranscriptionMode.onDevice)
           Text(context.l10n.audioProcessedLocally, style: TextStyle(color: Colors.grey.shade600, fontSize: 12))
+        else if (mode == TranscriptionMode.onDeviceMoonshine)
+          Text(
+            SttProviderConfig.get(SttProvider.onDeviceMoonshine).description,
+            style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+          )
         else if (mode == TranscriptionMode.omiParakeet)
           Text(
             SttProviderConfig.get(SttProvider.omiParakeet).description,
@@ -1180,7 +1223,9 @@ class _TranscriptionSettingsPageState extends State<TranscriptionSettingsPage> {
   Widget _buildProviderSection() {
     // On-Device Whisper and Omi Parakeet are fixed providers chosen from the
     // top dropdown — there's no sub-provider to pick, so hide this section.
-    if (_selectedProvider == SttProvider.onDeviceWhisper || _selectedProvider == SttProvider.omiParakeet) {
+    if (_selectedProvider == SttProvider.onDeviceWhisper ||
+        _selectedProvider == SttProvider.onDeviceMoonshine ||
+        _selectedProvider == SttProvider.omiParakeet) {
       return const SizedBox.shrink();
     }
 
@@ -1205,7 +1250,14 @@ class _TranscriptionSettingsPageState extends State<TranscriptionSettingsPage> {
               style: const TextStyle(color: Colors.white, fontSize: 15),
               icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey.shade500),
               items: [
-                ...SttProviderConfig.allProviders.where((config) => config.provider != SttProvider.onDeviceWhisper).map(
+                ...SttProviderConfig.allProviders
+                    .where(
+                      (config) =>
+                          config.provider != SttProvider.onDeviceWhisper &&
+                          config.provider != SttProvider.onDeviceMoonshine &&
+                          config.provider != SttProvider.omiParakeet,
+                    )
+                    .map(
                   (config) {
                     return DropdownMenuItem<SttProvider>(
                       value: config.provider,
@@ -1284,6 +1336,10 @@ class _TranscriptionSettingsPageState extends State<TranscriptionSettingsPage> {
       return _buildLocalWhisperConfig();
     } else if (_selectedProvider == SttProvider.onDeviceWhisper) {
       return _buildOnDeviceWhisperConfig();
+    } else if (_selectedProvider == SttProvider.onDeviceMoonshine) {
+      // Fixed on-device engine: tiny-streaming-en only, model + language handled natively. No UI.
+      // ponytail: expose model/language pickers once small/medium checkpoints are wired in the native bridge.
+      return const SizedBox.shrink();
     } else if (_selectedProvider == SttProvider.custom) {
       return _buildCustomPollingConfig();
     } else if (_selectedProvider == SttProvider.customLive) {
@@ -1935,8 +1991,10 @@ class _TranscriptionSettingsPageState extends State<TranscriptionSettingsPage> {
         ),
         if (_showAdvanced) ...[
           const SizedBox(height: 4),
-          // Hide generic model selector for OnDeviceWhisper as it has a specific UI
-          if (_currentConfig.supportedModels.isNotEmpty && _selectedProvider != SttProvider.onDeviceWhisper) ...[
+          // Hide generic model selector for fixed on-device providers with a specific UI.
+          if (_currentConfig.supportedModels.isNotEmpty &&
+              _selectedProvider != SttProvider.onDeviceWhisper &&
+              _selectedProvider != SttProvider.onDeviceMoonshine) ...[
             _buildModelSelector(),
             const SizedBox(height: 16),
           ],
