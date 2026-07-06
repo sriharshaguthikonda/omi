@@ -504,6 +504,9 @@ Note: transcripts will show **during capture** but still won't land in the conve
 1. do other features and next setps commit after commit! dont stop 
 2. compact sooner.....than way you will output high qualiy 
 3. have this check integrated into your workflow, see if the build is successful or else troubleshoot it.
+
+
+
 > **A (Claude, item 3):** already standard since the greying failure: every push arms a background build watcher (`gh run watch --exit-status`) that wakes me on finish — green ⇒ proceed/beep you, red ⇒ pull `--log-failed`, root-cause, fix, re-push. That loop caught+fixed the greying paren bug in one cycle. Also added: bracket-balance pre-check on every codex-touched Dart file BEFORE pushing (no local flutter here, so this catches syntax slop without burning a CI round).
 
 > **NEW: Groq presets SHIPPED (Q4)** — `b96fe9d` on branch `feature/groq-whisper-presets` (off main, cherry-pickable both ways, build watching): STT dropdown gains **Groq Whisper Large v3** + **Large v3 Turbo**, BYOK (key from <https://console.groq.com/keys>), reuses the custom-STT plumbing main already had. Watchers running: greying-fix build `28813351259` + groq build `28813777139` — will report/beep. Still pending from you: Moonshine + transcript-row test on GREEN APK `28810326937`.
@@ -515,3 +518,19 @@ Note: transcripts will show **during capture** but still won't land in the conve
 2. Stop capture → **Conversations tab** → transcript row appears, readable on tap.
 3. As guest: **Chat + Memories look greyed**, tapping shows sign-in hint; Conversations stays normal.
 Report all three here (worked / failed + any error text).
+
+
+
+## user comments
+1. do other features and next setps commit after commit! dont stop 
+2. compact sooner.....than way you will output high qualiy 
+3. have this check integrated into your workflow, see if the build is successful or else troubleshoot it.
+
+
+
+
+## agent update 2026-07-07 — Groq green + cherry-picked in; Phase-B PR staged
+
+- **Groq presets build GREEN** (`28813777139`) on its own branch, and **cherry-picked into `feature/local-first`** (`e36d340`, clean merge, build `28815045799` watching) — so your NEXT local-first APK will have the Groq dropdown entries too (needs your Groq API key from <https://console.groq.com/keys>).
+- **Phase-B PR is open and staged: <https://github.com/sriharshaguthikonda/omi/pull/6>** — everything bundled (Moonshine + B5 transcripts + greying + Groq presets). It does NOT merge until your 3-part test report on APK `28813351259` (or the newer `28815045799` once green — same content + Groq) comes back good. Then one click → apk-latest refreshes.
+- Your move: the 3-step test list above. Everything else is done and waiting on that.
