@@ -473,7 +473,9 @@ class TranscriptSocketServiceFactory {
 
     return PurePollingSocket(
       config: AudioPollingConfig(
-        bufferDuration: const Duration(seconds: 5),
+        // 10s chunks for cloud batch APIs: halves the request rate vs 5s so
+        // BYOK providers with tight rate limits (e.g. Groq free tier) don't 429.
+        bufferDuration: const Duration(seconds: 10),
         minBufferSizeBytes: sampleRate * 2,
         serviceId: config.provider.name,
         transcoder: transcoder,

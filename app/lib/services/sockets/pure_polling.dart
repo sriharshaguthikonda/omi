@@ -65,6 +65,15 @@ class PurePollingSocket implements IPureSocket {
   bool _isProcessing = false;
   double _audioOffsetSeconds = 0;
 
+  // Unique ids per emitted segment: batch results are final (never interim), so
+  // each segment must append instead of matching an earlier one by id upstream.
+  final String _idNonce = DateTime.now().millisecondsSinceEpoch.toRadixString(36);
+  int _segmentSeq = 0;
+
+  // ponytail: cap re-queued audio at ~2 min of 16kHz PCM16 so a permanently
+  // failing endpoint (bad key) can't grow the buffer unbounded.
+  static const int _maxBufferedBytes = 4 * 1024 * 1024;
+
   PurePollingSocket({required this.config, required this.sttProvider});
 
   @override
@@ -150,22 +159,38 @@ class PurePollingSocket implements IPureSocket {
     final serviceId = config.serviceId ?? 'Polling';
     try {
       final result = await sttProvider.transcribe(audioData, audioOffsetSeconds: _audioOffsetSeconds);
-      if (result != null && result.isNotEmpty) {
+      if (result == null) {
+        // Provider failure (non-200, upload error): keep the audio so the next
+        // flush retries it instead of silently dropping the speech.
+        _requeueFrames(frames);
+        return;
+      }
+      if (result.isNotEmpty) {
         if (result.segments.isNotEmpty) {
           _audioOffsetSeconds = result.segments.last.end;
         }
-        final segmentsJson =
-            result.segments.where((s) => s.text.trim().isNotEmpty).map((s) => s.toTranscriptSegmentJson()).toList();
+        final segmentsJson = result.segments
+            .where((s) => s.text.trim().isNotEmpty)
+            .map((s) => s.toTranscriptSegmentJson()..['id'] = 'poll_${_idNonce}_${_segmentSeq++}')
+            .toList();
         if (segmentsJson.isNotEmpty) {
           onMessage(jsonEncode(segmentsJson));
         }
       }
     } catch (e, trace) {
+      _requeueFrames(frames);
       CustomSttLogService.instance.error(serviceId, 'Transcription error: $e');
       DebugLogManager.logError(e, trace, 'polling_socket_transcription_error', {'service_id': serviceId});
       onError(e, trace);
     } finally {
       _isProcessing = false;
+    }
+  }
+
+  void _requeueFrames(List<Uint8List> frames) {
+    _audioFrames.insertAll(0, frames);
+    while (_audioFrames.isNotEmpty && _totalBufferBytes > _maxBufferedBytes) {
+      _audioFrames.removeAt(0);
     }
   }
 

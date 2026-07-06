@@ -20,6 +20,13 @@ class OnDeviceMoonshineSocket implements IPureSocket {
   PureSocketStatus _status = PureSocketStatus.notConnected;
   IPureSocketListener? _listener;
 
+  // Stable per-line segment ids: partial hypotheses for the current line reuse
+  // the same id (so they update one segment in place), and a completed line
+  // bumps the index so the next line appends as a new segment. The nonce keeps
+  // ids from colliding across socket instances within one conversation.
+  final String _idNonce = DateTime.now().millisecondsSinceEpoch.toRadixString(36);
+  int _lineIndex = 0;
+
   OnDeviceMoonshineSocket({
     required this.model,
     required this.language,
@@ -149,7 +156,9 @@ class OnDeviceMoonshineSocket implements IPureSocket {
       return;
     }
 
+    final isFinal = arguments['isFinal'] == true;
     final segment = {
+      'id': 'moonshine_${_idNonce}_$_lineIndex',
       'text': text,
       'speaker': 'SPEAKER_0',
       'speaker_id': 0,
@@ -159,6 +168,9 @@ class OnDeviceMoonshineSocket implements IPureSocket {
       'person_id': null,
       'stt_provider': 'onDeviceMoonshine',
     };
+    if (isFinal) {
+      _lineIndex++;
+    }
     onMessage(jsonEncode([segment]));
   }
 
