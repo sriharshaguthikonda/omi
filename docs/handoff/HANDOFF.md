@@ -1,18 +1,24 @@
 # Session Handoff Log
 
-## 2026-07-06 ~05:40 IST — Android 16 confirmed (Moonshine stays); full push/merge autonomy granted; B3 pushed for compile-check
+## 2026-07-06 ~06:15 IST — B4 landed (Moonshine selectable); B3 compile-GREEN; Sri device-verified local-first; awaiting B4 build to merge Phase B
 
-**Sri directives (Q&A end):** (1) Android **16** → Moonshine minSdk-35 fine, NO sherpa pivot, B4 unblocked. (2) **Drop the ask-before-push rule** — push + self-merge to fork main autonomously, commit-by-commit, "dont stop for my inputs, choose best option + fallback." (3) Parallel phases on other branches, merge + verify. (4) Codex heavy-lifts, Claude orchestrates + corrects.
+**Sri directives (Q&A end, this session):** (1) Android **16** → Moonshine minSdk-35 fine, NO sherpa pivot. (2) **Full push+self-merge autonomy** — "remove this rule of not pushing, do all this yourself", "dont stop for my inputs, choose best option + fallback and do." (3) Parallel phases on branches, merge+verify. (4) Codex heavy-lifts, Claude orchestrates+corrects. Saved: `mem_20260706_omi-project-2026-07-06-s_d81437` (autonomy), session row `mem_20260704_omi-fork-session-2026-07_78f542` (refreshed).
 
-**State:** `feature/local-first` HEAD `a9c253c43` (B3) **pushed** → branch build **`28759379198`** running (first real compile of B3 Kotlin bridge + `ai.moonshine:moonshine-voice:0.0.65` + minSdk override). apk-latest still P1.2-A (108 MB, 2026-07-05) — B3 not merged (dormant until B4 toggle).
+**Sri DEVICE TEST (current apk-latest P1.2-A):** ✅ got past sign-in (local-first boots, no login wall), ✅ recorded audio, ❌ on-device Whisper STT broke → logged low-prio in ROADMAP (Moonshine replaces it).
+
+**State:** `feature/local-first` HEAD ~`e641f02e8`. Commits since P1.2-A: B1 `868ad3b6d`, B2 `2d76bca1f`, B3 `a9c253c43`, **B4 `553838ecd`** + docs. Pushed.
+- **B3 compile-GREEN** (branch build `28759379198`): Kotlin bridge + `ai.moonshine:moonshine-voice:0.0.65` + minSdk-35 override all build. The big unverified chunk is sound.
+- **B4** (`transcription_settings_page.dart`): "On-Device Moonshine" is a top-level `TranscriptionMode`; selecting it persists `customSttConfig.provider=onDeviceMoonshine`, which `transcription_service.dart:354` already routes to `OnDeviceMoonshineSocket`. Codex implemented; Claude corrected 2 drifts (added Android-15+/Android-only device guard in `_switchToOnDevice`; hid the premature model/lang pickers — only tiny-en wired). Build **`28759840329`** in_progress (background watcher `b2u3g1yxj` armed → wakes on finish).
+- apk-latest still P1.2-A (108 MB, 2026-07-05).
+
+**Reviewed (no change needed):** Moonshine first-run path (`on_device_moonshine_socket.dart` + `MoonshineSttPlugin.kt`) — errors surface via onError, model download is resumable (per-component `.part`→rename, skips completed), API-35 gated. Sound for a device test. Caveat: ~79 MB download on first `initialize` (no progress UI ~30-60s; audio during download dropped) — "report if annoying", not a blocker.
 
 **Next (in order):**
-1. Branch build `28759379198` green ⇒ B3 compiles. If red, fix from log.
-2. **B4** on `feature/local-first` (Codex): STT engine toggle → `SttProvider.onDeviceMoonshine` in `transcription_settings_page.dart` + `aiConsentGiven` capture-gate. Makes Moonshine user-reachable.
-3. B4 green → merge Phase B (B1..B4) to main → apk-latest testable on-device Moonshine → beep Sri.
-4. **Parallel** `feature/guest-cloud-gating` (Codex): grey Conversations/Chat/Memories + "needs cloud" label. Merge when green.
+1. B4 build `28759840329` green ⇒ open PR `feature/local-first`→main, **regular merge (self-merge authorized)** → main APK build → apk-latest refresh → **beep Sri** to flip Settings→Transcription→"On-Device Moonshine" and test on-device STT. Mention the ~79 MB first-run download so it doesn't look frozen. If B4 build RED: fix `transcription_settings_page.dart` from the log (likely a `TranscriptionMode` switch exhaustiveness miss — both `_modeLabel`/`_selectMode` were verified exhaustive).
+2. Then **guest cloud-tab greying** (P1.2-B) as next increment on `feature/local-first` (Sri wants it; deprioritized behind Moonshine since Sri didn't flag empty tabs). Seam: home `pages/home/page.dart` `IndexedStack` `_pages` (line ~251/706), `HomeProvider.selectedIndex`, bottom nav. Grey Conversations/Chat/Memories for guests (`!AuthenticationProvider.isSignedIn()`) + "needs cloud" label → 1 new l10n key × 49 locales (skill `omi-add-missing-language-keys-l10n`).
+3. Deferred: B4b guest consent gate (`mobile_app.dart:40-43` ponytail note — gate capture-start on `aiConsentGiven` for guests; low value for on-device, do carefully so it can't block capture); whisper-STT debug (low-prio); dev-theme (roadmap last).
 
-**Safety kept:** apk-latest only refreshes from green compile builds. Codex jobs SEQUENTIAL (sqlite clash on parallel). Answer Sri at END of Q&A only.
+**Safety/rules:** apk-latest only refreshes from GREEN compile builds (no local flutter/dart/phone — CI + Sri's device are the only verification). Codex = gpt-5.5 **medium** (NOT xhigh), ONE job at a time (sqlite clash). Answer Sri ONLY at END of `Q and A.md`. Never upstream `BasedHardware/omi`.
 
 ---
 
