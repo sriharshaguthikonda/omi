@@ -376,3 +376,61 @@ This is exactly the confirmation I couldn't get on this box (no Flutter/phone he
 - **Whisper local STT ❌ → logged, not priority.** Added to ROADMAP Revisit-backlog as a low-prio debug item. Don't spend on it — **Moonshine is the on-device engine that replaces Whisper**, and that's what B4 just wired up. So whisper being broken doesn't block the on-device goal; Moonshine is the path.
 
 **So the next apk-latest (Phase B) is the one that matters for you:** it adds *On-Device Moonshine* under **Settings → Transcription → source dropdown**. B4 is compiling now; when green I merge Phase B → apk-latest refreshes → I beep you to install and flip Transcription to On-Device Moonshine. That's the real on-device-STT test.
+
+
+
+## user comments
+
+
+3. the whisper local stt didnt work but note in roadmap to debug but not priority now
+	a. error logs on the device show that connection afiled- primary: true, seconday: false.!
+	.
+	.
+	.
+	.
+	.
+	.
+	.
+	
+	
+	
+## agent answer 2026-07-06 (evening — post-B4-build)
+
+**Status first:** B4 build `28759840329` is GREEN. But holding the Phase-B merge — you already installed that exact build and report local STT broken, so merging now would just publish a broken feature to apk-latest. Root-cause first, merge after fix.
+
+**3a (connection failed primary: true, secondary: false):** that log is the transcription socket layer failing to connect. This is likely the same root cause as item 5. Codex is investigating the exact path now.
+
+**4 (Groq whisper presets in STT dropdown):** agreed, good increment. Groq is a cloud API (BYOK — needs your Groq API key), so it slots into the dropdown as preconfigured presets (whisper-large-v3-turbo, distil-whisper). Will do it on a separate clean branch off upstream-style base so it's cherry-pickable both ways. Queued after the local-STT fix.
+
+**5 (no transcripts in messages tab):** your hypothesis is probably right — the conversations/messages list is fetched from the backend, so in local-first mode captured transcripts may have no local store to land in. Codex is mapping the full path (capture → STT → segment → conversation → list UI) to confirm. Fix plan follows in this file.
+
+**6:** acknowledged. Codex = heavy lifting (investigation + implementation + review passes), I orchestrate and correct. I'll announce which engine does each chunk.
+
+**NEED FROM YOU (beeped):** adb on this PC sees NO device (`adb devices` → empty). Either:
+   a. plug phone in via USB + accept the "Allow USB debugging" prompt, or
+   b. wireless debugging: Settings → Developer options → Wireless debugging → pair, then paste the `ip:port` here, or
+   c. fallback: in the app, Settings → debug logs option → export/share, and paste the file path or contents here.
+Once I have logs I can confirm the socket failure root cause on-device.
+ 
+ 
+ 
+## user comments
+
+1. i have connected it properly now, sorry stupid computer was having issues, now check.
+
+
+3. the whisper local stt didnt work but note in roadmap to debug but not priority now
+	a. error logs on the device show that connection afiled- primary: true, seconday: false.!
+	
+4. i want that drop down for stt to have precongigured groq whisper models as well.
+	a. this can be on a branch of the upstream lke original fork and can be probably cherrypicked into our thing as well.
+	b. 
+	
+5. the local transcription none of them are working and no transcripts are showing up in the messages tab i think if you are connected to the backend they do show up, they are fetched from the backend i think
+
+6. you know you orchestrate, manage, correct and let the codex cli do the heavy lifting don't burn tokens, you are fable 5, be fabled
+
+7. tigger compact when you move to next phase!
+
+8. if there are other work that is not related to this that can be implemented in other commits, then do it and later merge them.
+
