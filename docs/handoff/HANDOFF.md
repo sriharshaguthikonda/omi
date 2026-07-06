@@ -539,3 +539,8 @@ unreachable on the branch until the Settings entry lands (next increment).
 - Dart format on this box: download stable SDK zip to scratchpad → `dart format --line-length 120 --language-version=3.0 <files>` (NEVER bare — style trap).
 - adb: `"$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe"`; device `10BF191Z51001DC` (I2220); package `com.friend.ios.dev` (not debuggable).
 - Codex invocation that works here: `codex exec --sandbox read-only -C C:/Android_software/omi "<prompt>"` (one job at a time).
+
+### Delta ~04:20 IST — P2 kicked off, definitive build watching
+- Lint GREEN on `d45c581` + `e67aa79`; APK on `d45c581` CANCELLED (concurrency-superseded). **Definitive pair on `24fe8e8`: APK `28827747244` + Lint `28827749076`, in progress, watcher armed** → green ⇒ beep Sri ×2 + install link at END of Q&A; his Moonshine-accumulates retest gates PR #6 merge.
+- **P2 Triggers v1 STARTED** (Sri: don't stop, commit-by-commit, codex lifts). D2 resolved by Sri's ROADMAP checkbox: all trigger types, big-red-button redesign deferred. Codex running P2.1 (trigger_router.dart seam + flutter_foreground_task notification start/stop buttons, 2 commits, NO push) in worktree `C:/Android_software/omi-p2-triggers`, branch `feature/p2-triggers` off feature/local-first. On completion: review diff, format-check, push branch, watch CI, then queue P2.2 QS tile and P2.3 Tasker intent receiver as next codex jobs.
+- Q&A latest answer committed `3729372` (root file — does not trigger app CI, so `24fe8e8` pair stays definitive).
