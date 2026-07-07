@@ -561,3 +561,63 @@ unreachable on the branch until the Settings entry lands (next increment).
 - Codex prompt lesson CONFIRMED: long inline prompt arg → stdin fallback no-op. Always short pointer prompt + spec file.
 - Pre-commit hook prints `xargs: dart: No such file or directory` — non-fatal, hook can't format (no dart on PATH); we format manually with scratchpad SDK.
 - Backlog registered in Q&A: Moonshine line-duration knob (items 2/3), settings-search UX (4), on-device multimodal model (10 → D6/Q13).
+
+---
+
+## 2026-07-07 ~23:15 IST — session: access verified, 3 parallel lanes shipped, codex on P2.2
+
+### Current task state
+- **feature/local-first** (main worktree `C:/Android_software/omi`): pushed through `a062df7`. New commits: `7d46fd9` (401 retry-stop), `7d25465` (Moonshine default STT on Android 15+ first boot), docs commits. All lints GREEN; APK build `28880013201` was in progress. All auto-join PR #6.
+- **feature/permission-gate** (worktree `C:/Android_software/omi-permission-gate`): Sri's item 8 DONE — codex commits `13a9d6e` (skip reviewed permission gate) + `d534c1b` (Settings reuses permission review) + my dedupe correction `03606aa` (shouldShowPermissionGate moved to permissions_checker.dart). Pushed; CI watcher `bwsmo062g` armed.
+- **feature/p2-triggers** (worktree `C:/Android_software/omi-p2-triggers`): P2.1 pushed, **APK build 28879578693 GREEN**. Codex NOW RUNNING P2.2 QS tile (task `b1vg8dqt1`, spec `SPEC-p2.2-qs-tile.md` in worktree root — untracked, don't commit).
+- **Sri's retest**: still pending, gates PR #6 merge. He's on the right APK (build #24 = run 28839829162 = b6fa27a; verified via adb: 1.0.542 vc24, installed 09:31).
+
+### Key decisions
+- 401/403 after fast-retry budget stops rescheduling (`_scheduleInitialFetchRetry(authRejected:)` in conversation_provider.dart) — backend rejects our Firebase project permanently, endless 15s retries were spam.
+- Moonshine default = one-time boot migration in main.dart `_applyMoonshineDefaultStt()` (pref key `moonshineDefaultSttApplied`); never overrides saved choice; Android<15/iOS untouched.
+- Permission gate: only missing MIC re-blocks boot after first completion; real runtime checks incl. battery-optimization exemption.
+- Codex-for-exploration is now the default too (Sri's explicit ask, answered in Q&A).
+
+### Modified files (this session)
+- app/lib/backend/http/api/conversations.dart, app/lib/providers/conversation_provider.dart (401 fix)
+- app/lib/main.dart (moonshine default)
+- ROADMAP.md (Bug parking lot section), Q and A.md (3 answer blocks)
+- worktree permission-gate: mobile_app.dart, permissions_checker.dart, permissions_widget.dart, wrapper.dart, permissions_page.dart, 2 test files
+
+### Blockers / open questions
+- Sri retest (3 steps at Q&A end) → PR #6 merge → apk-latest refresh.
+- Q13 still open (Sri's Kaggle ONNX links).
+- codex P2.2 result unreviewed (task `b1vg8dqt1`).
+
+### Next steps
+1. On codex P2.2 done: review diff in omi-p2-triggers, correct, push, watch CI.
+2. On permission-gate CI green (`bwsmo062g`): merge feature/permission-gate → feature/local-first (regular merge) so Sri's next APK has it; or keep separate for device test first — prefer merge, it's guest-boot-path critical.
+3. On Sri's green retest: merge PR #6 (regular merge) → apk-latest → beep.
+4. Then P2.3 Tasker intent receiver (next codex job, same worktree pattern).
+5. Bug parking lot items live in ROADMAP Revisit backlog with file pointers.
+
+### Critical context (gotchas)
+- gh CLI defaults to UPSTREAM BasedHardware/omi in this repo — ALWAYS `-R sriharshaguthikonda/omi`.
+- `grep` in Git Bash is shimmed by rtk; `\|` alternation silently returns 0 matches — use Claude Grep tool.
+- adb: `/c/Users/deletable/AppData/Local/Android/Sdk/platform-tools/adb.exe`, needs `MSYS_NO_PATHCONV=1` for /sdcard paths.
+- No dart/flutter/jq on this box (prior "installed dart" note stale). Format by matching style; CI Lint gates.
+- Codex dispatch pattern that works: write SPEC file in worktree root, `codex exec --sandbox workspace-write -m gpt-5.5 -c model_reasoning_effort=medium "<short pointer prompt>"` via background Bash. One codex job at a time (session DB clash).
+- CI versionCode = workflow run NUMBER. Phone: I2220 Android 16, package com.friend.ios.dev.
+
+### Model summary
+- Solved Sri's "nothing pushed" — bug-fix APK was pushed/built green; the unpushed thing was P2.1 (now pushed, green).
+- Verified all access: adb+phone, gh (fixed fork pinning), logcat.
+- Root-caused + shipped 401 poll-spam fix from live device logs.
+- Shipped Moonshine-as-default STT (boot migration, guarded to Android 15+).
+- Orchestrated codex item-8 permissions fix; reviewed, deduped gate logic, pushed.
+- P2.1 reviewed + pushed → APK green; P2.2 QS tile dispatched to codex.
+- ROADMAP bug parking lot; Q&A kept current (3 blocks); memory row saved (toolbox facts).
+- Beeped Sri once; his 3-step retest gates PR #6.
+
+### Handoff context
+- Watchers/tasks live at session scratchpad `C:/Users/DELETA~1/AppData/Local/Temp/claude/C--Android-software-omi/d56e76a7-dc8b-4afa-a7b2-b9b72e9eefa3/tasks/`: `bwsmo062g` (permission-gate CI), `b1vg8dqt1` (codex P2.2).
+- Check CI: `gh run list -R sriharshaguthikonda/omi --branch <br> --limit 5`.
+- Check codex P2.2 result: `git -C C:/Android_software/omi-p2-triggers log --oneline -5` + review diff before push.
+- Merge command shape (fork-internal only, never upstream): open PR with `gh pr create -R sriharshaguthikonda/omi ...`, merge with `gh pr merge -R sriharshaguthikonda/omi <n> --merge`.
+- Q&A protocol: write ONLY at END of `Q and A.md`; hooks inject Sri's saves live; beep via PushNotification (multiple times if he's away).
+- Compact after P2.2 lands (Sri: "compact sooner after one feature").
