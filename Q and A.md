@@ -656,5 +656,18 @@ Report all three here → green = I merge PR #6 → apk-latest refresh → beep.
 3. Moonshine: quick re-check that accumulation still works.
 Report all three → green = I merge PR #6 → apk-latest refreshes.
 
-**In flight meanwhile:** codex is on your **item 8** (permissions ask-once + Settings review row) on new branch `feature/permission-gate`; P2.1 CI watching; P2.2 (Quick Settings tile) queued next. Commit-by-commit, parallel branches, merge later — as ordered. 
+**In flight meanwhile:** codex is on your **item 8** (permissions ask-once + Settings review row) on new branch `feature/permission-gate`; P2.1 CI watching; P2.2 (Quick Settings tile) queued next. Commit-by-commit, parallel branches, merge later — as ordered.
+
+## user comments
+1. use codex agents to do this sort of exploration as well
+
+> **A (Claude):** acknowledged — exploration passes go to codex too from now on, not just implementation/review. (This one was a 3-file trace I did while codex was busy on item 8 — its single-session limit on this box means idle-Claude vs idle-work; but default flips to codex-first for exploration.) The trace's yield is already shipped: `7d46fd9` on feature/local-first stops the 15s 401 hammering — after the fast retry budget, an outright 401/403 stops rescheduling instead of retrying forever (pull-to-refresh still recovers manually). Build watching. 
+
+
+
+## user comments
+1. use codex agents to do this sort of exploration as well 
+
+
+
 
