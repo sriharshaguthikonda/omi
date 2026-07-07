@@ -598,7 +598,35 @@ Report all three here → green = I merge PR #6 → apk-latest refresh → beep.
 
 > **A (Claude):** already running that way — **P2 triggers is in its own worktree/branch (`feature/p2-triggers`) with codex lifting right now**, PR #6 stays frozen for your retest, and they merge independently later. One constraint I respect: codex handles **one job at a time** on this box (its session DB clashes when doubled), so parallelism = separate branches with codex jobs queued back-to-back: P2.1 (router + notification buttons, running) → P2.2 (Quick Settings tile) → P2.3 (Tasker intent). Each lands commit-by-commit with CI checks. When a lane needs device testing you'll get a beep + branch APK link.
 
+## user comments
+1. moonshine is accumulating...
+2. but i think the advantage of moonshine is that when it hears a longer sentence or something it goes back and changes the previous tokens or upcoming tokens something like that. we need to be able to use that advantage as well. we should be able to adjust the duration for which each transcript is or each chunk of the transcript is present or saved
 
 
+3. feature is already there somewhere in the settings i don't know i could not check
+4. the nasty thing is that when you go to settings and there is that search bar, it does not use that extraordinary lewensteinian and mistake tolerant system that it is supposed to use and automatically it has to focus on the search bar and expand. the original ui by the designer is so backward!
+5. there are still some rough edges! you can debug logs, i connected the phone.
+6. i don't know if this current version of the app is supposed to be working with whisper but i'm seeing no transcript when using whisper on device.
+7. i did use multiple record and stop sessions but it is only showing one transcript in the chat tab.
+	- i thought i did not have to press the process now button. apparently i have to press the process now button and only then this will be sent to that chats or transcript tab.
+	- for whisper and groq this button does not appear!
+8 . when i open the app it is showing this need permission to run in the background and location access, notification access, checkbox, screen. i think we can have this behind a settings panel when we would like to review the permissions but i don't think it has to ask every time. and it does not retain the permissions that i have given it previously. i am sure there might be something like this already. check and let agents implement.
 
+9.i used different grok api keys and it does look like there is a block in the grok pathway. our application is somehow faulty.
 
+10. as on device intelligence to handle as many aspects of the app as possible i am thinking of using a model that runs of my phone that can offer reasonable vision / embed / tool / ASR call capabiliites etc that app needs to handle as many features as possible in the app
+ - in future we can plug in better models or finetuned ones!
+
+11. 
+
+> **A (Claude, all 11) — triage:**
+> **1 ✅** Moonshine accumulation confirmed on your device — the fix works. 
+> **7 🔧 ROOT CAUSE FOUND, codex fixing NOW:** record/stop cycles all share one "session start" internally, and a guard blocks re-saving the same session — so only the first transcript ever persists, and it only lands via Process-now. Fix: each record→stop cycle becomes its own saved transcript, appearing on stop without Process-now. (Also tracing why Process-now shows only for Moonshine.)
+> **9 🔧 same codex job:** static end-to-end audit of the Groq path (key → header → request → response parse), PLUS new error surfacing — repeated failures will show an error in the UI instead of silently doing nothing. If the audit can't find it, next APK's surfaced error text will tell us. It's "Groq" btw, not Grok — key from console.groq.com is right.
+> **2/3 (Moonshine revises earlier words + adjustable chunk duration):** partials already revise in place now (the current line refines live before it locks). Line-length/duration knob = a Moonshine engine option — logged as backlog; I'll expose it in Transcription settings in a later pass. No existing setting does this today (the silence-timeout setting you may have seen only controls cloud conversation splitting).
+> **6:** on-device Whisper is the known-broken legacy engine (pre-dates this work; Moonshine is its replacement). Stays broken/deprioritized — use Moonshine.
+> **8 (permissions nag + not retained):** queued next after the bug job — will check the guest-boot permissions gate; goal: ask once, review later via Settings panel.
+> **4 (settings search bar UX):** agreed it's clunky — backlog, UI pass (fuzzy match + no forced focus/expand).
+> **5 (debug logs):** adb can't read the app's internal logs (release build). When something misbehaves: Settings → debug logs → export/share, drop the file anywhere in this repo folder and I'll parse it.
+> **10 (one on-device model for vision/embed/tool/ASR):** direction noted and it fits the architecture — the AsrEngine/D6 seam generalizes to a local model runtime; candidates like Gemma-3n-class multimodal ONNX models fit your phone. Parking as a roadmap item (needs your Kaggle link from Q13 for the ASR part anyway).
+> **Merge status:** PR #6 stays held until 7+9 fixes are green + you retest — they're part of the local-transcripts scope. P2 triggers branch continues in parallel after.
