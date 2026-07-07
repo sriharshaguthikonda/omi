@@ -393,6 +393,7 @@ class CaptureController extends ChangeNotifier
   Future<void>? _pendingFinalizeAndStamp;
 
   int? _lastPersistedLocalTranscriptSessionStart;
+  int _lastGuestLocalTranscriptSessionStart = 0;
 
   /// Set in onClosed() when the socket drops during active device recording.
   /// Consumed in _initiateWebsocket() to trigger onNetworkSocketReconnected()
@@ -667,7 +668,7 @@ class CaptureController extends ChangeNotifier
     _socket?.subscribe(this, this);
     _transcriptServiceReady = true;
     if (_sessionStartSeconds == 0) {
-      _sessionStartSeconds = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      _sessionStartSeconds = _nextSessionStartSeconds();
     }
 
     // Notify the device connection that the socket reconnected after a network
@@ -958,6 +959,29 @@ class CaptureController extends ChangeNotifier
       sessionStartSeconds: _sessionStartSeconds,
       segments: transcriptSegments,
     );
+  }
+
+  int _nextSessionStartSeconds() {
+    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    if (AuthService.instance.isSignedIn()) return now;
+    final next = now <= _lastGuestLocalTranscriptSessionStart ? _lastGuestLocalTranscriptSessionStart + 1 : now;
+    _lastGuestLocalTranscriptSessionStart = next;
+    return next;
+  }
+
+  Future<void> _finishGuestLocalTranscriptSession() async {
+    if (AuthService.instance.isSignedIn()) return;
+    await _persistLocalTranscriptIfNeeded();
+    segments = [];
+    photos = [];
+    hasTranscripts = false;
+    suggestionsBySegmentId = {};
+    _conversation = null;
+    taggingSegmentIds = [];
+    _sessionStartSeconds = 0;
+    _lastPersistedLocalTranscriptSessionStart = null;
+    _segmentsPhotosVersion++;
+    notifyListeners();
   }
 
   Future<BleAudioCodec> _getAudioCodec(String deviceId) async {
@@ -1411,7 +1435,7 @@ class CaptureController extends ChangeNotifier
     ServiceManager.instance().mic.stop();
     updateRecordingState(RecordingState.stop);
     await _socket?.stop(reason: 'stop stream recording');
-    await _persistLocalTranscriptIfNeeded();
+    await _finishGuestLocalTranscriptSession();
   }
 
   Future streamDeviceRecording({BtDevice? device}) async {
@@ -1441,7 +1465,7 @@ class CaptureController extends ChangeNotifier
     }
     updateRecordingState(RecordingState.stop);
     await _socket?.stop(reason: 'stop stream device recording');
-    await _persistLocalTranscriptIfNeeded();
+    await _finishGuestLocalTranscriptSession();
   }
 
   @override
