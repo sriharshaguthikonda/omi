@@ -621,3 +621,128 @@ unreachable on the branch until the Settings entry lands (next increment).
 - Merge command shape (fork-internal only, never upstream): open PR with `gh pr create -R sriharshaguthikonda/omi ...`, merge with `gh pr merge -R sriharshaguthikonda/omi <n> --merge`.
 - Q&A protocol: write ONLY at END of `Q and A.md`; hooks inject Sri's saves live; beep via PushNotification (multiple times if he's away).
 - Compact after P2.2 lands (Sri: "compact sooner after one feature").
+
+---
+
+## 2026-07-07 23:48 IST — merge-all executed, PR #6 MERGED, screen-off bug lane live
+
+### Current task state
+- **PR #6 MERGED to fork main** (`dc4097286`) after Sri's "check and merge all the branches" + permission-gate device confirmation. Main APK build running → apk-latest refresh → beep Sri (watcher `b8rf4qqvi` polls run for sha dc4097286).
+- feature/local-first now contains: permission-gate merge (`379981ddb`), p2-triggers P2.1 merge (`432ab59e2`), Groq presets, Moonshine default, all STT fixes. Branch APK build `28887422955` GREEN pre-merge.
+- **P2.2 QS tile**: found finished-but-uncommitted codex work in `C:/Android_software/omi-p2-triggers`; reviewed (sound), committed `34fe15a`, pushed; branch build watcher `bjqc1c738`. NOT yet merged into local-first (deliberately after apk-latest refresh to avoid cancelling Sri's build via branch concurrency group).
+- **ACTIVE BUG (Sri's report, fixed in NO branch)**: power button screen-off→on restarts recording session, live transcript disappears. Official upstream app survives screen-off on same phone ⇒ suspect OUR additions (OnDeviceMoonshineSocket lifecycle, guest capture reset on resume, MoonshineSttPlugin.kt scoping). Codex investigating on `feature/fix-screen-off` (worktree `C:/Android_software/omi-fix-screen-off`); dispatched via codex-rescue agent → background CLI runs `bmgtoib0k`/`b7y430xkw`.
+- Q&A slimmed by haiku agent: resolved threads → `Q and A archive.md`, live file 241 lines, commit `f38c0bb80` (local-first, NOT pushed yet — push with next merge train).
+
+### Key decisions
+- Merge order: PR #6 first, P2.2 + screen-off fix ride a SECOND merge train (task #4).
+- Screen-off fix branch: `feature/fix-screen-off` cut from post-merge local-first.
+- BT trigger P3 = next codex lane after screen-off fix (Sri flagged priority; learn-mode wizard spec already in plans/).
+
+### Modified files
+- Merges only + `Q and A.md`/`Q and A archive.md` (f38c0bb80), P2.2 files in omi-p2-triggers worktree (34fe15a: AndroidManifest.xml, MainActivity.kt, OmiQuickSettingsTileService.kt, strings.xml, home/page.dart, SPEC-p2.2-qs-tile.md).
+
+### Blockers / open questions
+- Codex screen-off root-cause result pending (background runs).
+- Sri must test apk-latest when refreshed (beep pending): merged bundle incl. permission gate + notification buttons.
+- Q13 (Kaggle ONNX link) still open with Sri.
+
+### Next steps
+1. On watcher `b8rf4qqvi` fire: verify apk-latest asset timestamp, PushNotification beep Sri with release link.
+2. On codex result: review fix on feature/fix-screen-off, correct, push, branch build, then merge with p2-triggers into local-first → main (second train). Push f38c0bb80 docs commit with it.
+3. On P2.2 build (`bjqc1c738`) red: root-cause via `gh -R sriharshaguthikonda/omi run view <id> --log-failed`.
+4. After screen-off fix: codex lane for P3 BT trigger (learn-mode wizard).
+5. Update ROADMAP bug parking lot: screen-off bug entry → in-progress with branch pointer.
+
+### Critical context (gotchas)
+- gh defaults to UPSTREAM — always `-R sriharshaguthikonda/omi`.
+- Pushing ANY commit to a branch cancels its in-flight APK run (concurrency group) — hold docs pushes while a build Sri waits on is running.
+- rtk grep shim breaks `\|` alternation silently — use Grep tool.
+- No dart/flutter on box; CI Lint gates formatting. memory row says local dart-sdk exists — STALE, not found.
+- Codex: ONE session at a time (sqlite clash); model gpt-5.5 medium; MCP tool blocks, prefer codex-rescue agent (backgrounds it).
+- Q&A file: user edits live; Edit tool may hit "modified since read" — re-read tail and retry; answers go at END only.
+
+### Model summary
+- Sri confirmed permission gate works on device; ordered merge-all + faster feature push.
+- New bug reported: screen-off/on kills live transcript, restarts session; official app unaffected.
+- Verified bug fixed in no branch; codex dispatched on feature/fix-screen-off with narrowing evidence.
+- Merged permission-gate + p2-triggers into local-first (only conflict: generated repo-intel manifest, took ours).
+- Branch build green → merged PR #6 to fork main; apk-latest watcher armed with beep planned.
+- Found+shipped codex's complete-but-uncommitted P2.2 QS tile (34fe15a) after import/compile review.
+- Groq presets branch synced (stray manifest commit pushed).
+- Q&A file slimmed 741→241 lines via haiku agent (Sri's request); archive file created.
+- Project state saved to memory (mem omi-fork-state-2026-07-0_714f8e).
+- Three watchers live: main APK/apk-latest, P2.2 branch build, codex background runs.
+
+### Handoff context
+1. Repo `C:/Android_software/omi`, branch feature/local-first; worktrees: omi-p2-triggers, omi-permission-gate, omi-groq-presets, omi-fix-screen-off.
+2. Fork main = dc4097286 (PR #6 merge). Local main ref synced.
+3. Check apk-latest: `gh -R sriharshaguthikonda/omi release view apk-latest --json publishedAt,assets`.
+4. Check runs: `gh -R sriharshaguthikonda/omi run list --limit 8`.
+5. Beep Sri via PushNotification when apk-latest refreshed; test list: permission ask-once, notification Start/Stop buttons, Moonshine default, transcript rows per record/stop cycle.
+6. Codex screen-off deliverable: root cause + fix + commit on feature/fix-screen-off (no push). Review before pushing.
+7. Suspect files for screen-off: app/lib/providers/capture_provider.dart, app/lib/services/sockets/*moonshine*, transcription_service.dart factory ~:354, MoonshineSttPlugin.kt, home page.dart lifecycle observer.
+8. Second merge train: p2-triggers (34fe15a+) + fix-screen-off + f38c0bb80 docs → local-first → main (regular merges, fork only).
+9. Never touch upstream BasedHardware/omi with pushes/PRs.
+10. Q&A protocol: answer at END of "Q and A.md"; archive graduated threads to "Q and A archive.md".
+11. Tasks: #2 in_progress (apk-latest), #3 in_progress (codex bug), #4 pending (second train).
+12. P3 BT trigger spec: plans/ + ROADMAP D2/D3 closed decisions — runtime learn-mode wizard, nothing hardcoded.
+
+---
+
+## Handoff 2026-07-08 02:47 IST — screen-off bug FIXED, merge train 2 running, 3 parallel lanes
+
+### Current task state
+- **Screen-off transcript wipe: ROOT-CAUSED + FIXED.** `app/lib/services/capture/capture_controller.dart:1669` `_loadInProgressConversation()` — on lifecycle resume (home page.dart:199) it fetched in-progress convo from backend; guest/local-STT/401 gets empty → `segments = []` wiped live transcript while mic kept recording. Fix `c594219` (branch `feature/fix-screen-off`, worktree C:/Android_software/omi-fix-screen-off): early-return when convos empty && local segments/photos non-empty (mirrors guard already in `_refreshInProgressConversationTick`).
+- Merge train 1 DONE: permission-gate + p2-triggers(P2.1) → local-first → PR #6 MERGED to fork main (dc4097286) → main APK green.
+- Merge train 2 IN FLIGHT: fix-screen-off (c594219) + p2-triggers(P2.2 QS tile 34fe15a, branch build green) merged into feature/local-first, pushed. Background watcher `bbo6zh733` polls its Android APK run. On green: open/merge PR local-first→main (gh -R sriharshaguthikonda/omi), apk-latest refreshes, PushNotification beep Sri with retest: screen-off/on mid-recording keeps transcript; QS tile "Omi capture" toggles.
+- Codex lane: P3 BT media-button trigger increment 1 running as codex background task `task-mrb5fg1c-lmgjt8` in worktree C:/Android_software/omi-p3-bt (branch feature/p3-bt-trigger). Plan: plans/P3-bt-trigger-matrix.md.
+- Sonnet agent lane: P2.3 Tasker intent trigger in C:/Android_software/omi-p2-triggers (BroadcastReceiver com.friend.ios.TRIGGER_CAPTURE, default-OFF setting gate).
+
+### Key decisions
+- Wipe-guard placed inside `_loadInProgressConversation` (single choke point, covers resume + init + tick callers), not per-caller.
+- P2.3 external intent receiver MUST stay gated off-by-default (exported receiver can start mic).
+- apk-latest only refreshes from green builds; never push docs commits to a branch mid-APK-build (concurrency cancels).
+
+### Modified files (this session)
+- app/lib/services/capture/capture_controller.dart (fix, on feature/fix-screen-off + merged to local-first)
+- Q and A.md (answers; slim done earlier: archive = "Q and A archive.md")
+- app/android/.../OmiQuickSettingsTileService.kt, MainActivity.kt, AndroidManifest.xml, res/values/strings.xml, app/lib/pages/home/page.dart (P2.2, commit 34fe15a on feature/p2-triggers)
+
+### Blockers / open questions
+- Codex quota reset ~2:30am IST — P3 codex task may still fail on "sqlite state runtime" error; if so re-dispatch or hand to sonnet agent.
+- Sri device retest of screen-off fix pending next apk-latest.
+- Q13 (Sri Kaggle ONNX links) still open.
+
+### Next steps
+1. Watcher fires → if green: `gh -R sriharshaguthikonda/omi pr create --base main --head feature/local-first` → merge (regular) → verify apk-latest asset updated → PushNotification beep with retest list.
+2. Collect P3 codex result (worktree omi-p3-bt): review diff, commit if sound, push branch, CI check.
+3. Collect P2.3 sonnet result (worktree omi-p2-triggers): review, push, CI.
+4. After both green: merge train 3 into local-first → main.
+5. Re-engage codex for P3 learn-mode wizard increments.
+
+### Critical context
+- gh defaults to upstream — ALWAYS `-R sriharshaguthikonda/omi`.
+- rtk's rg missing on PATH — plain grep works.
+- No Flutter/dart toolchain on this box; CI = compile proof. Pre-commit hook formats (installed in all worktrees).
+- Q&A file edited live by Sri — append via `cat >>` heredoc, never Edit (read-race).
+- Worktrees: omi (local-first), omi-p2-triggers, omi-permission-gate, omi-groq-presets, omi-fix-screen-off, omi-p3-bt.
+
+### Model summary
+- Sri confirmed permission gate works; background listening now works on new dev build.
+- Remaining reported bug was screen-off transcript reset — fixed this session, awaiting device verify.
+- All feature branches merged into feature/local-first; PR #6 merged to fork main.
+- P2.2 QS tile was codex-orphaned uncommitted work; reviewed + committed 34fe15a, compiled green.
+- Codex quota died mid-session; Claude did the bug investigation directly (announced engine switch in Q&A).
+- Three lanes now: merge train 2 (watcher), P3 BT (codex), P2.3 Tasker (sonnet).
+- Sri's standing orders: parallel agents per feature, BT trigger top priority, codex lifts when alive, beep at milestones, answer only at END of Q&A file.
+- Memory row `omi` project_state updated pre-compaction (mem set_project_state); refresh after train 2 lands.
+
+### Handoff context
+1. Check watcher output: `cat "$TMP/tasks/bbo6zh733.output"` (tasks dir under scratchpad root).
+2. If APK green → PR create/merge to main as above; if red → `gh -R sriharshaguthikonda/omi run view <id> --log-failed`.
+3. P3 codex status: /codex:status task-mrb5fg1c-lmgjt8; diff review: `git -C C:/Android_software/omi-p3-bt log --oneline -3` + `git diff HEAD~1`.
+4. P2.3 review: `git -C C:/Android_software/omi-p2-triggers log --oneline -3`.
+5. Beep Sri via PushNotification only at apk-latest refresh or if input needed.
+6. Retest list for Sri: (a) record → screen off → screen on → transcript intact, one session; (b) Process-now covers whole session; (c) QS tile toggle works after adding tile to shade.
+7. If codex sqlite error persists past 2:30am: delete/inspect C:/Users/deletable/.codex lock state before re-dispatch.
+8. Never push/PR upstream; fork only. Regular merges, never squash.

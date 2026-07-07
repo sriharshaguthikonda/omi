@@ -239,3 +239,30 @@ Report all three → green = I merge PR #6 → apk-latest refreshes.
 
 
 > **A (Claude, Q&A slimming):** Done — resolved threads moved to `Q and A archive.md` (same folder); this file now stays lean so session injections stop burning context. New rule: whenever a thread here is fully resolved, it graduates to the archive.
+
+
+## user comments
+1. codex is has hit quota see if you will get issues when you try to start new agents.
+2. it will reset at 2:30 am
+
+3.handover next features to your smaller agents
+
+> **A (Claude):** Confirmed — both codex runs on the screen-off bug died (state/quota error, zero progress made). **Engine switch: I'm doing the screen-off investigation myself right now** instead of idling until 2:30; when quota resets, codex takes implementation/review lanes again (BT trigger P3 queued for it). Meanwhile the good news wave: **PR #6 is MERGED**, main APK is building → apk-latest refresh + beep coming; **P2.2 Quick Settings tile compiled green** on its branch, merges in the next train with the screen-off fix.
+
+
+
+## user comments
+1. multiple parallel agents for differnt features. 
+
+2. triggers like bluetooh device and the type of keypress priority
+3. see what else features have been developed in other branches and merge
+4. codex does lifting you monitor and orchestrate and correct
+
+5. phone connected check debug logs 
+> **A (Claude, all 5):**
+> **SCREEN-OFF BUG: ROOT CAUSE FOUND + FIX COMMITTED (`c594219`).** Exactly what you described: recording never stopped — but on screen-ON the app reloads the "in-progress conversation" **from the backend**; guests/local-STT get an empty answer and the code wiped your live transcript and started a fresh session (that's also why Process-now only saw the recent part). Fix: never discard locally-produced transcript when the backend has nothing. Merged into `feature/local-first` together with **P2.2 (Quick Settings tile, compiled green)** — build running, on green it goes to main → apk-latest → beep + retest instructions.
+> **1 (parallel agents):** live now — 3 lanes: screen-off fix (done, mine), **P3 BT trigger increment 1 via codex** (media-button → toggle, per plans/P3-bt-trigger-matrix.md), **P2.3 Tasker intent trigger via Claude sonnet agent** (external app trigger, gated OFF by default for mic security).
+> **2 (BT priority):** yes — that's the codex lane above; learn-mode wizard (which device/button/press-type) is its next increments.
+> **3 (other branches):** checked & merged — permission-gate, p2-triggers (P2.1+P2.2), groq presets, screen-off fix are ALL in `feature/local-first` now; no other branch had unmerged feature work.
+> **4 (codex lifts):** codex is on the P3 lane; if its quota is still dead it reports back and the lane falls to a Claude agent until 2:30.
+> **5 (debug logs):** phone seen on adb (10BF191Z51001DC) but logcat had already rolled past your test — nothing useful. Not needed though: the wipe was found in code, exact line. If a future misbehave: tell me right away and I pull logcat within minutes.
