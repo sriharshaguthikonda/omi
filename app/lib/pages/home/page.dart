@@ -123,6 +123,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver, TickerProviderStateMixin {
+  static const _triggerActionChannel = MethodChannel('com.friend.ios/trigger_actions');
+
   ForegroundUtil foregroundUtil = ForegroundUtil();
   List<Widget> screens = [Container(), const SizedBox(), const SizedBox(), const SizedBox()];
 
@@ -233,8 +235,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, Ticker
   final Map<String, Widget> screensWithRespectToPath = {'/facts': const MemoriesPage()};
   bool? previousConnection;
 
+  Future<void> _initTriggerActionChannel() async {
+    _triggerActionChannel.setMethodCallHandler((call) async {
+      if (call.method == 'triggerCapture') {
+        _onReceiveTaskData(call.arguments);
+      }
+    });
+
+    final pendingTriggers = await _triggerActionChannel.invokeMethod<List<dynamic>>('drainPendingTriggers');
+    for (final trigger in pendingTriggers ?? const []) {
+      _onReceiveTaskData(trigger);
+    }
+  }
+
   void _onReceiveTaskData(dynamic data) async {
-    if (data is! Map<String, dynamic>) return;
+    if (data is! Map) return;
     final triggerAction = data['trigger_action'];
     if (triggerAction is String) {
       if (!mounted) return;
@@ -464,6 +479,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, Ticker
 
     // After init
     FlutterForegroundTask.addTaskDataCallback(_onReceiveTaskData);
+    if (Platform.isAndroid) {
+      _initTriggerActionChannel();
+    }
   }
 
   void _checkForAnnouncements() {
@@ -1242,6 +1260,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, Ticker
     QuickActionsService.instance.reset();
     // Clean up freemium handler
     _freemiumHandler.dispose();
+    if (Platform.isAndroid) {
+      _triggerActionChannel.setMethodCallHandler(null);
+    }
     // Remove foreground task callback to prevent memory leak
     FlutterForegroundTask.removeTaskDataCallback(_onReceiveTaskData);
     ForegroundUtil.stopForegroundTask();
