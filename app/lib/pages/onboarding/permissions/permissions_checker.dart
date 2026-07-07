@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:omi/utils/platform/platform_manager.dart';
 import 'package:flutter/material.dart';
 
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
@@ -13,17 +14,51 @@ import 'package:omi/providers/onboarding_provider.dart';
 import 'package:omi/utils/l10n_extensions.dart';
 import 'package:omi/widgets/dialog.dart';
 
-/// Checks if critical permissions are granted. Returns true if all are granted.
-Future<bool> arePermissionsGranted() async {
+class PermissionGateStatus {
+  final bool allRelevantPermissionsGranted;
+  final bool criticalPermissionsGranted;
+
+  const PermissionGateStatus({
+    required this.allRelevantPermissionsGranted,
+    required this.criticalPermissionsGranted,
+  });
+}
+
+/// Checks runtime permission state for boot gating.
+Future<PermissionGateStatus> getPermissionGateStatus() async {
   final notification = await Permission.notification.isGranted;
   final location = await Permission.location.isGranted;
-  return notification && location;
+  final microphone = await Permission.microphone.isGranted;
+  var background = true;
+  if (Platform.isAndroid) {
+    background = await FlutterForegroundTask.isIgnoringBatteryOptimizations;
+  }
+
+  return PermissionGateStatus(
+    allRelevantPermissionsGranted: notification && location && microphone && background,
+    criticalPermissionsGranted: microphone,
+  );
 }
 
 /// Interstitial screen shown when onboarding was completed (from backend)
 /// but permissions haven't been granted on this device (fresh install).
-class PermissionsInterstitialPage extends StatelessWidget {
+class PermissionsInterstitialPage extends StatefulWidget {
   const PermissionsInterstitialPage({super.key});
+
+  @override
+  State<PermissionsInterstitialPage> createState() => _PermissionsInterstitialPageState();
+}
+
+class _PermissionsInterstitialPageState extends State<PermissionsInterstitialPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<OnboardingProvider>().updatePermissions();
+      }
+    });
+  }
 
   void _goHome(BuildContext context) {
     SharedPreferencesUtil().permissionsCompleted = true;
@@ -106,6 +141,19 @@ class PermissionsInterstitialPage extends StatelessWidget {
                         ),
 
                       _PermissionTile(
+                        value: provider.hasMicrophonePermission,
+                        title: context.l10n.microphone,
+                        subtitle: context.l10n.onboardingMicrophoneRequired,
+                        onChanged: (s) async {
+                          if (s == true) {
+                            await provider.askForMicrophonePermissions();
+                          } else {
+                            provider.updateMicrophonePermission(false);
+                          }
+                        },
+                      ),
+
+                      _PermissionTile(
                         value: provider.hasLocationPermission,
                         title: context.l10n.locationAccess,
                         subtitle: context.l10n.locationAccessDesc,
@@ -172,6 +220,9 @@ class PermissionsInterstitialPage extends StatelessWidget {
                                   provider.setLoading(true);
                                   if (Platform.isAndroid && !provider.hasBackgroundPermission) {
                                     await provider.askForBackgroundPermissions();
+                                  }
+                                  if (!provider.hasMicrophonePermission) {
+                                    await provider.askForMicrophonePermissions();
                                   }
                                   await Permission.notification.request().then((value) async {
                                     if (value.isGranted) {

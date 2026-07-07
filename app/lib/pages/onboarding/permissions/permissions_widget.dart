@@ -20,6 +20,16 @@ class PermissionsWidget extends StatefulWidget {
 
 class _PermissionsWidgetState extends State<PermissionsWidget> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<OnboardingProvider>().updatePermissions();
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<OnboardingProvider>(
       builder: (context, provider, child) {
@@ -79,6 +89,21 @@ class _PermissionsWidgetState extends State<PermissionsWidget> {
                               }
                             },
                           ),
+
+                        _buildPermissionTile(
+                          value: provider.hasMicrophonePermission,
+                          title: context.l10n.microphone,
+                          subtitle: context.l10n.onboardingMicrophoneRequired,
+                          onChanged: (s) async {
+                            if (s != null) {
+                              if (s) {
+                                await provider.askForMicrophonePermissions();
+                              } else {
+                                provider.updateMicrophonePermission(false);
+                              }
+                            }
+                          },
+                        ),
 
                         // Location permission
                         _buildPermissionTile(
@@ -157,6 +182,9 @@ class _PermissionsWidgetState extends State<PermissionsWidget> {
                                   if (!provider.hasBackgroundPermission) {
                                     await provider.askForBackgroundPermissions();
                                   }
+                                }
+                                if (!provider.hasMicrophonePermission) {
+                                  await provider.askForMicrophonePermissions();
                                 }
                                 await Permission.notification.request().then((value) async {
                                   if (value.isGranted) {
