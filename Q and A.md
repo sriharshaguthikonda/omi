@@ -682,4 +682,11 @@ Report all three → green = I merge PR #6 → apk-latest refreshes.
 
 
 
+## user comments
+2. you are so fucking slow!!!
+3. use other codex agents to fix those background recording bug.....because the normal app does fine in terms of bacground recording!
+4. focus of bluetoot which device and waht button sort of trigger feature! lazy asshole!
+
+5. you are not waking up properly, you need to wake up in between and check what is going on as well.
+
 
