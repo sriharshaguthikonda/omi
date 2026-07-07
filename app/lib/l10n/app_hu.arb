@@ -3200,5 +3200,13 @@
     "deviceOnboardingIntroDuration": "Körülbelül 1 perc",
     "jumpToLatestMessage": "Ugrás a legújabb üzenethez",
     "latest": "Legújabb",
-    "flashFirmware": "Firmware flashelése"
+    "flashFirmware": "Firmware flashelése",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

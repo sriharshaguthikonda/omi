@@ -3109,5 +3109,13 @@
     "deviceOnboardingIntroDuration": "Približne 1 minúta",
     "jumpToLatestMessage": "Prejsť na najnovšiu správu",
     "latest": "Najnovšia",
-    "flashFirmware": "Nahrať firmvér"
+    "flashFirmware": "Nahrať firmvér",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

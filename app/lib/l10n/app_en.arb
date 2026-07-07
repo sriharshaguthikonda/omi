@@ -2769,6 +2769,14 @@
     "@autoCreateWhenNameDetected": {
         "description": "Description for auto-create speakers"
     },
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    },
     "followUpQuestions": "Follow-up Questions",
     "@followUpQuestions": {
         "description": "Experimental feature name"

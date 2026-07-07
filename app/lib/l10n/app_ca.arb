@@ -3073,5 +3073,13 @@
     "deviceOnboardingIntroDuration": "Aproximadament 1 minut",
     "jumpToLatestMessage": "Vés a l'últim missatge",
     "latest": "Últim",
-    "flashFirmware": "Grava el microprogramari"
+    "flashFirmware": "Grava el microprogramari",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

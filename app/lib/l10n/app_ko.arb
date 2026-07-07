@@ -3104,5 +3104,13 @@
     "deviceOnboardingIntroDuration": "약 1분",
     "jumpToLatestMessage": "최신 메시지로 이동",
     "latest": "최신",
-    "flashFirmware": "펌웨어 플래시"
+    "flashFirmware": "펌웨어 플래시",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

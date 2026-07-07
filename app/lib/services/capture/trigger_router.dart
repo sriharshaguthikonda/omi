@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:omi/backend/preferences.dart';
 import 'package:omi/services/capture/capture_controller.dart';
 import 'package:omi/utils/debug_log_manager.dart';
 import 'package:omi/utils/enums.dart';
@@ -10,6 +12,13 @@ class TriggerRouter {
   final CaptureController _captureController;
 
   Future<void> handleTrigger({required String source, required String action}) async {
+    // Security gate: an exported Android receiver lets any app (Tasker etc.) send this
+    // source, so it's off by default. Single choke point — every trigger routes through here.
+    if (source == 'external_intent' && !SharedPreferencesUtil().externalTriggersEnabled) {
+      debugPrint('TriggerRouter: ignoring external_intent trigger, externalTriggersEnabled is off');
+      return;
+    }
+
     final normalizedAction = action.trim().toLowerCase();
     final resolved = _resolveAction(normalizedAction);
 
