@@ -1668,6 +1668,14 @@ class CaptureController extends ChangeNotifier
 
   Future _loadInProgressConversation() async {
     var convos = await getConversations(statuses: [ConversationStatus.in_progress], limit: 1);
+    if (convos.isEmpty && (segments.isNotEmpty || photos.isNotEmpty)) {
+      // No backend in-progress conversation, but we hold locally-produced segments
+      // (guest mode, on-device/polling STT, or backend unreachable). Wiping here erased
+      // the live transcript on every screen-off→on resume; keep the local session.
+      // ponytail: stale local segments after fully-offline server-side processing linger
+      // until the next processing event resets state.
+      return;
+    }
     _conversation = convos.isNotEmpty ? convos.first : null;
     if (_conversation != null) {
       segments = _conversation!.transcriptSegments;
