@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "0.1.0",
+  "repo": {
+    "id": "omi-p2-triggers",
+    "root": ".",
+    "remoteUrl": "https://github.com/sriharshaguthikonda/omi.git",
+    "defaultBranch": "feature/p2-triggers",
+    "localPaths": [
+      ".cursor",
+      ".cursorignore",
+      ".dockerignore",
+      ".gemini",
+      ".github",
+      ".gitignore",
+      ".pre-commit-config.yaml",
+      ".secrets.baseline",
+      "AGENTS.md",
+      "CLAUDE.md",
+      "ISSUE_TRIAGE_GUIDE.MD",
+      "LICENSE",
+      "Makefile",
+      "Package.resolved",
+      "Package.swift",
+      "Q and A.md",
+      "README.md",
+      "ROADMAP.md",
+      "SECURITY.md",
+      "app",
+      "backend",
+      "codemagic.yaml",
+      "community-plugin-stats.json",
+      "contract_tests",
+      "desktop",
+      "docs",
+      "firebase.json",
+      "firestore.indexes.json",
+      "firestore.rules",
+      "mcp",
+      "omi",
+      "omiGlass",
+      "package-lock.json",
+      "package.json",
+      "phone-capture-deep-research-report.md",
+      "plans",
+      "plugins",
+      "scripts",
+      "sdks",
+      "web"
+    ]
+  },
+  "sourceState": {
+    "commit": "3d4e3c69920c3051aed5bbfe00da88ce1220e816",
+    "branch": "feature/p2-triggers",
+    "dirty": false,
+    "generatedForCommit": "3d4e3c69920c3051aed5bbfe00da88ce1220e816",
+    "sourceFingerprint": "8c29a4fde083ca98cd67946721a64cc3d25918991a363c16802ff82888cee66a"
+  },
+  "policy": {
+    "profile": "basic",
+    "sensitivity": "private",
+    "committedArtifacts": [
+      "manifest"
+    ],
+    "allowMemoryPointer": false,
+    "allowGraphPilots": false,
+    "runOnPush": false
+  },
+  "generatedAt": "2026-07-07T07:54:42.555908Z",
+  "toolRuns": [
+    {
+      "id": "repomix.basic",
+      "tool": "repomix",
+      "mode": "basic",
+      "status": "skipped",
+      "outputRef": "artifacts/repomix/repo-map.json",
+      "warnings": [
+        "Repomix is unavailable on PATH.",
+        "Suggested command: `npx repomix --output artifacts/repomix/repo-map.json`.",
+        "Repomix output is a native artifact and is not committed by default.",
+        "Bare `npx` does not prove Repomix is installed; install `repomix` or verify it explicitly."
+      ]
+    },
+    {
+      "id": "aider.basic",
+      "tool": "aider",
+      "mode": "basic",
+      "status": "skipped",
+      "outputRef": "artifacts/aider/repo-map-guidance.md",
+      "warnings": [
+        "Aider records repo-map guidance without forcing an interactive run.",
+        "Aider is unavailable on PATH.",
+        "Baseline guidance output lives in an artifact path and is not committed by default."
+      ]
+    },
+    {
+      "id": "serena.basic",
+      "tool": "serena",
+      "mode": "basic",
+      "status": "passed",
+      "outputRef": "artifacts/serena/capability.json",
+      "warnings": [
+        "Serena records ephemeral live-symbol capability without auto-configuring global state.",
+        "Suggested command: `serena start-mcp-server --project-from-cwd --context=codex`.",
+        "Serena query results are ephemeral; durable repo context stays in Repo_maps artifacts."
+      ]
+    }
+  ],
+  "artifacts": {
+    "manifestPath": ".repo-intel/manifest.json",
+    "summaryPath": ".repo-intel/summary.md",
+    "nativeOutputs": [
+      {
+        "name": "repomix",
+        "path": "artifacts/repomix/repo-map.json",
+        "kind": "native"
+      },
+      {
+        "name": "aider",
+        "path": "artifacts/aider/repo-map-guidance.md",
+        "kind": "native"
+      },
+      {
+        "name": "serena",
+        "path": "artifacts/serena/capability.json",
+        "kind": "native"
+      },
+      {
+        "name": "repo-map-full",
+        "path": "artifacts/repo-map/repo-map-full.json",
+        "kind": "native"
+      }
+    ],
+    "workflowArtifacts": []
+  },
+  "contextLevels": {
+    "level0": "identity",
+    "level1": "summary",
+    "level2": "importantFiles",
+    "level3": "symbols",
+    "level4": "fullExport"
+  },
+  "staleness": "current",
+  "security": {
+    "ignorePolicy": ".repo-map-ignore",
+    "secretScanStatus": "skipped",
+    "sizeGateStatus": "skipped"
+  }
+}
