@@ -53,7 +53,10 @@ if [ -n "$STAGED_ARB_FILES" ]; then
   if command -v jq >/dev/null 2>&1; then
     echo "Formatting ARB files to 4-space JSON indent..."
     for f in $STAGED_ARB_FILES; do
-      jq --indent 4 '.' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+      # ponytail: some native Windows jq builds write CRLF on redirected stdout
+      # (CRT text-mode translation) even though the source is LF-only; strip it
+      # back out so ARB files stay LF like the rest of the repo.
+      jq --indent 4 '.' "$f" | tr -d '\r' > "$f.tmp" && mv "$f.tmp" "$f"
     done
     echo "$STAGED_ARB_FILES" | xargs git add
   else
