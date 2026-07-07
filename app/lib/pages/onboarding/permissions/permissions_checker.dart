@@ -40,6 +40,18 @@ Future<PermissionGateStatus> getPermissionGateStatus() async {
   );
 }
 
+/// Single decision point for whether boot must show the permission screen:
+/// a missing critical permission (microphone) always re-blocks; anything else
+/// only blocks until the user has completed the screen once.
+bool shouldShowPermissionGate({
+  required bool permissionsCompleted,
+  required bool allRelevantPermissionsGranted,
+  required bool criticalPermissionsGranted,
+}) {
+  if (!criticalPermissionsGranted) return true;
+  return !permissionsCompleted && !allRelevantPermissionsGranted;
+}
+
 /// Interstitial screen shown when onboarding was completed (from backend)
 /// but permissions haven't been granted on this device (fresh install).
 class PermissionsInterstitialPage extends StatefulWidget {

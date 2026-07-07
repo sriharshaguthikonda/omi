@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:omi/mobile/mobile_app.dart';
+import 'package:omi/pages/onboarding/permissions/permissions_checker.dart';
 
 void main() {
   group('shouldShowPermissionGate', () {

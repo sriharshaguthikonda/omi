@@ -9,15 +9,6 @@ import 'package:omi/pages/onboarding/permissions/permissions_checker.dart';
 import 'package:omi/pages/onboarding/wrapper.dart';
 import 'package:omi/providers/auth_provider.dart';
 
-bool shouldShowPermissionGate({
-  required bool permissionsCompleted,
-  required bool allRelevantPermissionsGranted,
-  required bool criticalPermissionsGranted,
-}) {
-  if (!criticalPermissionsGranted) return true;
-  return !permissionsCompleted && !allRelevantPermissionsGranted;
-}
-
 class MobileApp extends StatelessWidget {
   const MobileApp({super.key});
 
