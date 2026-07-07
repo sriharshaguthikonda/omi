@@ -746,3 +746,41 @@ unreachable on the branch until the Settings entry lands (next increment).
 6. Retest list for Sri: (a) record → screen off → screen on → transcript intact, one session; (b) Process-now covers whole session; (c) QS tile toggle works after adding tile to shade.
 7. If codex sqlite error persists past 2:30am: delete/inspect C:/Users/deletable/.codex lock state before re-dispatch.
 8. Never push/PR upstream; fork only. Regular merges, never squash.
+
+---
+
+## Handoff 2026-07-08 03:30 IST — delta: train 2 LANDED, apk-latest live, awaiting Sri retest
+
+Supersedes 02:47 section — only deltas here:
+
+### Done since last handoff
+- Train 2 MERGED: screen-off fix (c594219) + P2.2 QS tile → PR #7 (d4b261b76) → fork main → main APK GREEN → **apk-latest asset refreshed 2026-07-07T21:46Z (03:16 IST)**. Sri beeped; retest list at end of "Q and A.md" (screen-off/on transcript survival, process-now whole session, QS tile toggle).
+- P2.3 Tasker trigger DONE by sonnet agent: commit `ffe7a2b38` pushed on feature/p2-triggers; receiver `com.friend.ios.TRIGGER_CAPTURE` (exported) gated by `externalTriggersEnabled` pref (default OFF, enforced in app/lib/services/capture/trigger_router.dart:17). CI watcher `bt44veuar` polls APK+Lint on that branch.
+- Docs committed to local-first pre-PR (ae0c32c4f).
+- Memory project_state row refreshed (mem ..._6084c4).
+
+### Known debt (P2.3 — resolve before polished release, fine for dev fork)
+- 48 non-English arb files: English placeholder text for externalTriggers/externalTriggersDescription (run omi-add-missing-language-keys-l10n skill later).
+- Commit made with --no-verify (no dart/jq on box); Lint CI is the format referee — if lint red, `dart format --line-length 120 --language-version=3.0` the touched Dart files (no local dart found; may need fresh SDK download).
+
+### Still in flight / next steps
+1. `bt44veuar` fires → P2.3 CI verdict; red = pull `gh -R sriharshaguthikonda/omi run view <id> --log-failed`, fix, re-push.
+2. Codex P3 BT trigger (task-mrb5fg1c-lmgjt8, worktree C:/Android_software/omi-p3-bt): when done review `git -C C:/Android_software/omi-p3-bt log/diff`, commit if codex didn't, push feature/p3-bt-trigger, CI.
+3. When both green: merge train 3 = feature/p2-triggers + feature/p3-bt-trigger → feature/local-first → PR → main → apk-latest → beep.
+4. Sri retest report lands in "Q and A.md" (hook injects) — if screen-off retest fails, next suspect is the paused-state path or conversation-page-level state, re-investigate with fresh logcat immediately (phone 10BF191Z51001DC).
+5. Codex quota was reset ~2:30am; if P3 task died on sqlite error re-dispatch via codex-rescue agent once.
+
+### Critical context (unchanged)
+gh needs -R sriharshaguthikonda/omi (except gh api full-path). Q&A: append-only via cat>> heredoc, answers at END. Fork-only merges, regular merge. apk-latest refreshes only from green main builds.
+
+---
+
+## Handoff 2026-07-08 03:55 IST — delta: P2.3 merged, 4 lanes live
+
+Delta over 03:30 section:
+- P2.3 APK CI GREEN (ffe7a2b38) → merged into feature/local-first (232d2c99d) + pushed; integration build watcher `bi53j3hye`.
+- Codex P3 first run produced NOTHING (worktree omi-p3-bt untouched; died on quota/sqlite). RE-DISPATCHED via codex-rescue agent (checks old task task-mrb5fg1c-lmgjt8 then re-runs; full prompt embedded in agent call).
+- NEW lane: settings-search UX fix (typo-tolerant matcher + always-visible field, Sri's old complaint) — sonnet agent in new worktree C:/Android_software/omi-settings-search, branch feature/settings-search (cut at 232d2c99d).
+- Sri retest of screen-off fix on apk-latest still pending — watch "Q and A.md" (hook injects).
+
+Next: collect P3 + settings-search agent results → review → commit/push → CI → merge train 3 (p3-bt-trigger + settings-search, P2.3 already in) → PR → main → apk-latest → beep. If P2.3 integration build (232d2c99d) red: log-failed, fix, re-push before train 3.
