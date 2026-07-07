@@ -3105,5 +3105,13 @@
     "deviceOnboardingIntroDuration": "Aproximadamente 1 minuto",
     "jumpToLatestMessage": "Ir al mensaje más reciente",
     "latest": "Más reciente",
-    "flashFirmware": "Flashear firmware"
+    "flashFirmware": "Flashear firmware",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

@@ -266,3 +266,32 @@ Report all three → green = I merge PR #6 → apk-latest refreshes.
 > **3 (other branches):** checked & merged — permission-gate, p2-triggers (P2.1+P2.2), groq presets, screen-off fix are ALL in `feature/local-first` now; no other branch had unmerged feature work.
 > **4 (codex lifts):** codex is on the P3 lane; if its quota is still dead it reports back and the lane falls to a Claude agent until 2:30.
 > **5 (debug logs):** phone seen on adb (10BF191Z51001DC) but logcat had already rolled past your test — nothing useful. Not needed though: the wipe was found in code, exact line. If a future misbehave: tell me right away and I pull logcat within minutes.
+
+## 🔔 2026-07-08 ~03:20 IST — apk-latest LIVE with screen-off fix (beeped)
+
+**Install:** <https://github.com/sriharshaguthikonda/omi/releases/tag/apk-latest> (asset refreshed 03:16 IST). Contains: screen-off transcript fix + Quick Settings "Omi capture" tile + everything from train 1 (permission gate, notification buttons, Groq presets, Moonshine default).
+
+Retest (the one that matters):
+1. Start recording → speak → press power (screen off) → wait ~30s speaking → screen on: **transcript must still be there, same session, and keep accumulating.**
+2. Process-now after that: should cover the WHOLE session including pre-screen-off speech.
+3. Bonus: add the "Omi capture" tile to your Quick Settings shade (edit tiles) → tap toggles recording.
+
+Report results here. In flight meanwhile: P3 BT media-button trigger (codex), P2.3 Tasker intent trigger (CI running).
+
+
+
+## user comments
+1. multiple parallel feature developemnt. 
+
+> **A (Claude, parallel dev):** 4 lanes live right now: **(1) P3 BT media-button trigger** — first codex run died on its quota crash, re-dispatched fresh now that quota reset; **(2) P2.3 Tasker/external-app trigger** — DONE + compiled green, merged into local-first (Settings → Developer → experimental toggle, OFF by default since an exported trigger can start your mic); **(3) settings-search fix** (your old complaint: typo-tolerant matching + no forced expand) — new sonnet agent on `feature/settings-search`; **(4) integration build watching**. Next apk-latest bundle: P2.3 + P3 + settings-search once green. Your screen-off retest on the current apk-latest is still the headline item.
+
+
+
+## user comments
+1. so it has persisted recording and transcript even after display off and display on but when i go back to home screen and then i come back, then i open the app again, it stops recording. it takes me back to the home screen.
+> **A (Claude):** 🎉 **Screen-off fix CONFIRMED by your test — that bug is dead.** The new one you found (Android home → reopen = recording stops, app relaunches fresh) is a different animal: screen-off keeps the app foregrounded so it survives, but HOME backgrounds it and your vivo kills the process unless a **microphone foreground service** is holding it alive. Prime suspects: our phone-mic path may not start the foreground service, or it lacks `foregroundServiceType="microphone"` (Android 14+ requirement). An agent is investigating + fixing right now on `feature/fix-screen-off` (service/manifest first, then interrupted-session recovery so nothing is lost even if the OEM still kills us). Also landed meanwhile: **settings-search fix** (typo-tolerant + no expand step) pushed, CI running. Train 3 bundle = home-kill fix + P3 BT + settings-search.
+
+> **A (Claude, home-nav kill — investigated + partial fix):** Turns out our side was already right: the mic **foreground service, manifest type, and battery exemption all exist and run**. What's killing the app is **vivo's own background killer** (FuntouchOS overrides standard Android protection when you leave via HOME; screen-off doesn't count as leaving, which is why that survives). Two-part response:
+> 1. **Shipped (`b5d665ce5`):** your live transcript now checkpoints to disk every ~15s while recording as guest — so even when vivo kills the process, reopening recovers everything up to ~15s before the kill (shows up in the same local recordings/transcripts UI). Before this, the whole in-memory session died with the process.
+> 2. **Your phone, one-time step (this is the real fix for the kill itself):** vivo has an *extra* permission beyond the background-usage toggle you already set — **Autostart / high background power**. Settings → Apps → App manager → Omi (dev) → turn ON **Autostart**, and in Battery → **High background power consumption** (allow). With those, vivo should stop killing the foreground service and recording should survive HOME-nav entirely. Try it and report.
+> A vivo/Xiaomi/OPPO "autostart settings" deep-link inside the app is queued as a follow-up so future installs don't need this manual step.

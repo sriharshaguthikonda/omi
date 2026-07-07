@@ -3073,5 +3073,13 @@
     "deviceOnboardingIntroDuration": "Přibližně 1 minuta",
     "jumpToLatestMessage": "Přejít na nejnovější zprávu",
     "latest": "Nejnovější",
-    "flashFirmware": "Nahrát firmware"
+    "flashFirmware": "Nahrát firmware",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

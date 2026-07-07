@@ -3139,5 +3139,13 @@
     "deviceOnboardingIntroDuration": "Около 1 минуты",
     "jumpToLatestMessage": "Перейти к последнему сообщению",
     "latest": "Последнее",
-    "flashFirmware": "Установить прошивку"
+    "flashFirmware": "Установить прошивку",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

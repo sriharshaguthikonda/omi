@@ -233,6 +233,12 @@ class SharedPreferencesUtil {
 
   bool get vadGateEnabled => getBool('vadGateEnabled');
 
+  // External automation triggers (Tasker etc. via TriggerCaptureReceiver) — an exported
+  // Android receiver can start the mic, so this is OFF by default and gated in TriggerRouter.
+  set externalTriggersEnabled(bool value) => saveBool('externalTriggersEnabled', value);
+
+  bool get externalTriggersEnabled => getBool('externalTriggersEnabled');
+
   // Claude Agent — route chat through desktop agent VM (experimental)
   set claudeAgentEnabled(bool value) => saveBool('claudeAgentEnabled', value);
 

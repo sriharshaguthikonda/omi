@@ -3104,5 +3104,13 @@
     "deviceOnboardingIntroDuration": "Ongeveer 1 minuut",
     "jumpToLatestMessage": "Naar nieuwste bericht springen",
     "latest": "Nieuwste",
-    "flashFirmware": "Firmware flashen"
+    "flashFirmware": "Firmware flashen",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

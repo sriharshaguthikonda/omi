@@ -10682,5 +10682,13 @@
     "deviceOnboardingIntroDuration": "Околу 1 минута",
     "jumpToLatestMessage": "Оди до последната порака",
     "latest": "Најново",
-    "flashFirmware": "Инсталирај фирмвер"
+    "flashFirmware": "Инсталирај фирмвер",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

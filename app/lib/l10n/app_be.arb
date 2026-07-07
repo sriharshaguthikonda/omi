@@ -10682,5 +10682,13 @@
     "deviceOnboardingIntroDuration": "Каля 1 хвіліны",
     "jumpToLatestMessage": "Перайсці да апошняга паведамлення",
     "latest": "Апошні",
-    "flashFirmware": "Усталяваць прашыўку"
+    "flashFirmware": "Усталяваць прашыўку",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

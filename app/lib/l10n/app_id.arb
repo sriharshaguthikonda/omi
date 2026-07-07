@@ -3146,5 +3146,13 @@
     "deviceOnboardingIntroDuration": "Sekitar 1 menit",
     "jumpToLatestMessage": "Lompat ke pesan terbaru",
     "latest": "Terbaru",
-    "flashFirmware": "Flash Firmware"
+    "flashFirmware": "Flash Firmware",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

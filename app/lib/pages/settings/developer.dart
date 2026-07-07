@@ -1608,6 +1608,18 @@ class _DeveloperSettingsPageState extends State<_DeveloperSettingsPageView> {
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           child: Divider(color: Colors.grey.shade800, height: 1),
                         ),
+                        // External Triggers (Tasker etc.)
+                        _buildExperimentalItem(
+                          title: context.l10n.externalTriggers,
+                          description: context.l10n.externalTriggersDescription,
+                          icon: FontAwesomeIcons.boltLightning,
+                          value: provider.externalTriggersEnabled,
+                          onChanged: provider.onExternalTriggersChanged,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Divider(color: Colors.grey.shade800, height: 1),
+                        ),
                         // Claude Agent
                         Row(
                           children: [

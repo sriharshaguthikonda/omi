@@ -3109,5 +3109,13 @@
     "deviceOnboardingIntroDuration": "Khoảng 1 phút",
     "jumpToLatestMessage": "Đi đến tin nhắn mới nhất",
     "latest": "Mới nhất",
-    "flashFirmware": "Nạp firmware"
+    "flashFirmware": "Nạp firmware",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

@@ -3139,5 +3139,13 @@
     "deviceOnboardingIntroDuration": "Około 1 minuty",
     "jumpToLatestMessage": "Przejdź do najnowszej wiadomości",
     "latest": "Najnowsza",
-    "flashFirmware": "Wgraj oprogramowanie układowe"
+    "flashFirmware": "Wgraj oprogramowanie układowe",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

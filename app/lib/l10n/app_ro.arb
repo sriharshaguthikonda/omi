@@ -3104,5 +3104,13 @@
     "deviceOnboardingIntroDuration": "Aproximativ 1 minut",
     "jumpToLatestMessage": "Sari la cel mai recent mesaj",
     "latest": "Recent",
-    "flashFirmware": "Instalați firmware-ul"
+    "flashFirmware": "Instalați firmware-ul",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

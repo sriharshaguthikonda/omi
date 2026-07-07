@@ -3104,5 +3104,13 @@
     "deviceOnboardingIntroDuration": "Noin 1 minuutti",
     "jumpToLatestMessage": "Siirry uusimpaan viestiin",
     "latest": "Uusin",
-    "flashFirmware": "Asenna laiteohjelmisto"
+    "flashFirmware": "Asenna laiteohjelmisto",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }
