@@ -69,6 +69,8 @@ class PurePollingSocket implements IPureSocket {
   // each segment must append instead of matching an earlier one by id upstream.
   final String _idNonce = DateTime.now().millisecondsSinceEpoch.toRadixString(36);
   int _segmentSeq = 0;
+  int _consecutiveTranscriptionFailures = 0;
+  bool _transcriptionFailureSurfaced = false;
 
   // ponytail: cap re-queued audio at ~2 min of 16kHz PCM16 so a permanently
   // failing endpoint (bad key) can't grow the buffer unbounded.
@@ -163,8 +165,10 @@ class PurePollingSocket implements IPureSocket {
         // Provider failure (non-200, upload error): keep the audio so the next
         // flush retries it instead of silently dropping the speech.
         _requeueFrames(frames);
+        _recordTranscriptionFailure(serviceId, StackTrace.current);
         return;
       }
+      _recordTranscriptionSuccess();
       if (result.isNotEmpty) {
         if (result.segments.isNotEmpty) {
           _audioOffsetSeconds = result.segments.last.end;
@@ -185,6 +189,26 @@ class PurePollingSocket implements IPureSocket {
     } finally {
       _isProcessing = false;
     }
+  }
+
+  void _recordTranscriptionFailure(String serviceId, StackTrace trace) {
+    _consecutiveTranscriptionFailures++;
+    CustomSttLogService.instance.warning(
+      serviceId,
+      'Transcription attempt $_consecutiveTranscriptionFailures failed; retrying buffered audio',
+    );
+    if (_consecutiveTranscriptionFailures < 3 || _transcriptionFailureSurfaced) return;
+
+    _transcriptionFailureSurfaced = true;
+    onError(
+      Exception('$serviceId transcription failed 3 times. Check Settings > Transcription logs for details.'),
+      trace,
+    );
+  }
+
+  void _recordTranscriptionSuccess() {
+    _consecutiveTranscriptionFailures = 0;
+    _transcriptionFailureSurfaced = false;
   }
 
   void _requeueFrames(List<Uint8List> frames) {

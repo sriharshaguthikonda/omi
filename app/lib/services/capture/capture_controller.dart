@@ -1546,6 +1546,11 @@ class CaptureController extends ChangeNotifier
     _transcriptionServiceStatuses = [];
     _transcriptServiceReady = false;
 
+    final ctx = globalNavigatorKey.currentContext;
+    if (ctx != null) {
+      AppSnackbar.showSnackbarError(ctx.l10n.connectionErrorDesc, duration: const Duration(seconds: 3));
+    }
+
     notifyListeners();
     _startKeepAliveServices();
   }
