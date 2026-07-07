@@ -59,7 +59,7 @@ Future<List<ServerConversation>> getConversations({
 // succeeded. An empty `items` with `ok == false` means the fetch failed
 // (no response / non-200, e.g. auth token not ready right after a cold
 // start) — which callers must NOT treat as "the user has no conversations".
-Future<({List<ServerConversation> items, bool ok})> getConversationsResult({
+Future<({List<ServerConversation> items, bool ok, int? statusCode})> getConversationsResult({
   int limit = 50,
   int offset = 0,
   List<ConversationStatus> statuses = const [],
@@ -87,17 +87,17 @@ Future<({List<ServerConversation> items, bool ok})> getConversationsResult({
   }
 
   var response = await makeApiCall(url: url, headers: {}, method: 'GET', body: '');
-  if (response == null) return (items: <ServerConversation>[], ok: false);
+  if (response == null) return (items: <ServerConversation>[], ok: false, statusCode: null);
   if (response.statusCode == 200) {
     // decode body bytes to utf8 string and then parse json so as to avoid utf8 char issues
     var body = utf8.decode(response.bodyBytes);
     var memories =
         (jsonDecode(body) as List<dynamic>).map((conversation) => ServerConversation.fromJson(conversation)).toList();
     Logger.debug('getConversations length: ${memories.length}');
-    return (items: memories, ok: true);
+    return (items: memories, ok: true, statusCode: response.statusCode);
   }
   Logger.debug('getConversations error ${response.statusCode}');
-  return (items: <ServerConversation>[], ok: false);
+  return (items: <ServerConversation>[], ok: false, statusCode: response.statusCode);
 }
 
 Future<ServerConversation?> reProcessConversationServer(String conversationId, {String? appId}) async {
