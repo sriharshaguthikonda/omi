@@ -10682,5 +10682,13 @@
     "deviceOnboardingIntroDuration": "సుమారు 1 నిమిషం",
     "jumpToLatestMessage": "తాజా సందేశానికి వెళ్ళు",
     "latest": "తాజా",
-    "flashFirmware": "ఫర్మ్‌వేర్ ఫ్లాష్ చేయండి"
+    "flashFirmware": "ఫర్మ్‌వేర్ ఫ్లాష్ చేయండి",
+    "btMediaButtonTrigger": "BT Media Button Trigger",
+    "@btMediaButtonTrigger": {
+        "description": "Experimental feature name"
+    },
+    "btMediaButtonTriggerDescription": "Use your headset play/pause button to start or stop recording. May override music playback controls while enabled.",
+    "@btMediaButtonTriggerDescription": {
+        "description": "Description for BT media button trigger toggle"
+    }
 }

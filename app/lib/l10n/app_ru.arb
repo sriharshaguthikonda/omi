@@ -3139,5 +3139,13 @@
     "deviceOnboardingIntroDuration": "Около 1 минуты",
     "jumpToLatestMessage": "Перейти к последнему сообщению",
     "latest": "Последнее",
-    "flashFirmware": "Установить прошивку"
+    "flashFirmware": "Установить прошивку",
+    "btMediaButtonTrigger": "BT Media Button Trigger",
+    "@btMediaButtonTrigger": {
+        "description": "Experimental feature name"
+    },
+    "btMediaButtonTriggerDescription": "Use your headset play/pause button to start or stop recording. May override music playback controls while enabled.",
+    "@btMediaButtonTriggerDescription": {
+        "description": "Description for BT media button trigger toggle"
+    }
 }

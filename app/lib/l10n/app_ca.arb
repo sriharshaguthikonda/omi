@@ -3073,5 +3073,13 @@
     "deviceOnboardingIntroDuration": "Aproximadament 1 minut",
     "jumpToLatestMessage": "Vés a l'últim missatge",
     "latest": "Últim",
-    "flashFirmware": "Grava el microprogramari"
+    "flashFirmware": "Grava el microprogramari",
+    "btMediaButtonTrigger": "BT Media Button Trigger",
+    "@btMediaButtonTrigger": {
+        "description": "Experimental feature name"
+    },
+    "btMediaButtonTriggerDescription": "Use your headset play/pause button to start or stop recording. May override music playback controls while enabled.",
+    "@btMediaButtonTriggerDescription": {
+        "description": "Description for BT media button trigger toggle"
+    }
 }

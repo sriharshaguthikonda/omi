@@ -3104,5 +3104,13 @@
     "deviceOnboardingIntroDuration": "약 1분",
     "jumpToLatestMessage": "최신 메시지로 이동",
     "latest": "최신",
-    "flashFirmware": "펌웨어 플래시"
+    "flashFirmware": "펌웨어 플래시",
+    "btMediaButtonTrigger": "BT Media Button Trigger",
+    "@btMediaButtonTrigger": {
+        "description": "Experimental feature name"
+    },
+    "btMediaButtonTriggerDescription": "Use your headset play/pause button to start or stop recording. May override music playback controls while enabled.",
+    "@btMediaButtonTriggerDescription": {
+        "description": "Description for BT media button trigger toggle"
+    }
 }

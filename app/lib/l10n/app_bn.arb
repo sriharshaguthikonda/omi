@@ -10682,5 +10682,13 @@
     "deviceOnboardingIntroDuration": "প্রায় ১ মিনিট",
     "jumpToLatestMessage": "সর্বশেষ বার্তায় যান",
     "latest": "সর্বশেষ",
-    "flashFirmware": "ফার্মওয়্যার ফ্ল্যাশ করুন"
+    "flashFirmware": "ফার্মওয়্যার ফ্ল্যাশ করুন",
+    "btMediaButtonTrigger": "BT Media Button Trigger",
+    "@btMediaButtonTrigger": {
+        "description": "Experimental feature name"
+    },
+    "btMediaButtonTriggerDescription": "Use your headset play/pause button to start or stop recording. May override music playback controls while enabled.",
+    "@btMediaButtonTriggerDescription": {
+        "description": "Description for BT media button trigger toggle"
+    }
 }

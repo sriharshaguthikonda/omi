@@ -238,6 +238,13 @@ class SharedPreferencesUtil {
 
   bool get claudeAgentEnabled => getBool('claudeAgentEnabled');
 
+  // BT Media Button Trigger — P3 increment 1, default off: claims BT headset play/pause
+  // focus to toggle capture, which steals playback control from music apps while active.
+  // Native (BtMediaButtonTrigger.kt) reads this same key as "flutter.btMediaButtonTriggerEnabled".
+  set btMediaButtonTriggerEnabled(bool value) => saveBool('btMediaButtonTriggerEnabled', value);
+
+  bool get btMediaButtonTriggerEnabled => getBool('btMediaButtonTriggerEnabled');
+
   // Notification frequency (0-5): 0 = off, 5 = most frequent. Default is 0 (disabled)
   set notificationFrequency(int value) => saveInt('notificationFrequency', value);
 

@@ -3109,5 +3109,13 @@
     "deviceOnboardingIntroDuration": "Khoảng 1 phút",
     "jumpToLatestMessage": "Đi đến tin nhắn mới nhất",
     "latest": "Mới nhất",
-    "flashFirmware": "Nạp firmware"
+    "flashFirmware": "Nạp firmware",
+    "btMediaButtonTrigger": "BT Media Button Trigger",
+    "@btMediaButtonTrigger": {
+        "description": "Experimental feature name"
+    },
+    "btMediaButtonTriggerDescription": "Use your headset play/pause button to start or stop recording. May override music playback controls while enabled.",
+    "@btMediaButtonTriggerDescription": {
+        "description": "Description for BT media button trigger toggle"
+    }
 }

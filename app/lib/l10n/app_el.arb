@@ -3104,5 +3104,13 @@
     "deviceOnboardingIntroDuration": "Περίπου 1 λεπτό",
     "jumpToLatestMessage": "Μετάβαση στο πιο πρόσφατο μήνυμα",
     "latest": "Πρόσφατο",
-    "flashFirmware": "Εγκατάσταση firmware"
+    "flashFirmware": "Εγκατάσταση firmware",
+    "btMediaButtonTrigger": "BT Media Button Trigger",
+    "@btMediaButtonTrigger": {
+        "description": "Experimental feature name"
+    },
+    "btMediaButtonTriggerDescription": "Use your headset play/pause button to start or stop recording. May override music playback controls while enabled.",
+    "@btMediaButtonTriggerDescription": {
+        "description": "Description for BT media button trigger toggle"
+    }
 }

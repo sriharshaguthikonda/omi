@@ -3200,5 +3200,13 @@
     "deviceOnboardingIntroDuration": "Körülbelül 1 perc",
     "jumpToLatestMessage": "Ugrás a legújabb üzenethez",
     "latest": "Legújabb",
-    "flashFirmware": "Firmware flashelése"
+    "flashFirmware": "Firmware flashelése",
+    "btMediaButtonTrigger": "BT Media Button Trigger",
+    "@btMediaButtonTrigger": {
+        "description": "Experimental feature name"
+    },
+    "btMediaButtonTriggerDescription": "Use your headset play/pause button to start or stop recording. May override music playback controls while enabled.",
+    "@btMediaButtonTriggerDescription": {
+        "description": "Description for BT media button trigger toggle"
+    }
 }

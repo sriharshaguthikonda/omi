@@ -3146,5 +3146,13 @@
     "deviceOnboardingIntroDuration": "Sekitar 1 menit",
     "jumpToLatestMessage": "Lompat ke pesan terbaru",
     "latest": "Terbaru",
-    "flashFirmware": "Flash Firmware"
+    "flashFirmware": "Flash Firmware",
+    "btMediaButtonTrigger": "BT Media Button Trigger",
+    "@btMediaButtonTrigger": {
+        "description": "Experimental feature name"
+    },
+    "btMediaButtonTriggerDescription": "Use your headset play/pause button to start or stop recording. May override music playback controls while enabled.",
+    "@btMediaButtonTriggerDescription": {
+        "description": "Description for BT media button trigger toggle"
+    }
 }

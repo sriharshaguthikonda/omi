@@ -3105,5 +3105,13 @@
     "deviceOnboardingIntroDuration": "約1分",
     "jumpToLatestMessage": "最新のメッセージにジャンプ",
     "latest": "最新",
-    "flashFirmware": "ファームウェアを書き込む"
+    "flashFirmware": "ファームウェアを書き込む",
+    "btMediaButtonTrigger": "BT Media Button Trigger",
+    "@btMediaButtonTrigger": {
+        "description": "Experimental feature name"
+    },
+    "btMediaButtonTriggerDescription": "Use your headset play/pause button to start or stop recording. May override music playback controls while enabled.",
+    "@btMediaButtonTriggerDescription": {
+        "description": "Description for BT media button trigger toggle"
+    }
 }

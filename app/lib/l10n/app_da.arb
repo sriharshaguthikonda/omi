@@ -3113,5 +3113,13 @@
     "deviceOnboardingIntroDuration": "Cirka 1 minut",
     "jumpToLatestMessage": "Gå til nyeste besked",
     "latest": "Nyeste",
-    "flashFirmware": "Flash firmware"
+    "flashFirmware": "Flash firmware",
+    "btMediaButtonTrigger": "BT Media Button Trigger",
+    "@btMediaButtonTrigger": {
+        "description": "Experimental feature name"
+    },
+    "btMediaButtonTriggerDescription": "Use your headset play/pause button to start or stop recording. May override music playback controls while enabled.",
+    "@btMediaButtonTriggerDescription": {
+        "description": "Description for BT media button trigger toggle"
+    }
 }

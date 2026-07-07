@@ -157,4 +157,6 @@ dependencies {
     implementation 'io.intercom.android:intercom-sdk:latest.release'
     implementation 'com.twilio:voice-android:6.10.2'
     implementation 'ai.moonshine:moonshine-voice:0.0.65'
+    // P3 trigger: MediaSessionCompat for BT media-button capture (BtMediaButtonTrigger.kt)
+    implementation 'androidx.media:media:1.7.0'
 }

@@ -3139,5 +3139,13 @@
     "deviceOnboardingIntroDuration": "Yaklaşık 1 dakika",
     "jumpToLatestMessage": "En son mesaja git",
     "latest": "En son",
-    "flashFirmware": "Donanım Yazılımını Yükle"
+    "flashFirmware": "Donanım Yazılımını Yükle",
+    "btMediaButtonTrigger": "BT Media Button Trigger",
+    "@btMediaButtonTrigger": {
+        "description": "Experimental feature name"
+    },
+    "btMediaButtonTriggerDescription": "Use your headset play/pause button to start or stop recording. May override music playback controls while enabled.",
+    "@btMediaButtonTriggerDescription": {
+        "description": "Description for BT media button trigger toggle"
+    }
 }
