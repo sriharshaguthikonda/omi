@@ -22,7 +22,7 @@
 | Phase | Name | Outcome | Status |
 |---|---|---|---|
 | P0 | CI foundation | Push → installable dev APK | 🔨 this PR |
-| P1 | Sign-in that works | Sideloaded APK signs in via community lane | 🔨 in progress |
+| P1 | Sign-in / local-first pivot | Boots to local Home; Omi cloud optional | 🔨 P1.2-A merged |
 | P2 | Triggers v1 (phone-only) | Record without opening the app | |
 | P3 | **BT multi-device trigger matrix** | Any button on any of your BT devices starts capture | flagship |
 | P4 | Local-first capture core | Ring buffer, VAD, mark-last-buffer salvage | |
@@ -99,6 +99,9 @@ The web-auth OAuth flow works end-to-end (browser → account → `omi://auth/ca
 - [x] Install CI APK → run web-auth flow → confirmed it reaches `api.omiapi.com` and fails only at Firebase custom-token
 - [x] Try native Google Sign-In — native Firebase sign-in succeeds, but backend API rejects `based-hardware-dev` token with 401
 - [x] **P1.2 — decided 2026-07-05: de-mandatory login + local-first.** The community lane is structurally dead (api.omiapi.com verifies `based-hardware`; app is `based-hardware-dev`; #5939 won't-fix). Instead of chasing a matching config: **remove the mandatory login gate** → app boots local-only; Omi-cloud sign-in → optional Settings row (re-enable later via self-host, P7/D7); cloud-only features gated behind toggles (greyed + red "needs cloud"). **On-device Moonshine STT (P5) pulled forward** as the primary path; **local-Gemini/free-chain LLM** replaces cloud "intelligence" (Sri, Q&A item 12). Work branch `feature/local-first`. Plan: [plans/P1-signin.md](./plans/P1-signin.md) P1.2 section.
+- [x] **P1.2-A shipped** (2026-07-06): boot-to-local-Home + optional "Connect to Omi Cloud" Settings entry (both list + search) + Sign Out hidden for guests — merged to fork main via [PR #5](https://github.com/sriharshaguthikonda/omi/pull/5); `apk-latest` rebuilding. Label reuses existing `connectTo` l10n key (no new translations). Fix folded: reset `onboardingCompleted` before guest→cloud sign-in so a fresh cloud account still onboards.
+- [ ] **P1.2-B next:** gate cloud-only surfaces (conversations/chat/memories) for guests — grey + "needs cloud" affordance routing to Connect Omi Cloud.
+- [ ] **Then Phase B — on-device Moonshine streaming STT** (pulled forward, see [P5](#p5--on-device-asr) + [plans/P1-signin.md](./plans/P1-signin.md) Phase B).
 - [ ] Document the local-first + cloud-optional path in `docs/` once P1.2 lands
 
 **Decision D1 — auth lane going forward** ✅ closed 2026-07-04
@@ -222,6 +225,8 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 
 **Goal:** live transcript without cloud round-trip. Cloud STT (upstream backend) is an optional fallback behind the Omi-cloud toggle, not the default.
 
+**Execution plan:** [plans/P5-moonshine.md](./plans/P5-moonshine.md) — B0 reuse-check (done), verified seam map (file:line), compile-verifiable-first increments B1→B5. Moonshine wires at the `IPureSocket` streaming seam, bypassing the cloud-coupled composite socket.
+
 **Tasks**
 - [ ] Spike A: Moonshine Android (Maven package) — live latency + battery on your actual phone, 15-min session
 - [ ] Spike B (hedge): sherpa-onnx Android demo with a streaming model — same measurements
@@ -341,6 +346,14 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 ### Revisit backlog (deferred decisions to reopen later)
 - **APK shape (D0b):** currently arm64-only. Revisit fat/`--split-per-abi` if a non-arm64 target device appears or the release page needs multi-arch (Sri, 2026-07-04).
 - **Data portability / anti-lock-in (Sri, 2026-07-05):** map how the official Omi app stores conversations/audio and whether it's exportable/importable into our local store — before relying on their storage; guards against a buyout locking Sri out.
+- **Dev-build theme / visual distinction (Sri, 2026-07-06, low prio — "roadmap last"):** give the dev flavor a visibly different theme/accent (or a persistent DEV banner) so dev vs prod/official installs stop being confusing side-by-side. Cheapest path: flavor-gated accent/badge behind `F.env == Environment.dev`, no new deps. Brand rule still applies — no purple.
+- **On-device Whisper STT broken (Sri device test, 2026-07-06, low prio):** local Whisper (`SttProvider.onDeviceWhisper`) failed to transcribe on Sri's Android 16 phone though audio recording worked. Debug later — NOT priority (Moonshine is the on-device engine replacing it). Start at `transcription_settings_page.dart` `_checkLocalModel`/`_buildOnDeviceWhisperConfig` + the `whisper_flutter_new` plugin (likely model-download/path or ggml runtime).
+
+### Bug parking lot (open, fix in later phases — Sri 2026-07-07 "park those other bugs")
+- **Background recording not working (suspected permission retention):** permissions ask-once fix is in flight on `feature/permission-gate`; if background capture is still dead after it lands, debug the foreground-service + mic path next (`app/lib/utils/audio/foreground.dart`, FGS types in AndroidManifest, battery optimization exemption).
+- **Settings search bar UX:** search doesn't use the fuzzy/typo-tolerant matcher and force-focuses/expands awkwardly. UI pass: fuzzy match + no forced focus. (Sri: "the original ui by the designer is so backward".)
+- **Moonshine chunk/line-duration knob:** expose an engine option in Transcription settings controlling how long a transcript line stays "live" before locking (Moonshine revises recent tokens — let the user tune the revision window).
+- **On-device intelligence consolidation (item 10):** one local multimodal model (Gemma-3n-class ONNX) serving vision/embed/tool/ASR behind the AsrEngine/D6 seam; needs Sri's Kaggle ONNX links (Q13) for the ASR lane.
 
 ---
 

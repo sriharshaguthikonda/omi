@@ -10,11 +10,13 @@ import 'package:omi/backend/http/api/users.dart';
 import 'package:omi/backend/schema/daily_summary.dart';
 import 'package:omi/pages/conversation_capturing/page.dart';
 import 'package:omi/pages/conversations/widgets/processing_capture.dart';
+import 'package:omi/pages/home/guest_cloud_only_guard.dart';
 import 'package:omi/pages/conversations/widgets/today_tasks_widget.dart';
 import 'package:omi/pages/memories/widgets/memory_graph_page.dart';
 import 'package:omi/pages/onboarding/device_selection.dart';
 import 'package:omi/pages/phone_calls/phone_calls_page.dart';
 import 'package:omi/pages/settings/daily_summary_detail_page.dart';
+import 'package:omi/providers/auth_provider.dart';
 import 'package:omi/providers/capture_provider.dart';
 import 'package:omi/providers/conversation_provider.dart';
 import 'package:omi/providers/home_provider.dart';
@@ -71,6 +73,7 @@ class HomeContentPageState extends State<HomeContentPage> with AutomaticKeepAliv
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final isGuest = !context.watch<AuthenticationProvider>().isSignedIn();
     return Consumer<ConversationProvider>(
       builder: (context, convoProvider, child) {
         return RefreshIndicator(
@@ -98,7 +101,7 @@ class HomeContentPageState extends State<HomeContentPage> with AutomaticKeepAliv
                     context.l10n.dailyRecaps,
                     onViewAll: () {
                       if (!convoProvider.showDailySummaries) convoProvider.toggleDailySummaries();
-                      context.read<HomeProvider>().setIndex(1);
+                      context.read<HomeProvider>().setIndex(HomeProvider.conversationsTabIndex);
                     },
                   ),
                 ),
@@ -117,14 +120,18 @@ class HomeContentPageState extends State<HomeContentPage> with AutomaticKeepAliv
                   child: _buildSectionHeader(
                     context,
                     context.l10n.mindMap,
-                    onViewAll: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const MemoryGraphPage(trackOpenEvent: false)),
-                    ),
+                    onViewAll: () {
+                      if (guardGuestCloudOnlyAccess(context)) return;
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const MemoryGraphPage(trackOpenEvent: false)),
+                      );
+                    },
                     buttonLabel: context.l10n.expand,
+                    disabled: isGuest,
                   ),
                 ),
-                SliverToBoxAdapter(child: _buildMindMapPreview(context)),
+                SliverToBoxAdapter(child: _buildMindMapPreview(context, isGuest: isGuest)),
 
                 // Bottom padding so content isn't hidden behind chat bar + nav
                 const SliverToBoxAdapter(child: SizedBox(height: 160)),
@@ -263,35 +270,44 @@ class HomeContentPageState extends State<HomeContentPage> with AutomaticKeepAliv
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title, {VoidCallback? onViewAll, String? buttonLabel}) {
+  Widget _buildSectionHeader(
+    BuildContext context,
+    String title, {
+    VoidCallback? onViewAll,
+    String? buttonLabel,
+    bool disabled = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 16, 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          GestureDetector(
-            onTap: onViewAll,
-            child: Text(
-              title,
-              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-          ),
-          if (onViewAll != null)
+      child: Opacity(
+        opacity: disabled ? 0.45 : 1,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
             GestureDetector(
               onTap: onViewAll,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Text(
-                  buttonLabel ?? context.l10n.viewAll,
-                  style: TextStyle(color: Colors.grey[400], fontSize: 12, fontWeight: FontWeight.w500),
-                ),
+              child: Text(
+                title,
+                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
               ),
             ),
-        ],
+            if (onViewAll != null)
+              GestureDetector(
+                onTap: onViewAll,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Text(
+                    buttonLabel ?? context.l10n.viewAll,
+                    style: TextStyle(color: Colors.grey[400], fontSize: 12, fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -479,29 +495,41 @@ class HomeContentPageState extends State<HomeContentPage> with AutomaticKeepAliv
     return '${weekdays[date.weekday - 1]}, ${months[month - 1]} $day';
   }
 
-  Widget _buildMindMapPreview(BuildContext context) {
+  Widget _buildMindMapPreview(BuildContext context, {required bool isGuest}) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const MemoryGraphPage(trackOpenEvent: false)),
-      ),
+      onTap: () {
+        if (guardGuestCloudOnlyAccess(context)) return;
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const MemoryGraphPage(trackOpenEvent: false)),
+        );
+      },
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: const SizedBox(
-            height: 180,
-            child: IgnorePointer(
-              child: MemoryGraphPage(
-                embedded: true,
-                showAppBar: false,
-                showShareButton: false,
-                trackOpenEvent: false,
-                autoRebuildIfEmpty: false,
-                hideRebuildButtonWhenEmpty: true,
-                initialZoom: 0.6,
-              ),
+        child: Opacity(
+          opacity: isGuest ? 0.45 : 1,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: SizedBox(
+              height: 180,
+              child: isGuest
+                  ? Container(
+                      color: AppStyles.backgroundSecondary,
+                      alignment: Alignment.center,
+                      child: const Icon(Icons.account_tree_outlined, color: Colors.white54, size: 42),
+                    )
+                  : const IgnorePointer(
+                      child: MemoryGraphPage(
+                        embedded: true,
+                        showAppBar: false,
+                        showShareButton: false,
+                        trackOpenEvent: false,
+                        autoRebuildIfEmpty: false,
+                        hideRebuildButtonWhenEmpty: true,
+                        initialZoom: 0.6,
+                      ),
+                    ),
             ),
           ),
         ),

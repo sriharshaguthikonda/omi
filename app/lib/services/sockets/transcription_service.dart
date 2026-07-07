@@ -11,6 +11,7 @@ import 'package:omi/models/custom_stt_config.dart';
 import 'package:omi/models/stt_provider.dart';
 import 'package:omi/services/notifications.dart';
 import 'package:omi/services/sockets/on_device_apple_provider.dart';
+import 'package:omi/services/sockets/on_device_moonshine_socket.dart';
 import 'package:omi/services/sockets/on_device_whisper_provider.dart';
 import 'package:omi/services/sockets/pure_socket.dart';
 import 'package:omi/services/sockets/transcription_service.dart';
@@ -350,6 +351,24 @@ class TranscriptSocketServiceFactory {
       "[STTFactory] Creating socket: provider=${config.provider.name}, isLive=${config.isLive}, lang=$effectiveLang, model=$effectiveModel",
     );
 
+    if (config.provider == SttProvider.onDeviceMoonshine) {
+      final socket = OnDeviceMoonshineSocket(
+        model: effectiveModel,
+        language: effectiveLang,
+        sampleRate: sampleRate,
+        sourceCodec: codec,
+      );
+      return TranscriptSegmentSocketService.withSocket(
+        sampleRate,
+        codec,
+        effectiveLang,
+        socket,
+        source: source,
+        customSttMode: true,
+        sttConfigId: sttConfigId,
+      );
+    }
+
     // Create primary socket based on isLive/isPolling
     final primarySocket = config.isLive
         ? _createStreamingSocket(sampleRate, codec, config)
@@ -454,7 +473,9 @@ class TranscriptSocketServiceFactory {
 
     return PurePollingSocket(
       config: AudioPollingConfig(
-        bufferDuration: const Duration(seconds: 5),
+        // 10s chunks for cloud batch APIs: halves the request rate vs 5s so
+        // BYOK providers with tight rate limits (e.g. Groq free tier) don't 429.
+        bufferDuration: const Duration(seconds: 10),
         minBufferSizeBytes: sampleRate * 2,
         serviceId: config.provider.name,
         transcoder: transcoder,

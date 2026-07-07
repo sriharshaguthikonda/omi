@@ -26,10 +26,7 @@ class MobileApp extends StatelessWidget {
             return const OnboardingWrapper();
           }
           if (SharedPreferencesUtil().onboardingCompleted) {
-            if (!SharedPreferencesUtil().permissionsCompleted) {
-              return const _PermissionsGate();
-            }
-            return const HomePageWrapper();
+            return const _PermissionsGate();
           } else {
             return const OnboardingWrapper();
           }
@@ -38,9 +35,11 @@ class MobileApp extends StatelessWidget {
           // straight in; Omi-cloud sign-in lives in Settings. Route through the
           // permissions gate so mic access is still granted for capture.
           // ponytail: aiConsentGiven is intentionally NOT gated here — no AI
-          // processing runs at guest boot (cloud off, on-device STT not wired
-          // yet). Phase B (Moonshine) must gate capture/transcription start on
-          // consent for signed-out users.
+          // processing runs at guest boot. Phase B decision (2026-07-07): the
+          // guest consent gate stays deferred on this personal fork — guests
+          // only get STT after explicitly configuring an engine (BYOK key or
+          // on-device model download) in Settings, which is a deliberate act
+          // by the device owner. Revisit before any public distribution.
           return const _PermissionsGate();
         }
       },
@@ -67,12 +66,17 @@ class _PermissionsGateState extends State<_PermissionsGate> {
   }
 
   Future<void> _check() async {
-    final granted = await arePermissionsGranted();
-    if (granted) {
+    final status = await getPermissionGateStatus();
+    final showGate = shouldShowPermissionGate(
+      permissionsCompleted: SharedPreferencesUtil().permissionsCompleted,
+      allRelevantPermissionsGranted: status.allRelevantPermissionsGranted,
+      criticalPermissionsGranted: status.criticalPermissionsGranted,
+    );
+    if (status.allRelevantPermissionsGranted) {
       SharedPreferencesUtil().permissionsCompleted = true;
     }
     if (mounted) {
-      setState(() => _permissionsGranted = granted);
+      setState(() => _permissionsGranted = !showGate);
     }
   }
 

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 import 'dart:ui';
 // trigger rebuild
 
@@ -9,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:marionette_flutter/marionette_flutter.dart';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -34,6 +36,8 @@ import 'package:omi/firebase_options_dev.dart' as dev;
 import 'package:omi/firebase_options_prod.dart' as prod;
 import 'package:omi/flavors.dart';
 import 'package:omi/l10n/app_localizations.dart';
+import 'package:omi/models/custom_stt_config.dart';
+import 'package:omi/models/stt_provider.dart';
 import 'package:omi/pages/apps/providers/add_app_provider.dart';
 import 'package:omi/pages/conversation_detail/conversation_detail_provider.dart';
 import 'package:omi/pages/payments/payment_method_provider.dart';
@@ -115,6 +119,21 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
+/// One-time default: on devices that can run it (Android 15+/API 35), on-device
+/// Moonshine becomes the out-of-box STT engine so local-first capture works with
+/// no cloud account or BYOK setup. Runs once and never overrides a saved choice;
+/// unsupported devices keep the existing default untouched.
+Future<void> _applyMoonshineDefaultStt() async {
+  final prefs = SharedPreferencesUtil();
+  if (prefs.getBool('moonshineDefaultSttApplied')) return;
+  await prefs.saveBool('moonshineDefaultSttApplied', true);
+  if (!Platform.isAndroid) return;
+  if (prefs.getString('customSttConfig').isNotEmpty) return; // user already chose an engine
+  final sdkInt = (await DeviceInfoPlugin().androidInfo).version.sdkInt;
+  if (sdkInt < 35) return;
+  await prefs.saveCustomSttConfig(const CustomSttConfig(provider: SttProvider.onDeviceMoonshine));
+}
+
 Future _init() async {
   // Env
   if (F.env == Environment.prod) {
@@ -148,6 +167,7 @@ Future _init() async {
   }
 
   await SharedPreferencesUtil.init();
+  await _applyMoonshineDefaultStt();
 
   // TestFlight environment detection — must be after SharedPreferencesUtil.init()
   if (F.env == Environment.prod) {

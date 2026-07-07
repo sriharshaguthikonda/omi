@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:omi/backend/preferences.dart';
+import 'package:omi/backend/schema/transcript_segment.dart';
 import 'package:omi/models/local_recording.dart';
 import 'package:omi/providers/conversation_provider.dart';
 import 'package:omi/services/bridges/ble_bridge.dart';
@@ -37,6 +38,10 @@ enum LocalUploadOutcome { started, rateLimited, failed, busy }
 class LocalRecordingsProvider extends ChangeNotifier {
   final AudioPlayerUtils _audio = AudioPlayerUtils.instance;
 
+  static const String _transcriptSuffix = '.transcript.json';
+  static const String _localTranscriptPrefix = 'local_transcript_';
+  static final ValueNotifier<int> _transcriptStoreVersion = ValueNotifier<int>(0);
+
   // Sidecar: fileName -> server jobId for recordings uploaded but not yet
   // confirmed transcribed. Persisted as JSON under [_jobsPrefKey].
   static const String _jobsPrefKey = 'localRecordingJobs';
@@ -64,6 +69,7 @@ class LocalRecordingsProvider extends ChangeNotifier {
 
   LocalRecordingsProvider() {
     _audio.addListener(_onAudioChanged);
+    _transcriptStoreVersion.addListener(_onTranscriptStoreChanged);
     // Native batch writer → Dart on file finalize (rotation/gap/stop) so a
     // rotated recording surfaces without waiting for a BLE disconnect.
     BleBridge.instance.addBatchRecordingFinalizedListener(_onRecordingFinalized);
@@ -113,6 +119,7 @@ class LocalRecordingsProvider extends ChangeNotifier {
         _recordings = [];
         return;
       }
+      final transcriptSidecars = await _loadTranscriptSidecars(dir);
       final list = <LocalRecording>[];
       final seen = <String>{};
       for (final entity in dir.listSync().whereType<File>()) {
@@ -122,6 +129,7 @@ class LocalRecordingsProvider extends ChangeNotifier {
         // writer stamps the `batchRecordingDevice` marker into the device segment.
         if (!name.startsWith('audio_${batchRecordingDevice}_') || !name.endsWith('.bin')) continue;
         final size = await entity.length();
+        final transcript = transcriptSidecars.byRecording[name];
         seen.add(name);
         final rec = LocalRecording.fromFile(
           fileName: name,
@@ -130,8 +138,23 @@ class LocalRecordingsProvider extends ChangeNotifier {
           seconds: await _durationSeconds(name, entity.path, size),
           jobId: _jobs[name],
           state: _stateFor(name),
+          transcriptSegments: transcript?.segments ?? const [],
+          transcriptPath: transcript?.path,
         );
         if (rec != null) list.add(rec);
+      }
+      for (final transcript in transcriptSidecars.standalone) {
+        seen.add(transcript.fileName);
+        list.add(
+          LocalRecording.fromTranscriptSidecar(
+            fileName: transcript.fileName,
+            filePath: transcript.path,
+            timerStart: transcript.sessionStart,
+            sizeBytes: transcript.sizeBytes,
+            seconds: transcript.seconds,
+            transcriptSegments: transcript.segments,
+          ),
+        );
       }
       list.sort((a, b) => b.timerStart.compareTo(a.timerStart));
       _recordings = list;
@@ -329,6 +352,8 @@ class LocalRecordingsProvider extends ChangeNotifier {
       if (dir == null) return;
       final file = File('${dir.path}/$fileName');
       if (file.existsSync()) await file.delete();
+      final transcriptFile = File('${dir.path}/$fileName$_transcriptSuffix');
+      if (transcriptFile.existsSync()) await transcriptFile.delete();
     } catch (e) {
       Logger.error('LocalRecordings: delete failed for $fileName: $e');
     }
@@ -357,14 +382,18 @@ class LocalRecordingsProvider extends ChangeNotifier {
   Duration get totalDuration => _audio.totalDuration;
   double get playbackProgress => _audio.playbackProgress;
 
-  bool isPlaying(LocalRecording r) => _audio.isPlaying(_walFor(r).id);
-  bool canPlay(LocalRecording r) => _audio.canPlayOrShare(_walFor(r));
-  Future<void> togglePlayback(LocalRecording r) => _audio.togglePlayback(_walFor(r));
+  bool isPlaying(LocalRecording r) => r.hasAudio && _audio.isPlaying(_walFor(r).id);
+  bool canPlay(LocalRecording r) => r.hasAudio && _audio.canPlayOrShare(_walFor(r));
+  Future<void> togglePlayback(LocalRecording r) {
+    if (!r.hasAudio) return Future.value();
+    return _audio.togglePlayback(_walFor(r));
+  }
 
   bool _isPreparingShare = false;
   bool get isPreparingShare => _isPreparingShare;
 
   Future<void> share(LocalRecording r) async {
+    if (!r.hasAudio) return;
     if (_isPreparingShare) return;
     final wal = _walFor(r);
     _isPreparingShare = true;
@@ -390,6 +419,7 @@ class LocalRecordingsProvider extends ChangeNotifier {
   Future<void> skipBackward() => _audio.skipBackward();
 
   Future<List<double>?> getWaveform(LocalRecording r) async {
+    if (!r.hasAudio) return null;
     final wal = _walFor(r);
     String? wavPath = _audio.getCachedAudioPath(wal.id);
     if (wavPath == null && _audio.canPlayOrShare(wal)) {
@@ -419,6 +449,10 @@ class LocalRecordingsProvider extends ChangeNotifier {
     await SharedPreferencesUtil().saveString(_jobsPrefKey, jsonEncode(_jobs));
   }
 
+  void _onTranscriptStoreChanged() {
+    refresh();
+  }
+
   void _onAudioChanged() {
     if (!_disposed) notifyListeners();
   }
@@ -428,9 +462,150 @@ class LocalRecordingsProvider extends ChangeNotifier {
     _disposed = true;
     _stopReconcileTimer();
     BleBridge.instance.removeBatchRecordingFinalizedListener(_onRecordingFinalized);
+    _transcriptStoreVersion.removeListener(_onTranscriptStoreChanged);
     _audio.removeListener(_onAudioChanged);
     super.dispose();
   }
+
+  static Future<void> persistTranscriptSession({
+    required int sessionStartSeconds,
+    required List<TranscriptSegment> segments,
+  }) async {
+    final cleanSegments = segments.where((s) => s.text.trim().isNotEmpty).toList();
+    if (sessionStartSeconds <= 0 || cleanSegments.isEmpty) return;
+
+    final dir = await _transcriptDir();
+    if (!await dir.exists()) await dir.create(recursive: true);
+    final recordingName = _matchingRecordingFileName(dir, sessionStartSeconds);
+    final fileName =
+        recordingName == null ? '$_localTranscriptPrefix$sessionStartSeconds.json' : '$recordingName$_transcriptSuffix';
+    final file = File('${dir.path}/$fileName');
+    final seconds = _transcriptSeconds(cleanSegments);
+    // Write via temp+rename so a concurrent refresh never reads a half-written sidecar.
+    final tmp = File('${file.path}.tmp');
+    await tmp.writeAsString(
+      jsonEncode({
+        'version': 1,
+        'session_start': sessionStartSeconds,
+        'seconds': seconds,
+        'created_at': DateTime.now().toUtc().toIso8601String(),
+        'segments': cleanSegments.map(_segmentToJson).toList(),
+      }),
+    );
+    await tmp.rename(file.path);
+    _transcriptStoreVersion.value++;
+  }
+
+  static String? _matchingRecordingFileName(Directory dir, int sessionStartSeconds) {
+    for (final entity in dir.listSync().whereType<File>()) {
+      final name = entity.path.split('/').last;
+      if (!name.startsWith('audio_${batchRecordingDevice}_') || !name.endsWith('.bin')) continue;
+      final info = BatchRecordingInfo.fromFileName(name);
+      if (info?.timerStart == sessionStartSeconds) return name;
+    }
+    return null;
+  }
+
+  static Future<Directory> _transcriptDir() async {
+    final configured = SharedPreferencesUtil().getString('batchAudioDir');
+    if (configured.isNotEmpty) return Directory(configured);
+    return getApplicationDocumentsDirectory();
+  }
+
+  static int _transcriptSeconds(List<TranscriptSegment> segments) {
+    var end = 0.0;
+    for (final segment in segments) {
+      if (segment.end > end) end = segment.end;
+    }
+    return end.ceil().clamp(1, 24 * 3600);
+  }
+
+  static Map<String, dynamic> _segmentToJson(TranscriptSegment segment) {
+    return {
+      'id': segment.id,
+      'text': segment.text,
+      'speaker': segment.speaker,
+      'speaker_id': segment.speakerId,
+      'is_user': segment.isUser,
+      'person_id': segment.personId,
+      'start': segment.start,
+      'end': segment.end,
+      'translations': segment.translations.map((t) => t.toJson()).toList(),
+      'speech_profile_processed': segment.speechProfileProcessed,
+      if (segment.sttProvider != null) 'stt_provider': segment.sttProvider,
+    };
+  }
+
+  Future<_TranscriptSidecars> _loadTranscriptSidecars(Directory dir) async {
+    final byRecording = <String, _LocalTranscriptSidecar>{};
+    final standalone = <_LocalTranscriptSidecar>[];
+    for (final entity in dir.listSync().whereType<File>()) {
+      final name = entity.path.split('/').last;
+      if (!name.endsWith(_transcriptSuffix) && !name.startsWith(_localTranscriptPrefix)) continue;
+      final sidecar = await _readTranscriptSidecar(entity, name);
+      if (sidecar == null) continue;
+      if (name.endsWith(_transcriptSuffix)) {
+        final recordingName = name.substring(0, name.length - _transcriptSuffix.length);
+        byRecording[recordingName] = sidecar;
+      } else {
+        standalone.add(sidecar);
+      }
+    }
+    return _TranscriptSidecars(byRecording: byRecording, standalone: standalone);
+  }
+
+  Future<_LocalTranscriptSidecar?> _readTranscriptSidecar(File file, String fileName) async {
+    try {
+      final decoded = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+      final rawSegments = decoded['segments'] as List<dynamic>? ?? const [];
+      final segments = rawSegments
+          .whereType<Map>()
+          .map((m) => TranscriptSegment.fromJson(Map<String, dynamic>.from(m)))
+          .where((s) => s.text.trim().isNotEmpty)
+          .toList();
+      if (segments.isEmpty) return null;
+      final fallbackStart = int.tryParse(fileName.replaceFirst(_localTranscriptPrefix, '').replaceFirst('.json', ''));
+      final sessionStart = (decoded['session_start'] as num?)?.toInt() ?? fallbackStart;
+      if (sessionStart == null || sessionStart <= 0) return null;
+      final seconds = (decoded['seconds'] as num?)?.toInt() ?? _transcriptSeconds(segments);
+      return _LocalTranscriptSidecar(
+        fileName: fileName,
+        path: file.path,
+        sessionStart: sessionStart,
+        seconds: seconds,
+        sizeBytes: await file.length(),
+        segments: segments,
+      );
+    } catch (e) {
+      Logger.error('LocalRecordings: transcript sidecar scan failed for $fileName: $e');
+      return null;
+    }
+  }
+}
+
+class _TranscriptSidecars {
+  final Map<String, _LocalTranscriptSidecar> byRecording;
+  final List<_LocalTranscriptSidecar> standalone;
+
+  const _TranscriptSidecars({required this.byRecording, required this.standalone});
+}
+
+class _LocalTranscriptSidecar {
+  final String fileName;
+  final String path;
+  final int sessionStart;
+  final int seconds;
+  final int sizeBytes;
+  final List<TranscriptSegment> segments;
+
+  const _LocalTranscriptSidecar({
+    required this.fileName,
+    required this.path,
+    required this.sessionStart,
+    required this.seconds,
+    required this.sizeBytes,
+    required this.segments,
+  });
 }
 
 /// Counts complete length-prefixed frames (`[4-byte LE length][payload]`) in a

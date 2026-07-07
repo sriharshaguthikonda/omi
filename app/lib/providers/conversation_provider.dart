@@ -430,7 +430,7 @@ class ConversationProvider extends ChangeNotifier {
       }
       _groupConversationsByDateWithoutNotify();
       notifyListeners();
-      _scheduleInitialFetchRetry();
+      _scheduleInitialFetchRetry(authRejected: result.statusCode == 401 || result.statusCode == 403);
       return;
     }
 
@@ -460,8 +460,15 @@ class ConversationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _scheduleInitialFetchRetry() {
+  void _scheduleInitialFetchRetry({bool authRejected = false}) {
     _initialFetchRetryTimer?.cancel();
+    if (authRejected && _initialFetchRetryCount >= _maxInitialFetchRetries) {
+      // The backend rejected our auth outright (401/403) — endless slow retries
+      // can't heal that, they just hammer the API every 15s. Fast retries above
+      // still cover the token-not-ready-at-cold-start case; pull-to-refresh
+      // resets the budget for a manual recovery.
+      return;
+    }
     final int delaySeconds;
     if (_initialFetchRetryCount < _maxInitialFetchRetries) {
       _initialFetchRetryCount++;
@@ -623,7 +630,7 @@ class ConversationProvider extends ChangeNotifier {
     return (DateTime(date.year, date.month, date.day, 0, 0, 0), DateTime(date.year, date.month, date.day, 23, 59, 59));
   }
 
-  Future<({List<ServerConversation> items, bool ok})> _getConversationsFromServer() async {
+  Future<({List<ServerConversation> items, bool ok, int? statusCode})> _getConversationsFromServer() async {
     final (startDate, endDate) = _getDateFilterRange();
 
     return await getConversationsResult(

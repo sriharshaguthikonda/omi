@@ -1,4 +1,5 @@
 import 'package:omi/backend/schema/bt_device/bt_device.dart';
+import 'package:omi/backend/schema/transcript_segment.dart';
 import 'package:omi/utils/batch_recording.dart';
 
 /// Lifecycle of a local recording captured in batch/offline mode.
@@ -41,10 +42,20 @@ class LocalRecording {
   /// Estimated duration in seconds (the backend computes the exact value).
   final int seconds;
 
+  /// Transcript captured locally for a guest/local session. Stored in a JSON
+  /// sidecar and rendered without requiring a cloud conversation.
+  final List<TranscriptSegment> transcriptSegments;
+
+  /// Absolute path to the local transcript sidecar, when one exists.
+  final String? transcriptPath;
+
   /// Server job id once uploaded (HTTP 202); null while [LocalRecordingState.pending].
   final String? jobId;
 
   final LocalRecordingState state;
+
+  /// False for transcript-only rows that have no playable audio file.
+  final bool hasAudio;
 
   const LocalRecording({
     required this.fileName,
@@ -55,12 +66,17 @@ class LocalRecording {
     required this.sizeBytes,
     required this.seconds,
     required this.state,
+    this.transcriptSegments = const [],
+    this.transcriptPath,
     this.jobId,
+    this.hasAudio = true,
   });
 
   String get id => fileName;
 
   DateTime get startedAt => DateTime.fromMillisecondsSinceEpoch(timerStart * 1000);
+
+  bool get hasTranscript => transcriptSegments.isNotEmpty;
 
   /// True while uploading or processing — playback/delete stay allowed, but a
   /// second upload must not start.
@@ -75,6 +91,8 @@ class LocalRecording {
     int? seconds,
     String? jobId,
     required LocalRecordingState state,
+    List<TranscriptSegment> transcriptSegments = const [],
+    String? transcriptPath,
   }) {
     final info = BatchRecordingInfo.fromFileName(fileName);
     if (info == null || sizeBytes <= 0) return null;
@@ -88,6 +106,31 @@ class LocalRecording {
       seconds: seconds ?? info.estimateSeconds(sizeBytes),
       jobId: jobId,
       state: state,
+      transcriptSegments: transcriptSegments,
+      transcriptPath: transcriptPath,
+    );
+  }
+
+  static LocalRecording fromTranscriptSidecar({
+    required String fileName,
+    required String filePath,
+    required int timerStart,
+    required int sizeBytes,
+    required int seconds,
+    required List<TranscriptSegment> transcriptSegments,
+  }) {
+    return LocalRecording(
+      fileName: fileName,
+      filePath: filePath,
+      timerStart: timerStart,
+      codec: BleAudioCodec.pcm16,
+      frameSize: 320,
+      sizeBytes: sizeBytes,
+      seconds: seconds,
+      state: LocalRecordingState.pending,
+      transcriptSegments: transcriptSegments,
+      transcriptPath: filePath,
+      hasAudio: false,
     );
   }
 }

@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:omi/widgets/shimmer_with_timeout.dart';
 
 import 'package:omi/backend/schema/memory.dart';
+import 'package:omi/pages/home/guest_cloud_only_guard.dart';
 import 'package:omi/providers/home_provider.dart';
 import 'package:omi/providers/memories_provider.dart';
 import 'package:omi/utils/l10n_extensions.dart';
@@ -126,6 +127,11 @@ class MemoriesPageState extends State<MemoriesPage> with AutomaticKeepAliveClien
     // Set default filter to all
 
     (() async {
+      // Post-build: the guest redirect can pop this route and mutate HomeProvider,
+      // which is illegal synchronously inside initState.
+      await Future<void>.delayed(Duration.zero);
+      if (!mounted) return;
+      if (redirectGuestCloudOnlyRoute(context)) return;
       final provider = context.read<MemoriesProvider>();
       await provider.init();
       if (!mounted) return;

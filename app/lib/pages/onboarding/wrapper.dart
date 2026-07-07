@@ -133,14 +133,19 @@ class _OnboardingWrapperState extends State<OnboardingWrapper> with TickerProvid
   }
 
   Future<void> _routeWithPermissionsCheck(BuildContext context) async {
-    if (!SharedPreferencesUtil().permissionsCompleted) {
-      final granted = await arePermissionsGranted();
-      if (!granted) {
-        if (context.mounted) {
-          routeToPage(context, const PermissionsInterstitialPage(), replace: true);
-        }
-        return;
+    final status = await getPermissionGateStatus();
+    final showGate = shouldShowPermissionGate(
+      permissionsCompleted: SharedPreferencesUtil().permissionsCompleted,
+      allRelevantPermissionsGranted: status.allRelevantPermissionsGranted,
+      criticalPermissionsGranted: status.criticalPermissionsGranted,
+    );
+    if (showGate) {
+      if (context.mounted) {
+        routeToPage(context, const PermissionsInterstitialPage(), replace: true);
       }
+      return;
+    }
+    if (status.allRelevantPermissionsGranted) {
       SharedPreferencesUtil().permissionsCompleted = true;
     }
     if (context.mounted) {

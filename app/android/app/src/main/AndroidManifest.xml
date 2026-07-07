@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.friend.ios">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-sdk tools:overrideLibrary="ai.moonshine.voice" />
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Tell Google Play Store that your app uses Bluetooth LE

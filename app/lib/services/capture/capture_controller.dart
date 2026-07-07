@@ -30,6 +30,7 @@ import 'package:omi/env/env.dart';
 import 'package:omi/models/custom_stt_config.dart';
 import 'package:omi/models/stt_provider.dart';
 import 'package:omi/providers/device_onboarding_provider.dart';
+import 'package:omi/providers/local_recordings_provider.dart';
 import 'package:omi/services/capture/capture_external_actions.dart';
 import 'package:omi/services/capture/capture_metrics_tracker.dart';
 import 'package:omi/services/capture/freemium_threshold_tracker.dart';
@@ -391,6 +392,9 @@ class CaptureController extends ChangeNotifier
   /// can await it before querying disk WALs. Prevents race when backend responds fast.
   Future<void>? _pendingFinalizeAndStamp;
 
+  int? _lastPersistedLocalTranscriptSessionStart;
+  int _lastGuestLocalTranscriptSessionStart = 0;
+
   /// Set in onClosed() when the socket drops during active device recording.
   /// Consumed in _initiateWebsocket() to trigger onNetworkSocketReconnected()
   /// on the device connection (e.g. Limitless re-sends enable-data-stream).
@@ -494,6 +498,7 @@ class CaptureController extends ChangeNotifier
   }
 
   Future _resetStateVariables() async {
+    await _persistLocalTranscriptIfNeeded();
     _stopInProgressConversationRefresh();
     segments = [];
     photos = [];
@@ -502,6 +507,7 @@ class CaptureController extends ChangeNotifier
     _conversation = null;
     taggingSegmentIds = [];
     _sessionStartSeconds = 0;
+    _lastPersistedLocalTranscriptSessionStart = null;
     _endOfflineSession();
     notifyListeners();
   }
@@ -662,7 +668,7 @@ class CaptureController extends ChangeNotifier
     _socket?.subscribe(this, this);
     _transcriptServiceReady = true;
     if (_sessionStartSeconds == 0) {
-      _sessionStartSeconds = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      _sessionStartSeconds = _nextSessionStartSeconds();
     }
 
     // Notify the device connection that the socket reconnected after a network
@@ -939,6 +945,42 @@ class CaptureController extends ChangeNotifier
     _stopInProgressConversationRefresh();
     await _closeBleStream(disableNativeBackground: disableNativeBackground);
     _activeSource = null;
+    notifyListeners();
+  }
+
+  Future<void> _persistLocalTranscriptIfNeeded() async {
+    if (AuthService.instance.isSignedIn()) return;
+    if (_sessionStartSeconds <= 0 || _lastPersistedLocalTranscriptSessionStart == _sessionStartSeconds) return;
+    final transcriptSegments = segments.where((s) => s.text.trim().isNotEmpty).toList();
+    if (transcriptSegments.isEmpty) return;
+
+    _lastPersistedLocalTranscriptSessionStart = _sessionStartSeconds;
+    await LocalRecordingsProvider.persistTranscriptSession(
+      sessionStartSeconds: _sessionStartSeconds,
+      segments: transcriptSegments,
+    );
+  }
+
+  int _nextSessionStartSeconds() {
+    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    if (AuthService.instance.isSignedIn()) return now;
+    final next = now <= _lastGuestLocalTranscriptSessionStart ? _lastGuestLocalTranscriptSessionStart + 1 : now;
+    _lastGuestLocalTranscriptSessionStart = next;
+    return next;
+  }
+
+  Future<void> _finishGuestLocalTranscriptSession() async {
+    if (AuthService.instance.isSignedIn()) return;
+    await _persistLocalTranscriptIfNeeded();
+    segments = [];
+    photos = [];
+    hasTranscripts = false;
+    suggestionsBySegmentId = {};
+    _conversation = null;
+    taggingSegmentIds = [];
+    _sessionStartSeconds = 0;
+    _lastPersistedLocalTranscriptSessionStart = null;
+    _segmentsPhotosVersion++;
     notifyListeners();
   }
 
@@ -1393,6 +1435,7 @@ class CaptureController extends ChangeNotifier
     ServiceManager.instance().mic.stop();
     updateRecordingState(RecordingState.stop);
     await _socket?.stop(reason: 'stop stream recording');
+    await _finishGuestLocalTranscriptSession();
   }
 
   Future streamDeviceRecording({BtDevice? device}) async {
@@ -1422,6 +1465,7 @@ class CaptureController extends ChangeNotifier
     }
     updateRecordingState(RecordingState.stop);
     await _socket?.stop(reason: 'stop stream device recording');
+    await _finishGuestLocalTranscriptSession();
   }
 
   @override
@@ -1501,6 +1545,11 @@ class CaptureController extends ChangeNotifier
   void onError(Object err) {
     _transcriptionServiceStatuses = [];
     _transcriptServiceReady = false;
+
+    final ctx = globalNavigatorKey.currentContext;
+    if (ctx != null) {
+      AppSnackbar.showSnackbarError(ctx.l10n.connectionErrorDesc, duration: const Duration(seconds: 3));
+    }
 
     notifyListeners();
     _startKeepAliveServices();

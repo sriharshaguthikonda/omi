@@ -4,10 +4,11 @@
 
 | Plan | Phase | Status |
 |---|---|---|
-| [P1-signin.md](./P1-signin.md) | P1 — Sign-in → **local-first pivot (P1.2)** | 🔨 executing |
+| [P1-signin.md](./P1-signin.md) | P1 — Sign-in → **local-first pivot (P1.2)** | 🔨 P1.2-A merged (apk-latest live) |
 | [P2-triggers-v1.md](./P2-triggers-v1.md) | P2 — Triggers v1 (phone-only) | planned (gate: D2) |
 | [P3-bt-trigger-matrix.md](./P3-bt-trigger-matrix.md) | P3 — BT multi-device trigger matrix ⭐ | planned (gates: D3 closed-by-default, see file) |
-| P4+ | see ROADMAP task lists | plan file created when phase becomes next |
+| [P5-moonshine.md](./P5-moonshine.md) | P5 / Phase B — on-device Moonshine STT (pulled fwd) | 📝 planned (B0 reuse-check done) |
+| P4 | see ROADMAP task lists | plan file created when phase becomes next |
 
 Current blocker report: [2026-07-05 community build auth investigation](../docs/investigations/2026-07-05-community-build-auth.md).
 

@@ -25,6 +25,9 @@ class RecordingListItem extends StatelessWidget {
 
   (Color, String) _status(BuildContext context) {
     final l = context.l10n;
+    if (recording.hasTranscript) {
+      return (Colors.grey.shade400, l.transcript);
+    }
     switch (recording.state) {
       case LocalRecordingState.uploading:
         return (Colors.grey.shade300, l.syncStatusBackingUp);
@@ -77,7 +80,11 @@ class RecordingListItem extends StatelessWidget {
                             color: const Color(0xFF35343B),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Icon(Icons.graphic_eq, color: Colors.grey.shade400, size: 20),
+                          child: Icon(
+                            recording.hasAudio ? Icons.graphic_eq : Icons.notes_rounded,
+                            color: Colors.grey.shade400,
+                            size: 20,
+                          ),
                         ),
                         const SizedBox(width: 14),
                         Expanded(
@@ -101,19 +108,22 @@ class RecordingListItem extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        GestureDetector(
-                          onTap: () => provider.togglePlayback(recording),
-                          child: Container(
-                            width: 44,
-                            height: 44,
-                            decoration: const BoxDecoration(color: Color(0xFF35343B), shape: BoxShape.circle),
-                            child: Icon(
-                              isPlaying ? Icons.pause : Icons.play_arrow,
-                              color: Colors.white,
-                              size: 24,
+                        if (recording.hasAudio)
+                          GestureDetector(
+                            onTap: () => provider.togglePlayback(recording),
+                            child: Container(
+                              width: 44,
+                              height: 44,
+                              decoration: const BoxDecoration(color: Color(0xFF35343B), shape: BoxShape.circle),
+                              child: Icon(
+                                isPlaying ? Icons.pause : Icons.play_arrow,
+                                color: Colors.white,
+                                size: 24,
+                              ),
                             ),
-                          ),
-                        ),
+                          )
+                        else
+                          Icon(Icons.chevron_right_rounded, color: Colors.grey.shade500, size: 26),
                       ],
                     ),
                   ),
