@@ -8,6 +8,18 @@ import 'package:geolocator/geolocator.dart';
 
 import 'package:omi/utils/logger.dart';
 
+const _triggerSourceKey = 'trigger_source';
+const _triggerActionKey = 'trigger_action';
+const _notificationTriggerSource = 'notification';
+const _notificationStartButtonId = 'trigger_start';
+const _notificationStopButtonId = 'trigger_stop';
+const _notificationButtons = [
+  // TODO(l10n): Wire ROADMAP P2 notification action labels to app l10n once foreground-task labels can use context.
+  NotificationButton(id: _notificationStartButtonId, text: 'Start'),
+  // TODO(l10n): Wire ROADMAP P2 notification action labels to app l10n once foreground-task labels can use context.
+  NotificationButton(id: _notificationStopButtonId, text: 'Stop'),
+];
+
 @pragma('vm:entry-point')
 void _startForegroundCallback() {
   FlutterForegroundTask.setTaskHandler(_ForegroundFirstTaskHandler());
@@ -65,6 +77,25 @@ class _ForegroundFirstTaskHandler extends TaskHandler {
   Future<void> onDestroy(DateTime timestamp, bool isTimeout) async {
     Logger.debug("Destroying foreground task");
     FlutterForegroundTask.stopService();
+  }
+
+  @override
+  void onNotificationButtonPressed(String id) {
+    String? action;
+    if (id == _notificationStartButtonId) {
+      action = 'start';
+    } else if (id == _notificationStopButtonId) {
+      action = 'stop';
+    }
+    if (action == null) {
+      Logger.debug('Unknown foreground notification button pressed: $id');
+      return;
+    }
+
+    FlutterForegroundTask.sendDataToMain({
+      _triggerSourceKey: _notificationTriggerSource,
+      _triggerActionKey: action,
+    });
   }
 }
 
@@ -152,10 +183,16 @@ class ForegroundUtil {
       ServiceRequestResult result;
       if (await FlutterForegroundTask.isRunningService) {
         result = await FlutterForegroundTask.restartService();
+        await FlutterForegroundTask.updateService(
+          notificationTitle: 'Your Omi Device is connected.',
+          notificationText: 'Transcription service is running in the background.',
+          notificationButtons: _notificationButtons,
+        );
       } else {
         result = await FlutterForegroundTask.startService(
           notificationTitle: 'Your Omi Device is connected.',
           notificationText: 'Transcription service is running in the background.',
+          notificationButtons: _notificationButtons,
           callback: _startForegroundCallback,
         );
       }

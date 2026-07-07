@@ -56,6 +56,7 @@ import 'package:omi/providers/announcement_provider.dart';
 import 'package:omi/providers/home_provider.dart';
 import 'package:omi/providers/message_provider.dart';
 import 'package:omi/providers/sync_provider.dart';
+import 'package:omi/services/capture/trigger_router.dart';
 import 'package:omi/providers/task_integration_provider.dart';
 import 'package:omi/services/integrations/apple_reminders_sync_service.dart';
 import 'package:omi/services/quick_actions_service.dart';
@@ -234,6 +235,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, Ticker
 
   void _onReceiveTaskData(dynamic data) async {
     if (data is! Map<String, dynamic>) return;
+    final triggerAction = data['trigger_action'];
+    if (triggerAction is String) {
+      if (!mounted) return;
+      final triggerSource = data['trigger_source'];
+      final captureProvider = Provider.of<CaptureProvider>(context, listen: false);
+      await TriggerRouter(captureProvider).handleTrigger(
+        source: triggerSource is String ? triggerSource : 'foreground_task',
+        action: triggerAction,
+      );
+      return;
+    }
     if (!(data.containsKey('latitude') && data.containsKey('longitude'))) return;
     await updateUserGeolocation(
       geolocation: Geolocation(
