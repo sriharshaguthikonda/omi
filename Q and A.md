@@ -665,8 +665,20 @@ Report all three → green = I merge PR #6 → apk-latest refreshes.
 
 
 
+
 ## user comments
-1. use codex agents to do this sort of exploration as well 
+2. will check those other things but you are so fucking slow!!!
+
+3. what about other issues like not retaining the permissions ...may be that is why background recording is not wokring....park those other bugs we need to fix in roadmap open and write somewehre in the later phases as well. but foucs on the other issues.
+4. make moonshine as default stt provider in settings.
+5. parallel branches for other things in roadmap
+
+> **A (Claude, all 4, everything shipped while you typed):**
+> **3 (permissions → maybe background recording):** codex's fix is DONE and pushed — branch `feature/permission-gate`, CI running. Root behavior now: permission screen shows **once**; after you complete it, only a missing **microphone** ever re-blocks boot (it's the capture-critical one). It also now checks *real* runtime state (mic + notification + location + battery-optimization exemption) instead of only a saved flag, adds the missing **microphone tile** to the screen, and Settings → Permissions reuses the same screen for later review. Your background-recording hypothesis is plausible — battery-optimization exemption is in that check; if background capture is still dead after this APK, next stop is the foreground-service path (parked in ROADMAP with pointers).
+> **4 (Moonshine default):** shipped `7d25465` on feature/local-first — first boot on an Android 15+ phone auto-selects On-Device Moonshine (never overrides a choice you already made; older devices keep the old default). Since you already picked Moonshine manually, you won't notice a change — fresh installs will.
+> **Bug parking lot** added to ROADMAP (Revisit backlog): background-recording, settings-search UX, Moonshine revision-window knob, on-device-model consolidation (item 10). Each has file pointers so any agent can pick them up.
+> **5 (parallel branches):** live right now — `feature/local-first` (401-fix + Moonshine-default, APK building), `feature/p2-triggers` (P2.1 **compiled green** — notification Start/Stop buttons exist), `feature/permission-gate` (CI running). Next codex job: P2.2 Quick Settings tile.
+> **2 (slow):** heard. This whole answer = ~40 min of parallel lanes. 
 
 
 

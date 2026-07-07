@@ -349,6 +349,12 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 - **Dev-build theme / visual distinction (Sri, 2026-07-06, low prio — "roadmap last"):** give the dev flavor a visibly different theme/accent (or a persistent DEV banner) so dev vs prod/official installs stop being confusing side-by-side. Cheapest path: flavor-gated accent/badge behind `F.env == Environment.dev`, no new deps. Brand rule still applies — no purple.
 - **On-device Whisper STT broken (Sri device test, 2026-07-06, low prio):** local Whisper (`SttProvider.onDeviceWhisper`) failed to transcribe on Sri's Android 16 phone though audio recording worked. Debug later — NOT priority (Moonshine is the on-device engine replacing it). Start at `transcription_settings_page.dart` `_checkLocalModel`/`_buildOnDeviceWhisperConfig` + the `whisper_flutter_new` plugin (likely model-download/path or ggml runtime).
 
+### Bug parking lot (open, fix in later phases — Sri 2026-07-07 "park those other bugs")
+- **Background recording not working (suspected permission retention):** permissions ask-once fix is in flight on `feature/permission-gate`; if background capture is still dead after it lands, debug the foreground-service + mic path next (`app/lib/utils/audio/foreground.dart`, FGS types in AndroidManifest, battery optimization exemption).
+- **Settings search bar UX:** search doesn't use the fuzzy/typo-tolerant matcher and force-focuses/expands awkwardly. UI pass: fuzzy match + no forced focus. (Sri: "the original ui by the designer is so backward".)
+- **Moonshine chunk/line-duration knob:** expose an engine option in Transcription settings controlling how long a transcript line stays "live" before locking (Moonshine revises recent tokens — let the user tune the revision window).
+- **On-device intelligence consolidation (item 10):** one local multimodal model (Gemma-3n-class ONNX) serving vision/embed/tool/ASR behind the AsrEngine/D6 seam; needs Sri's Kaggle ONNX links (Q13) for the ASR lane.
+
 ---
 
 ## Cross-cutting
