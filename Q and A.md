@@ -616,8 +616,10 @@ Report all three here → green = I merge PR #6 → apk-latest refresh → beep.
 
 10. as on device intelligence to handle as many aspects of the app as possible i am thinking of using a model that runs of my phone that can offer reasonable vision / embed / tool / ASR call capabiliites etc that app needs to handle as many features as possible in the app
  - in future we can plug in better models or finetuned ones!
+ 
+ 
+**A (Claude):**
 
-11. 
 
 > **A (Claude, all 11) — triage:**
 > **1 ✅** Moonshine accumulation confirmed on your device — the fix works. 
@@ -630,3 +632,11 @@ Report all three here → green = I merge PR #6 → apk-latest refresh → beep.
 > **5 (debug logs):** adb can't read the app's internal logs (release build). When something misbehaves: Settings → debug logs → export/share, drop the file anywhere in this repo folder and I'll parse it.
 > **10 (one on-device model for vision/embed/tool/ASR):** direction noted and it fits the architecture — the AsrEngine/D6 seam generalizes to a local model runtime; candidates like Gemma-3n-class multimodal ONNX models fit your phone. Parking as a roadmap item (needs your Kaggle link from Q13 for the ASR part anyway).
 > **Merge status:** PR #6 stays held until 7+9 fixes are green + you retest — they're part of the local-transcripts scope. P2 triggers branch continues in parallel after.
+
+
+
+## user comments
+1. use codex agents to do other work in parallel commits later we can merge
+
+> **A (Claude):** running that way. Status right now: **(a)** codex's fixes for your bugs 7+9 are DONE + pushed (`c431110` each record/stop = own transcript row, no Process-now needed; `b6fa27a` Groq/whisper failures now show an error after 3 strikes instead of silence — codex's audit found the Groq request path itself is correctly built, so the surfaced error text on the next APK will name the real culprit) — build watching, beep on green; **(b)** codex is simultaneously implementing P2.1 triggers (router + notification start/stop buttons) on `feature/p2-triggers`; **(c)** merge plan unchanged: PR #6 after your retest, P2 branch merges later once its APK is device-checked. Next codex job after P2.1: your item 8 (permissions ask-once + review panel). 
+
