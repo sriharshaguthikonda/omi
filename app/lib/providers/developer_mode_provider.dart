@@ -41,6 +41,9 @@ class DeveloperModeProvider extends BaseProvider {
   // VAD Gate (experimental)
   bool vadGateEnabled = false;
 
+  // External triggers (experimental) — Tasker etc. via TriggerCaptureReceiver, off by default
+  bool externalTriggersEnabled = false;
+
   // Claude Agent (experimental)
   bool claudeAgentEnabled = false;
   bool claudeAgentLoading = false;
@@ -120,6 +123,7 @@ class DeveloperModeProvider extends BaseProvider {
     showTasksEnabled = SharedPreferencesUtil().showTasksEnabled;
     showPhoneCallButton = SharedPreferencesUtil().showPhoneCallButton;
     vadGateEnabled = SharedPreferencesUtil().vadGateEnabled;
+    externalTriggersEnabled = SharedPreferencesUtil().externalTriggersEnabled;
     claudeAgentEnabled = SharedPreferencesUtil().claudeAgentEnabled;
     conversationEventsToggled = SharedPreferencesUtil().conversationEventsToggled;
     transcriptsToggled = SharedPreferencesUtil().transcriptsToggled;
@@ -285,6 +289,12 @@ class DeveloperModeProvider extends BaseProvider {
   void onVadGateChanged(bool value) {
     vadGateEnabled = value;
     SharedPreferencesUtil().vadGateEnabled = value;
+    notifyListeners();
+  }
+
+  void onExternalTriggersChanged(bool value) {
+    externalTriggersEnabled = value;
+    SharedPreferencesUtil().externalTriggersEnabled = value;
     notifyListeners();
   }
 

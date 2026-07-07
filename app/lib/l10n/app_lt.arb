@@ -3104,5 +3104,13 @@
     "deviceOnboardingIntroDuration": "Maždaug 1 minutė",
     "jumpToLatestMessage": "Peršokti į naujausią pranešimą",
     "latest": "Naujausias",
-    "flashFirmware": "Įrašyti programinę aparatinę įrangą"
+    "flashFirmware": "Įrašyti programinę aparatinę įrangą",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

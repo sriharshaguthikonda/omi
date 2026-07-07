@@ -3104,5 +3104,13 @@
     "deviceOnboardingIntroDuration": "Cirka 1 minutt",
     "jumpToLatestMessage": "Gå til nyeste melding",
     "latest": "Nyeste",
-    "flashFirmware": "Flash fastvare"
+    "flashFirmware": "Flash fastvare",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

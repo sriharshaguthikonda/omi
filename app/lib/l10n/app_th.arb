@@ -3104,5 +3104,13 @@
     "deviceOnboardingIntroDuration": "ประมาณ 1 นาที",
     "jumpToLatestMessage": "ไปยังข้อความล่าสุด",
     "latest": "ล่าสุด",
-    "flashFirmware": "แฟลชเฟิร์มแวร์"
+    "flashFirmware": "แฟลชเฟิร์มแวร์",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

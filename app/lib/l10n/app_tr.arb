@@ -3139,5 +3139,13 @@
     "deviceOnboardingIntroDuration": "Yaklaşık 1 dakika",
     "jumpToLatestMessage": "En son mesaja git",
     "latest": "En son",
-    "flashFirmware": "Donanım Yazılımını Yükle"
+    "flashFirmware": "Donanım Yazılımını Yükle",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

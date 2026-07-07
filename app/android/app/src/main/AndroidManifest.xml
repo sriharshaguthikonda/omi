@@ -113,6 +113,16 @@
             </intent-filter>
         </service>
 
+        <!-- External automation trigger (Tasker etc.) — see TriggerCaptureReceiver.kt.
+             Gated OFF by default via Dart-side externalTriggersEnabled setting. -->
+        <receiver
+            android:name=".TriggerCaptureReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.friend.ios.TRIGGER_CAPTURE" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"

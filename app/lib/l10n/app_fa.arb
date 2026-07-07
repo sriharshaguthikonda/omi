@@ -10682,5 +10682,13 @@
     "deviceOnboardingIntroDuration": "حدود ۱ دقیقه",
     "jumpToLatestMessage": "پرش به آخرین پیام",
     "latest": "آخرین",
-    "flashFirmware": "فلش کردن میان‌افزار"
+    "flashFirmware": "فلش کردن میان‌افزار",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

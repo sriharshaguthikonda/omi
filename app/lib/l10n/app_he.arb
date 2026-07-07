@@ -10682,5 +10682,13 @@
     "deviceOnboardingIntroDuration": "כדקה אחת",
     "jumpToLatestMessage": "קפוץ להודעה האחרונה",
     "latest": "האחרון",
-    "flashFirmware": "צריבת קושחה"
+    "flashFirmware": "צריבת קושחה",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

@@ -10682,5 +10682,13 @@
     "deviceOnboardingIntroDuration": "تقریباً 1 منٹ",
     "jumpToLatestMessage": "تازہ ترین پیغام پر جائیں",
     "latest": "تازہ ترین",
-    "flashFirmware": "فرم ویئر فلیش کریں"
+    "flashFirmware": "فرم ویئر فلیش کریں",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

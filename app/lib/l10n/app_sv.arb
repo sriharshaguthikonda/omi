@@ -3104,5 +3104,13 @@
     "deviceOnboardingIntroDuration": "Cirka 1 minut",
     "jumpToLatestMessage": "Hoppa till senaste meddelandet",
     "latest": "Senaste",
-    "flashFirmware": "Installera firmware"
+    "flashFirmware": "Installera firmware",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }

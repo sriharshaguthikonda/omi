@@ -3104,5 +3104,13 @@
     "deviceOnboardingIntroDuration": "Umbes 1 minut",
     "jumpToLatestMessage": "Hüppa uusima sõnumi juurde",
     "latest": "Uusim",
-    "flashFirmware": "Installi püsivara"
+    "flashFirmware": "Installi püsivara",
+    "externalTriggers": "External Triggers",
+    "@externalTriggers": {
+        "description": "Experimental feature name"
+    },
+    "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
+    "@externalTriggersDescription": {
+        "description": "Description for external triggers"
+    }
 }
