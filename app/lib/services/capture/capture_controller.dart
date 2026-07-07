@@ -394,6 +394,7 @@ class CaptureController extends ChangeNotifier
 
   int? _lastPersistedLocalTranscriptSessionStart;
   int _lastGuestLocalTranscriptSessionStart = 0;
+  DateTime? _lastGuestCheckpointAt;
 
   /// Set in onClosed() when the socket drops during active device recording.
   /// Consumed in _initiateWebsocket() to trigger onNetworkSocketReconnected()
@@ -508,6 +509,7 @@ class CaptureController extends ChangeNotifier
     taggingSegmentIds = [];
     _sessionStartSeconds = 0;
     _lastPersistedLocalTranscriptSessionStart = null;
+    _lastGuestCheckpointAt = null;
     _endOfflineSession();
     notifyListeners();
   }
@@ -961,6 +963,27 @@ class CaptureController extends ChangeNotifier
     );
   }
 
+  // ponytail: guest transcript previously lived only in memory until an explicit
+  // stop() flushed it — an OEM background-kill (vivo etc. after HOME nav) during
+  // active recording lost the whole session. Checkpoint to the same local-recordings
+  // sidecar every ~15s of new segments so at most one checkpoint interval is lost.
+  static const Duration _guestCheckpointInterval = Duration(seconds: 15);
+
+  void _checkpointGuestTranscript() {
+    if (AuthService.instance.isSignedIn()) return;
+    if (_sessionStartSeconds <= 0) return;
+    final now = DateTime.now();
+    if (_lastGuestCheckpointAt != null && now.difference(_lastGuestCheckpointAt!) < _guestCheckpointInterval) return;
+    final transcriptSegments = segments.where((s) => s.text.trim().isNotEmpty).toList();
+    if (transcriptSegments.isEmpty) return;
+    _lastGuestCheckpointAt = now;
+    // Fire-and-forget: don't block segment processing on disk I/O.
+    unawaited(LocalRecordingsProvider.persistTranscriptSession(
+      sessionStartSeconds: _sessionStartSeconds,
+      segments: transcriptSegments,
+    ));
+  }
+
   int _nextSessionStartSeconds() {
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     if (AuthService.instance.isSignedIn()) return now;
@@ -980,6 +1003,7 @@ class CaptureController extends ChangeNotifier
     taggingSegmentIds = [];
     _sessionStartSeconds = 0;
     _lastPersistedLocalTranscriptSessionStart = null;
+    _lastGuestCheckpointAt = null;
     _segmentsPhotosVersion++;
     notifyListeners();
   }
@@ -2195,6 +2219,7 @@ class CaptureController extends ChangeNotifier
 
     _segmentsPhotosVersion++; // Bump version so Selector rebuilds
     hasTranscripts = true;
+    _checkpointGuestTranscript();
     notifyListeners();
   }
 
