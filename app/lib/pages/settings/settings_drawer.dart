@@ -22,6 +22,7 @@ import 'package:omi/models/subscription.dart';
 import 'package:omi/utils/auth/clear_user_state.dart';
 import 'package:omi/utils/other/temp.dart';
 import 'package:omi/utils/platform/platform_service.dart';
+import 'package:omi/utils/settings_search_match.dart';
 import 'package:omi/widgets/dialog.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -63,7 +64,6 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
   String? buildVersion;
   String? shortDeviceInfo;
 
-  bool _isSearching = false;
   String _searchQuery = '';
   late TextEditingController _searchController;
   late FocusNode _searchFocusNode;
@@ -479,8 +479,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
 
   Widget _buildSearchResults(BuildContext context) {
     final allItems = _buildSearchableItems(context);
-    final query = _searchQuery.toLowerCase();
-    final filtered = allItems.where((item) => item.title.toLowerCase().contains(query)).toList();
+    final filtered = allItems.where((item) => matchesSettingsQuery(_searchQuery, item.title)).toList();
 
     if (filtered.isEmpty) {
       return Center(
@@ -801,113 +800,82 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
               width: 36,
               decoration: BoxDecoration(color: const Color(0xFF3C3C43), borderRadius: BorderRadius.circular(2)),
             ),
-            // Header
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 200),
-              transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
-              child: _isSearching
-                  ? Padding(
-                      key: const ValueKey('search-header'),
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              controller: _searchController,
-                              focusNode: _searchFocusNode,
-                              autofocus: true,
-                              style: const TextStyle(color: Colors.white, fontSize: 14),
-                              cursorColor: Colors.white,
-                              decoration: InputDecoration(
-                                hintText: 'Search settings…',
-                                hintStyle: const TextStyle(color: Colors.white60, fontSize: 14),
-                                filled: true,
-                                fillColor: const Color(0xFF1C1C1E),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                  borderSide: BorderSide.none,
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                  borderSide: BorderSide.none,
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                  borderSide: BorderSide.none,
-                                ),
-                                prefixIcon: const Icon(Icons.search, color: Colors.white60),
-                                suffixIcon: _searchQuery.isNotEmpty
-                                    ? GestureDetector(
-                                        onTap: () {
-                                          setState(() => _searchQuery = '');
-                                          _searchController.clear();
-                                        },
-                                        child: const Icon(Icons.close, color: Colors.white60),
-                                      )
-                                    : null,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                              ),
-                              onChanged: (value) => setState(() => _searchQuery = value),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _isSearching = false;
-                                _searchQuery = '';
-                                _searchController.clear();
-                              });
-                              _searchFocusNode.unfocus();
-                            },
-                            child: const Text('Cancel', style: TextStyle(color: Colors.white, fontSize: 16)),
-                          ),
-                        ],
-                      ),
-                    )
-                  : Padding(
-                      key: const ValueKey('normal-header'),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                      child: Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              setState(() => _isSearching = true);
-                              Future.microtask(() => _searchFocusNode.requestFocus());
-                            },
-                            child: const Icon(Icons.search, color: Colors.white, size: 22),
-                          ),
-                          Expanded(
-                            child: Center(
-                              child: Text(
-                                context.l10n.settings,
-                                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-                              child: Text(
-                                context.l10n.done,
-                                style: const TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                          ),
-                        ],
+            // Header — title row stays put; search field is always visible
+            // below it (no expand/tap step), but never grabs focus on open.
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: Row(
+                children: [
+                  // Balances the Done pill so the title stays centered.
+                  const SizedBox(width: 22),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        context.l10n.settings,
+                        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
                       ),
                     ),
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                      child: Text(
+                        context.l10n.done,
+                        style: const TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 4),
+              child: TextFormField(
+                controller: _searchController,
+                focusNode: _searchFocusNode,
+                autofocus: false,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+                cursorColor: Colors.white,
+                decoration: InputDecoration(
+                  hintText: 'Search settings…',
+                  hintStyle: const TextStyle(color: Colors.white60, fontSize: 14),
+                  filled: true,
+                  fillColor: const Color(0xFF1C1C1E),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide.none,
+                  ),
+                  prefixIcon: const Icon(Icons.search, color: Colors.white60),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? GestureDetector(
+                          onTap: () {
+                            setState(() => _searchQuery = '');
+                            _searchController.clear();
+                          },
+                          child: const Icon(Icons.close, color: Colors.white60),
+                        )
+                      : null,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                ),
+                onChanged: (value) => setState(() => _searchQuery = value),
+              ),
+            ),
+            const SizedBox(height: 12),
             // Content
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: _isSearching && _searchQuery.isNotEmpty
-                    ? _buildSearchResults(context)
-                    : _buildOmiModeContent(context),
+                child: _searchQuery.isNotEmpty ? _buildSearchResults(context) : _buildOmiModeContent(context),
               ),
             ),
           ],
