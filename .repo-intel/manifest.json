@@ -1,10 +1,10 @@
 {
   "schemaVersion": "0.1.0",
   "repo": {
-    "id": "omi",
+    "id": "omi-fix-screen-off",
     "root": ".",
     "remoteUrl": "https://github.com/sriharshaguthikonda/omi.git",
-    "defaultBranch": "feature/local-first",
+    "defaultBranch": "feature/fix-screen-off",
     "localPaths": [
       ".cursor",
       ".cursorignore",
@@ -49,11 +49,11 @@
     ]
   },
   "sourceState": {
-    "commit": "2d58e16ee51915f431ed8faa2fb1f57c8014abf7",
-    "branch": "feature/local-first",
+    "commit": "432ab59e21f140f11820aba013d8c4b795280fa1",
+    "branch": "feature/fix-screen-off",
     "dirty": false,
-    "generatedForCommit": "2d58e16ee51915f431ed8faa2fb1f57c8014abf7",
-    "sourceFingerprint": "924def13de6f2344a32a23900ea3aa8edd6672e0b6e000b59bd1ed70d0207963"
+    "generatedForCommit": "432ab59e21f140f11820aba013d8c4b795280fa1",
+    "sourceFingerprint": "aafde6c106cc5b2974cb4e5b73350283c69c5525a22f0b45e47007bde78b878f"
   },
   "policy": {
     "profile": "basic",
@@ -65,7 +65,7 @@
     "allowGraphPilots": false,
     "runOnPush": false
   },
-  "generatedAt": "2026-07-07T07:49:08.049328Z",
+  "generatedAt": "2026-07-07T20:52:22.508408Z",
   "toolRuns": [
     {
       "id": "repomix.basic",
