@@ -638,5 +638,23 @@ Report all three here → green = I merge PR #6 → apk-latest refresh → beep.
 ## user comments
 1. use codex agents to do other work in parallel commits later we can merge
 
-> **A (Claude):** running that way. Status right now: **(a)** codex's fixes for your bugs 7+9 are DONE + pushed (`c431110` each record/stop = own transcript row, no Process-now needed; `b6fa27a` Groq/whisper failures now show an error after 3 strikes instead of silence — codex's audit found the Groq request path itself is correctly built, so the surfaced error text on the next APK will name the real culprit) — build watching, beep on green; **(b)** codex is simultaneously implementing P2.1 triggers (router + notification start/stop buttons) on `feature/p2-triggers`; **(c)** merge plan unchanged: PR #6 after your retest, P2 branch merges later once its APK is device-checked. Next codex job after P2.1: your item 8 (permissions ask-once + review panel). 
+> **A (Claude):** running that way. Status right now: **(a)** codex's fixes for your bugs 7+9 are DONE + pushed (`c431110` each record/stop = own transcript row, no Process-now needed; `b6fa27a` Groq/whisper failures now show an error after 3 strikes instead of silence — codex's audit found the Groq request path itself is correctly built, so the surfaced error text on the next APK will name the real culprit) — build watching, beep on green; **(b)** codex is simultaneously implementing P2.1 triggers (router + notification start/stop buttons) on `feature/p2-triggers`; **(c)** merge plan unchanged: PR #6 after your retest, P2 branch merges later once its APK is device-checked. Next codex job after P2.1: your item 8 (permissions ask-once + review panel).
+
+---
+
+## agent update 2026-07-07 evening — access verified, "nothing pushed" solved, retest is THE gate
+
+**Your "idk what is pushed" — answered:** the bug-fix APK **WAS pushed and built green**: run `28839829162` = **build #24**. And adb says your phone (I2220) is running exactly it — **1.0.542, versionCode 24, installed 09:31 today**. So you already have the right APK; no reinstall needed. What was NOT pushed: codex's P2.1 trigger commits sat local-only in the triggers worktree — your hunch was right. I reviewed them (router seam + notification Start/Stop buttons, wiring is sound), pushed `feature/p2-triggers`, first CI compile check running now.
+
+**Access check you asked for — all green:** adb ✅ (phone I2220 connected), gh/CI ✅ (one gotcha fixed: gh was defaulting to upstream repo, now pinned to the fork), logcat ✅. One find from your live logs: **the app hammers `getConversations` every ~15s and gets 401 every time** (signed-in-but-backend-rejects state) — battery/network waste + log spam. Queued a backoff/skip fix as its own commit.
+
+**Debug logs:** logcat buffer had already rolled past your test session, so I couldn't see your STT failures. Next time something misbehaves: tell me right away (I pull logcat live), or Settings → debug logs → export/share and drop the file anywhere in this repo folder.
+
+**🔔 YOUR RETEST (this gates PR #6 merge — you're already on the right build):**
+1. Record → stop → record → stop (2-3 cycles): **each** cycle should appear as its **own row** in Conversations, **without** pressing Process-now.
+2. Groq (your key in): speak ~15s — if it fails you should now get a **visible error banner**; report the **exact text** here (it names the real culprit).
+3. Moonshine: quick re-check that accumulation still works.
+Report all three → green = I merge PR #6 → apk-latest refreshes.
+
+**In flight meanwhile:** codex is on your **item 8** (permissions ask-once + Settings review row) on new branch `feature/permission-gate`; P2.1 CI watching; P2.2 (Quick Settings tile) queued next. Commit-by-commit, parallel branches, merge later — as ordered. 
 
