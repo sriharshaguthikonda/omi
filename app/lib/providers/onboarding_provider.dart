@@ -50,6 +50,9 @@ class OnboardingProvider extends BaseProvider with MessageNotifierMixin implemen
     hasLocationPermission = await Permission.location.isGranted;
     hasNotificationPermission = await Permission.notification.isGranted;
     hasMicrophonePermission = await Permission.microphone.isGranted;
+    if (Platform.isAndroid) {
+      hasBackgroundPermission = await FlutterForegroundTask.isIgnoringBatteryOptimizations;
+    }
 
     SharedPreferencesUtil().notificationsEnabled = hasNotificationPermission;
     SharedPreferencesUtil().locationEnabled = hasLocationPermission;

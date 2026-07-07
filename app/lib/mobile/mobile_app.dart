@@ -26,10 +26,7 @@ class MobileApp extends StatelessWidget {
             return const OnboardingWrapper();
           }
           if (SharedPreferencesUtil().onboardingCompleted) {
-            if (!SharedPreferencesUtil().permissionsCompleted) {
-              return const _PermissionsGate();
-            }
-            return const HomePageWrapper();
+            return const _PermissionsGate();
           } else {
             return const OnboardingWrapper();
           }
@@ -69,12 +66,17 @@ class _PermissionsGateState extends State<_PermissionsGate> {
   }
 
   Future<void> _check() async {
-    final granted = await arePermissionsGranted();
-    if (granted) {
+    final status = await getPermissionGateStatus();
+    final showGate = shouldShowPermissionGate(
+      permissionsCompleted: SharedPreferencesUtil().permissionsCompleted,
+      allRelevantPermissionsGranted: status.allRelevantPermissionsGranted,
+      criticalPermissionsGranted: status.criticalPermissionsGranted,
+    );
+    if (status.allRelevantPermissionsGranted) {
       SharedPreferencesUtil().permissionsCompleted = true;
     }
     if (mounted) {
-      setState(() => _permissionsGranted = granted);
+      setState(() => _permissionsGranted = !showGate);
     }
   }
 
