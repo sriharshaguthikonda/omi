@@ -2482,6 +2482,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'สร้างอัตโนมัติเมื่อตรวจพบชื่อ';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'คำถามติดตาม';
 
   @override
@@ -9438,4 +9444,18 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get flashFirmware => 'แฟลชเฟิร์มแวร์';
+
+  @override
+  String get transcriptRevisionWindowTitle => 'หน้าต่างแก้ไขถอดเสียง';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'ระยะเวลาที่บรรทัดยังแก้ไขได้ก่อนถูกล็อก';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'ค่าเริ่มต้น';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '$milliseconds ms';
+  }
 }

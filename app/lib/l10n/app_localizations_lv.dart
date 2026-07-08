@@ -2500,6 +2500,12 @@ class AppLocalizationsLv extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'Automātiski izveidot, kad konstatēts vārds';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'Turpinājuma jautājumi';
 
   @override
@@ -9512,4 +9518,18 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Instalēt aparātprogrammatūru';
+
+  @override
+  String get transcriptRevisionWindowTitle => 'Transkripta labošanas logs';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Cik ilgi rindu var labot pirms fiksēšanas.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Noklusējums';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '$milliseconds ms';
+  }
 }

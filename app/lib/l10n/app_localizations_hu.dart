@@ -2509,6 +2509,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'Automatikus létrehozás név észlelésekor';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'Követő kérdések';
 
   @override
@@ -9530,4 +9536,18 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Firmware flashelése';
+
+  @override
+  String get transcriptRevisionWindowTitle => 'Átirat javítási ablak';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Meddig módosítható egy sor a rögzítés előtt.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Alapértelmezett';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '$milliseconds ms';
+  }
 }

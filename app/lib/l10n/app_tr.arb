@@ -3147,5 +3147,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "Transkript düzeltme penceresi",
+    "transcriptRevisionWindowDescription": "Bir satır kilitlenmeden önce ne kadar süre düzeltilebilir.",
+    "transcriptRevisionWindowDefault": "Varsayılan",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

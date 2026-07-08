@@ -3147,5 +3147,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "Окно правки транскрипта",
+    "transcriptRevisionWindowDescription": "Как долго строка может изменяться перед фиксацией.",
+    "transcriptRevisionWindowDefault": "По умолчанию",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

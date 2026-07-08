@@ -2501,6 +2501,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'İsim algılandığında otomatik oluştur';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'Takip Soruları';
 
   @override
@@ -9500,4 +9506,18 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Donanım Yazılımını Yükle';
+
+  @override
+  String get transcriptRevisionWindowTitle => 'Transkript düzeltme penceresi';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Bir satır kilitlenmeden önce ne kadar süre düzeltilebilir.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Varsayılan';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '$milliseconds ms';
+  }
 }

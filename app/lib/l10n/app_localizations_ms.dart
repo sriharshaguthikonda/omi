@@ -2503,6 +2503,12 @@ class AppLocalizationsMs extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'Cipta automatik apabila nama dikesan';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'Soalan Susulan';
 
   @override
@@ -9515,4 +9521,18 @@ class AppLocalizationsMs extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Flash Perisian Tegar';
+
+  @override
+  String get transcriptRevisionWindowTitle => 'Tetingkap semakan transkrip';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Berapa lama baris boleh disemak sebelum dikunci.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Lalai';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '$milliseconds ms';
+  }
 }

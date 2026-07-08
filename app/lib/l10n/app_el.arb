@@ -3112,5 +3112,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "Παράθυρο αναθεώρησης απομαγνητοφώνησης",
+    "transcriptRevisionWindowDescription": "Πόσο παραμένει μια γραμμή αναθεωρήσιμη πριν κλειδώσει.",
+    "transcriptRevisionWindowDefault": "Προεπιλογή",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

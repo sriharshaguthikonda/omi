@@ -10690,5 +10690,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "نقل نوشت نظرثانی ونڈو",
+    "transcriptRevisionWindowDescription": "لاک ہونے سے پہلے ایک لائن کتنی دیر قابل ترمیم رہتی ہے۔",
+    "transcriptRevisionWindowDefault": "ڈیفالٹ",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

@@ -10690,5 +10690,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "ಪ್ರತಿಲಿಪಿ ಪರಿಷ್ಕರಣೆ ವಿಂಡೋ",
+    "transcriptRevisionWindowDescription": "ಲಾಕ್ ಆಗುವ ಮೊದಲು ಸಾಲು ಎಷ್ಟು ಕಾಲ ಪರಿಷ್ಕರಿಸಬಹುದಾಗಿರುತ್ತದೆ.",
+    "transcriptRevisionWindowDefault": "ಡೀಫಾಲ್ಟ್",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

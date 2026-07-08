@@ -3112,5 +3112,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "Transkripti parandamise aken",
+    "transcriptRevisionWindowDescription": "Kui kaua saab rida enne lukustumist parandada.",
+    "transcriptRevisionWindowDefault": "Vaikimisi",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

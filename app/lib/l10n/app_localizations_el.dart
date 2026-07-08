@@ -2513,6 +2513,12 @@ class AppLocalizationsEl extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'Αυτόματη δημιουργία όταν ανιχνευθεί όνομα';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'Συμπληρωματικές ερωτήσεις';
 
   @override
@@ -9557,4 +9563,18 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Εγκατάσταση firmware';
+
+  @override
+  String get transcriptRevisionWindowTitle => 'Παράθυρο αναθεώρησης απομαγνητοφώνησης';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Πόσο παραμένει μια γραμμή αναθεωρήσιμη πριν κλειδώσει.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Προεπιλογή';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '$milliseconds ms';
+  }
 }

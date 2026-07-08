@@ -2507,6 +2507,12 @@ class AppLocalizationsKn extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'ಹೆಸರು ಕಂಡುಬಂದಾಗ ಸ್ವಯಂ ರಚಿಸಿ';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'ಫಾಲೋ-ಅಪ್ ಪ್ರಶ್ನೆಗಳು';
 
   @override
@@ -9520,4 +9526,18 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get flashFirmware => 'ಫರ್ಮ್‌ವೇರ್ ಫ್ಲ್ಯಾಶ್ ಮಾಡಿ';
+
+  @override
+  String get transcriptRevisionWindowTitle => 'ಪ್ರತಿಲಿಪಿ ಪರಿಷ್ಕರಣೆ ವಿಂಡೋ';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'ಲಾಕ್ ಆಗುವ ಮೊದಲು ಸಾಲು ಎಷ್ಟು ಕಾಲ ಪರಿಷ್ಕರಿಸಬಹುದಾಗಿರುತ್ತದೆ.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'ಡೀಫಾಲ್ಟ್';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '$milliseconds ms';
+  }
 }

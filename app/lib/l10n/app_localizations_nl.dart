@@ -2502,6 +2502,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'Automatisch aanmaken wanneer naam gedetecteerd wordt';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'Vervolgvragen';
 
   @override
@@ -9516,4 +9522,18 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Firmware flashen';
+
+  @override
+  String get transcriptRevisionWindowTitle => 'Transcript revisievenster';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Hoe lang een regel kan worden aangepast voordat deze vaststaat.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Standaard';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '$milliseconds ms';
+  }
 }

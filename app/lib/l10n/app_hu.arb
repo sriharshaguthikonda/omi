@@ -3208,5 +3208,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "Átirat javítási ablak",
+    "transcriptRevisionWindowDescription": "Meddig módosítható egy sor a rögzítés előtt.",
+    "transcriptRevisionWindowDefault": "Alapértelmezett",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

@@ -2516,6 +2516,12 @@ class AppLocalizationsTl extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'Awtomatikong lumikha kapag ang pangalan ay natuklasan';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'Follow-up Questions';
 
   @override
@@ -9578,4 +9584,18 @@ class AppLocalizationsTl extends AppLocalizations {
 
   @override
   String get flashFirmware => 'I-flash ang Firmware';
+
+  @override
+  String get transcriptRevisionWindowTitle => 'Window ng rebisyon ng transcript';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Gaano katagal maaaring baguhin ang linya bago ma-lock.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Default';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '$milliseconds ms';
+  }
 }

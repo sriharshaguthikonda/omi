@@ -2499,6 +2499,12 @@ class AppLocalizationsUk extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'Автоматично створювати при виявленні імені';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'Додаткові питання';
 
   @override
@@ -9509,4 +9515,18 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Встановити прошивку';
+
+  @override
+  String get transcriptRevisionWindowTitle => 'Вікно редагування транскрипту';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Як довго рядок можна змінювати перед фіксацією.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Типово';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '$milliseconds ms';
+  }
 }

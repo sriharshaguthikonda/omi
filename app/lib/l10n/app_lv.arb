@@ -3112,5 +3112,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "Transkripta labošanas logs",
+    "transcriptRevisionWindowDescription": "Cik ilgi rindu var labot pirms fiksēšanas.",
+    "transcriptRevisionWindowDefault": "Noklusējums",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

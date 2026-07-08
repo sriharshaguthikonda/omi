@@ -3134,5 +3134,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "转录修订窗口",
+    "transcriptRevisionWindowDescription": "一行在锁定前可修改的时长。",
+    "transcriptRevisionWindowDefault": "默认",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

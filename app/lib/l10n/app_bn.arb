@@ -10690,5 +10690,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "ট্রান্সক্রিপ্ট সংশোধন উইন্ডো",
+    "transcriptRevisionWindowDescription": "লক হওয়ার আগে একটি লাইন কতক্ষণ সংশোধনযোগ্য থাকবে।",
+    "transcriptRevisionWindowDefault": "ডিফল্ট",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

@@ -4830,6 +4830,18 @@ abstract class AppLocalizations {
   /// Experimental feature name
   ///
   /// In en, this message translates to:
+  /// **'External Triggers'**
+  String get externalTriggers;
+
+  /// Description for external triggers
+  ///
+  /// In en, this message translates to:
+  /// **'Allow apps like Tasker to start/stop recording'**
+  String get externalTriggersDescription;
+
+  /// Experimental feature name
+  ///
+  /// In en, this message translates to:
   /// **'Follow-up Questions'**
   String get followUpQuestions;
 
@@ -17702,6 +17714,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Flash Firmware'**
   String get flashFirmware;
+
+  /// Title for the Moonshine transcript revision window setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcript revision window'**
+  String get transcriptRevisionWindowTitle;
+
+  /// Description for the Moonshine transcript revision window setting.
+  ///
+  /// In en, this message translates to:
+  /// **'How long a transcript line stays revisable before it locks.'**
+  String get transcriptRevisionWindowDescription;
+
+  /// Label for using the SDK default transcript revision window.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get transcriptRevisionWindowDefault;
+
+  /// Formatted transcript revision window value.
+  ///
+  /// In en, this message translates to:
+  /// **'{milliseconds} ms'**
+  String transcriptRevisionWindowMs(int milliseconds);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

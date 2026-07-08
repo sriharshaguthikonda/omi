@@ -2504,6 +2504,12 @@ class AppLocalizationsHr extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'Automatski kreiraj kada je ime detektirano';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'Pitanja za praćenje';
 
   @override
@@ -9523,4 +9529,18 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Instaliraj firmver';
+
+  @override
+  String get transcriptRevisionWindowTitle => 'Prozor za reviziju transkripta';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Koliko dugo se redak može mijenjati prije zaključavanja.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Zadano';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '$milliseconds ms';
+  }
 }

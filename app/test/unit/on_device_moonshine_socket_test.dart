@@ -4,7 +4,9 @@ import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:omi/backend/preferences.dart';
 import 'package:omi/backend/schema/bt_device/bt_device.dart';
 import 'package:omi/models/custom_stt_config.dart';
 import 'package:omi/models/stt_provider.dart';
@@ -47,7 +49,9 @@ void main() {
   final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
   final nativeCalls = <MethodCall>[];
 
-  setUp(() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    await SharedPreferencesUtil.init();
     nativeCalls.clear();
     messenger.setMockMethodCallHandler(channel, (call) async {
       nativeCalls.add(call);
@@ -77,6 +81,14 @@ void main() {
       'moonshine-streaming-medium',
     ]);
     expect(config.defaultModel, 'moonshine-streaming-tiny');
+  });
+
+  test('moonshine revision window preference defaults to SDK behavior and round trips', () {
+    expect(SharedPreferencesUtil().moonshineRevisionWindowMs, 0);
+
+    SharedPreferencesUtil().moonshineRevisionWindowMs = 2500;
+
+    expect(SharedPreferencesUtil().moonshineRevisionWindowMs, 2500);
   });
 
   test('connects, appends PCM16, forwards native transcript segments, and stops', () async {
@@ -126,6 +138,40 @@ void main() {
     expect(socket.status, PureSocketStatus.disconnected);
     expect(listener.closed, isTrue);
     expect(nativeCalls.map((call) => call.method), containsAllInOrder(['initialize', 'appendPcm16', 'stop']));
+  });
+
+  test('omits Moonshine revision window argument when preference is zero', () async {
+    final socket = OnDeviceMoonshineSocket(
+      model: 'moonshine-streaming-tiny',
+      language: 'en',
+      sampleRate: 16000,
+      sourceCodec: BleAudioCodec.pcm16,
+      revisionWindowMs: 0,
+    );
+
+    expect(await socket.connect(), isTrue);
+
+    final args = Map<String, dynamic>.from(nativeCalls.single.arguments as Map);
+    expect(args.containsKey('revisionWindowMs'), isFalse);
+  });
+
+  test('passes Moonshine revision window argument when preference is positive', () async {
+    final socket = OnDeviceMoonshineSocket(
+      model: 'moonshine-streaming-tiny',
+      language: 'en',
+      sampleRate: 16000,
+      sourceCodec: BleAudioCodec.pcm16,
+      revisionWindowMs: 2500,
+    );
+
+    expect(await socket.connect(), isTrue);
+
+    expect(nativeCalls.single.arguments, {
+      'model': 'moonshine-streaming-tiny',
+      'language': 'en',
+      'sampleRate': 16000,
+      'revisionWindowMs': 2500,
+    });
   });
 
   test('partials reuse one segment id; a completed line starts a new id', () async {

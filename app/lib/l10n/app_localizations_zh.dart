@@ -2448,6 +2448,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get autoCreateWhenNameDetected => '检测到名称时自动创建';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => '后续问题';
 
   @override
@@ -9319,4 +9325,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get flashFirmware => '刷写固件';
+
+  @override
+  String get transcriptRevisionWindowTitle => '转录修订窗口';
+
+  @override
+  String get transcriptRevisionWindowDescription => '一行在锁定前可修改的时长。';
+
+  @override
+  String get transcriptRevisionWindowDefault => '默认';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '$milliseconds ms';
+  }
 }

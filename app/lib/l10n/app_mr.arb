@@ -10690,5 +10690,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "प्रतिलेख सुधारणा विंडो",
+    "transcriptRevisionWindowDescription": "लॉक होण्यापूर्वी ओळ किती वेळ सुधारता येईल.",
+    "transcriptRevisionWindowDefault": "डीफॉल्ट",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

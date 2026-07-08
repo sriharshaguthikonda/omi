@@ -3113,5 +3113,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "文字起こし修正ウィンドウ",
+    "transcriptRevisionWindowDescription": "行が確定する前に修正できる時間です。",
+    "transcriptRevisionWindowDefault": "デフォルト",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

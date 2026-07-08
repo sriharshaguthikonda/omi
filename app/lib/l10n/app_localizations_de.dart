@@ -2515,6 +2515,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'Automatisch erstellen, wenn Name erkannt wird';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'Folgefragen';
 
   @override
@@ -9568,4 +9574,18 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Firmware flashen';
+
+  @override
+  String get transcriptRevisionWindowTitle => 'Überarbeitungsfenster für Transkripte';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Wie lange eine Zeile vor dem Festschreiben überarbeitbar bleibt.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Standard';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '$milliseconds ms';
+  }
 }

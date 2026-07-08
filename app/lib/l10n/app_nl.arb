@@ -3112,5 +3112,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "Transcript revisievenster",
+    "transcriptRevisionWindowDescription": "Hoe lang een regel kan worden aangepast voordat deze vaststaat.",
+    "transcriptRevisionWindowDefault": "Standaard",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

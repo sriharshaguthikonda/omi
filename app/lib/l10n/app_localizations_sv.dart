@@ -2497,6 +2497,12 @@ class AppLocalizationsSv extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'Skapa automatiskt när namn upptäcks';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'Uppföljningsfrågor';
 
   @override
@@ -9495,4 +9501,18 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Installera firmware';
+
+  @override
+  String get transcriptRevisionWindowTitle => 'Revisionsfönster för transkription';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Hur länge en rad kan ändras innan den låses.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Standard';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '$milliseconds ms';
+  }
 }

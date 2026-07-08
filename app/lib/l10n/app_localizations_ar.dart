@@ -2478,6 +2478,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'إنشاء تلقائي عند اكتشاف الاسم';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'أسئلة المتابعة';
 
   @override
@@ -9433,4 +9439,18 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get flashFirmware => 'تحديث البرنامج الثابت';
+
+  @override
+  String get transcriptRevisionWindowTitle => 'نافذة مراجعة النص';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'مدة بقاء السطر قابلا للمراجعة قبل تثبيته.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'افتراضي';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '$milliseconds ms';
+  }
 }

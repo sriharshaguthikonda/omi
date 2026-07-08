@@ -3112,5 +3112,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "전사 수정 시간",
+    "transcriptRevisionWindowDescription": "줄이 확정되기 전까지 수정 가능한 시간입니다.",
+    "transcriptRevisionWindowDefault": "기본값",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }
