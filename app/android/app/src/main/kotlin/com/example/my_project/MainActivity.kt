@@ -1,7 +1,9 @@
 package com.friend.ios
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Vibrator
 import androidx.annotation.NonNull
 import com.friend.ios.trigger.bt.BtLearnMode
 import com.friend.ios.trigger.bt.BtMediaButtonTrigger
@@ -100,6 +102,7 @@ class MainActivity: FlutterActivity() {
 
         val triggerChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, TRIGGER_ACTION_CHANNEL)
         triggerActionChannel = triggerChannel
+        TriggerFeedback.setVibrator(getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator)
         TriggerActionBridge.attach(triggerChannel, intent)
         triggerChannel.setMethodCallHandler { call, result ->
             when (call.method) {
@@ -114,6 +117,11 @@ class MainActivity: FlutterActivity() {
                             return@setMethodCallHandler
                         }
                     }
+                    result.success(true)
+                }
+                "configure" -> {
+                    call.argument<Number>("volume")?.toInt()?.let(TriggerFeedback::setVolume)
+                    call.argument<Boolean>("haptic")?.let(TriggerFeedback::setHaptic)
                     result.success(true)
                 }
                 else -> result.notImplemented()
@@ -243,6 +251,7 @@ class MainActivity: FlutterActivity() {
     override fun onDestroy() {
         BtMediaButtonTrigger.stop()
         BtLearnMode.stop()
+        TriggerFeedback.release()
         triggerActionChannel?.let { TriggerActionBridge.detach(it) }
         triggerActionChannel = null
         triggerConfigChannel?.setMethodCallHandler(null)

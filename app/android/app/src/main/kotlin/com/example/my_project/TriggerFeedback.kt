@@ -31,6 +31,7 @@ fun rmsToVolume(rms: Double, base: Int, floor: Int, ceil: Int): Int {
 object TriggerFeedback {
     private val handler = Handler(Looper.getMainLooper())
     private var toneGenerator: ToneGenerator? = null
+    private var toneGeneratorVolume: Int? = null
     private var volume = DEFAULT_VOLUME
     private var hapticEnabled = false
     private var vibrator: Vibrator? = null
@@ -56,6 +57,7 @@ object TriggerFeedback {
         volume = v.coerceIn(DEFAULT_FLOOR, DEFAULT_CEIL)
         toneGenerator?.release()
         toneGenerator = null
+        toneGeneratorVolume = null
     }
 
     @Synchronized
@@ -73,12 +75,25 @@ object TriggerFeedback {
         handler.removeCallbacksAndMessages(null)
         toneGenerator?.release()
         toneGenerator = null
+        toneGeneratorVolume = null
         vibrator = null
     }
 
     private fun beep(toneVolume: Int) {
-        val generator = toneGenerator ?: ToneGenerator(AudioManager.STREAM_NOTIFICATION, toneVolume.coerceIn(0, 100))
-            .also { toneGenerator = it }
+        val requestedVolume = toneVolume.coerceIn(0, 100)
+        if (toneGenerator != null && toneGeneratorVolume != requestedVolume) {
+            toneGenerator?.release()
+            toneGenerator = null
+            toneGeneratorVolume = null
+        }
+        val generator = toneGenerator ?: try {
+            ToneGenerator(AudioManager.STREAM_NOTIFICATION, requestedVolume).also {
+                toneGenerator = it
+                toneGeneratorVolume = requestedVolume
+            }
+        } catch (_: RuntimeException) {
+            return
+        }
         generator.startTone(ToneGenerator.TONE_PROP_BEEP, SHORT_BEEP_MS)
         vibrate()
     }

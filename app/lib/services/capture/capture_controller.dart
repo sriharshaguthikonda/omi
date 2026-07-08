@@ -69,6 +69,7 @@ class CaptureController extends ChangeNotifier
     with MessageNotifierMixin
     implements ITransctiptSegmentSocketServiceListener {
   static const MethodChannel _nativeBleTranscriptChannel = MethodChannel('com.friend.ios/native_ble_transcript');
+  static const MethodChannel _triggerActionChannel = MethodChannel('com.friend.ios/trigger_actions');
   static const int _maxInProgressConversationRefreshAttempts = 30;
   static const Duration _inProgressConversationRefreshInterval = Duration(seconds: 2);
 
@@ -431,6 +432,8 @@ class CaptureController extends ChangeNotifier
   List<List<int>> _commandBytes = [];
   bool _isProcessingButtonEvent = false; // Guard to prevent overlapping button operations
   Timer? _voiceCommandTimeoutTimer; // 30s auto-end timer for voice questions
+  Timer? _stillListeningBeepTimer;
+  int? _stillListeningBeepIntervalSec;
   bool _voiceSessionStartedByLegacyLongPress =
       false; // Track if session was started by legacy long press (3) vs new toggle (1), TODO: remove this flag later
 
@@ -1351,6 +1354,7 @@ class CaptureController extends ChangeNotifier
     _socket?.unsubscribe(this);
     _keepAliveTimer?.cancel();
     _inProgressConversationRefreshTimer?.cancel();
+    _stillListeningBeepTimer?.cancel();
     _connectionStateListener?.cancel();
     _audioInterruptionSubscription?.cancel();
     _metrics.dispose();
@@ -1363,7 +1367,38 @@ class CaptureController extends ChangeNotifier
 
   void updateRecordingState(RecordingState state) {
     recordingState = state;
+    _syncStillListeningBeepTimer();
     notifyListeners();
+  }
+
+  void _syncStillListeningBeepTimer() {
+    final shouldRun = SharedPreferencesUtil().stillListeningBeepEnabled &&
+        _activeSource is PhoneMicSource &&
+        (recordingState == RecordingState.record || recordingState == RecordingState.interrupted);
+    if (!shouldRun) {
+      _stillListeningBeepTimer?.cancel();
+      _stillListeningBeepTimer = null;
+      _stillListeningBeepIntervalSec = null;
+      return;
+    }
+
+    final intervalSec = SharedPreferencesUtil().stillListeningIntervalSec.clamp(10, 120).toInt();
+    if (_stillListeningBeepTimer != null && _stillListeningBeepIntervalSec == intervalSec) return;
+    _stillListeningBeepTimer?.cancel();
+    _stillListeningBeepIntervalSec = intervalSec;
+    _stillListeningBeepTimer = Timer.periodic(Duration(seconds: intervalSec), (_) async {
+      if (!SharedPreferencesUtil().stillListeningBeepEnabled ||
+          _activeSource is! PhoneMicSource ||
+          (recordingState != RecordingState.record && recordingState != RecordingState.interrupted)) {
+        _syncStillListeningBeepTimer();
+        return;
+      }
+      try {
+        await _triggerActionChannel.invokeMethod('feedback', {'type': 'beepStillListening'});
+      } catch (e) {
+        Logger.debug('Still-listening feedback failed: $e');
+      }
+    });
   }
 
   /// Sends current geolocation to backend if location services are enabled and permission is granted

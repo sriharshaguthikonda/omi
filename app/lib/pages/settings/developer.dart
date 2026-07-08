@@ -21,6 +21,7 @@ import 'package:omi/models/stt_provider.dart';
 import 'package:omi/pages/settings/conversation_timeout_dialog.dart';
 import 'package:omi/pages/settings/import_history_page.dart';
 import 'package:omi/pages/settings/transcription_settings_page.dart';
+import 'package:omi/pages/settings/trigger_mappings_page.dart';
 import 'package:omi/pages/settings/widgets/create_mcp_api_key_dialog.dart';
 import 'package:omi/pages/settings/widgets/developer_api_keys_section.dart';
 import 'package:omi/pages/settings/widgets/mcp_api_key_list_item.dart';
@@ -148,6 +149,93 @@ class _DeveloperSettingsPageState extends State<_DeveloperSettingsPageView> {
           ),
         ),
         Switch(value: value, onChanged: onChanged, activeThumbColor: const Color(0xFF22C55E)),
+      ],
+    );
+  }
+
+  Widget _buildNavigationItem({
+    required String title,
+    required String description,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(color: const Color(0xFF2A2A2E), borderRadius: BorderRadius.circular(10)),
+            child: Center(child: FaIcon(icon, color: Colors.grey.shade400, size: 16)),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 2),
+                Text(description, style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
+              ],
+            ),
+          ),
+          Icon(Icons.chevron_right, color: Colors.grey.shade500),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSliderItem({
+    required String title,
+    required IconData icon,
+    required double value,
+    required double min,
+    required double max,
+    required int divisions,
+    required String valueLabel,
+    required ValueChanged<double> onChanged,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(color: const Color(0xFF2A2A2E), borderRadius: BorderRadius.circular(10)),
+          child: Center(child: FaIcon(icon, color: Colors.grey.shade400, size: 16)),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  Text(valueLabel, style: TextStyle(color: Colors.grey.shade400, fontSize: 12)),
+                ],
+              ),
+              Slider(
+                value: value,
+                min: min,
+                max: max,
+                divisions: divisions,
+                activeColor: const Color(0xFF22C55E),
+                inactiveColor: Colors.grey.shade800,
+                onChanged: onChanged,
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -1627,6 +1715,80 @@ class _DeveloperSettingsPageState extends State<_DeveloperSettingsPageView> {
                           icon: FontAwesomeIcons.bluetooth,
                           value: provider.btMediaButtonTriggerEnabled,
                           onChanged: provider.onBtMediaButtonTriggerChanged,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Divider(color: Colors.grey.shade800, height: 1),
+                        ),
+                        _buildNavigationItem(
+                          title: context.l10n.btTriggerManageMappings,
+                          description: context.l10n.btTriggerManageMappingsDescription,
+                          icon: FontAwesomeIcons.keyboard,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (_) => const TriggerMappingsPage()),
+                            );
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Divider(color: Colors.grey.shade800, height: 1),
+                        ),
+                        _buildExperimentalItem(
+                          title: context.l10n.feedbackBeeps,
+                          description: context.l10n.feedbackBeepsDescription,
+                          icon: Icons.volume_up,
+                          value: provider.feedbackBeepsEnabled,
+                          onChanged: provider.onFeedbackBeepsChanged,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Divider(color: Colors.grey.shade800, height: 1),
+                        ),
+                        _buildExperimentalItem(
+                          title: context.l10n.stillListeningBeeps,
+                          description: context.l10n.stillListeningBeepsDescription,
+                          icon: Icons.notifications_active,
+                          value: provider.stillListeningBeepEnabled,
+                          onChanged: provider.onStillListeningBeepChanged,
+                        ),
+                        if (provider.stillListeningBeepEnabled) ...[
+                          const SizedBox(height: 12),
+                          _buildSliderItem(
+                            title: context.l10n.stillListeningInterval,
+                            icon: Icons.schedule,
+                            value: provider.stillListeningIntervalSec.toDouble(),
+                            min: 10,
+                            max: 120,
+                            divisions: 11,
+                            valueLabel: context.l10n.secondsCount(provider.stillListeningIntervalSec),
+                            onChanged: provider.onStillListeningIntervalChanged,
+                          ),
+                        ],
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Divider(color: Colors.grey.shade800, height: 1),
+                        ),
+                        _buildSliderItem(
+                          title: context.l10n.feedbackBaseVolume,
+                          icon: Icons.volume_down,
+                          value: provider.feedbackBaseVolume.toDouble(),
+                          min: 8,
+                          max: 60,
+                          divisions: 52,
+                          valueLabel: '${provider.feedbackBaseVolume}%',
+                          onChanged: provider.onFeedbackBaseVolumeChanged,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Divider(color: Colors.grey.shade800, height: 1),
+                        ),
+                        _buildExperimentalItem(
+                          title: context.l10n.feedbackHaptics,
+                          description: context.l10n.feedbackHapticsDescription,
+                          icon: Icons.vibration,
+                          value: provider.feedbackHapticEnabled,
+                          onChanged: provider.onFeedbackHapticChanged,
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16),

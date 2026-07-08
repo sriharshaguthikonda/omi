@@ -1,5 +1,6 @@
 import 'package:omi/utils/platform/platform_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:omi/backend/http/api/agents.dart';
 import 'package:omi/backend/http/api/users.dart';
@@ -13,6 +14,8 @@ import 'package:omi/utils/logger.dart';
 import 'package:omi/utils/other/validators.dart';
 
 class DeveloperModeProvider extends BaseProvider {
+  static const MethodChannel _triggerActionChannel = MethodChannel('com.friend.ios/trigger_actions');
+
   final TextEditingController webhookOnConversationCreated = TextEditingController();
   final TextEditingController webhookOnTranscriptReceived = TextEditingController();
   final TextEditingController webhookAudioBytes = TextEditingController();
@@ -46,6 +49,11 @@ class DeveloperModeProvider extends BaseProvider {
 
   // BT Media Button Trigger (experimental, P3 increment 1)
   bool btMediaButtonTriggerEnabled = false;
+  bool feedbackBeepsEnabled = true;
+  bool stillListeningBeepEnabled = false;
+  int stillListeningIntervalSec = 30;
+  int feedbackBaseVolume = 25;
+  bool feedbackHapticEnabled = false;
 
   // Claude Agent (experimental)
   bool claudeAgentEnabled = false;
@@ -128,6 +136,12 @@ class DeveloperModeProvider extends BaseProvider {
     vadGateEnabled = SharedPreferencesUtil().vadGateEnabled;
     externalTriggersEnabled = SharedPreferencesUtil().externalTriggersEnabled;
     btMediaButtonTriggerEnabled = SharedPreferencesUtil().btMediaButtonTriggerEnabled;
+    feedbackBeepsEnabled = SharedPreferencesUtil().feedbackBeepsEnabled;
+    stillListeningBeepEnabled = SharedPreferencesUtil().stillListeningBeepEnabled;
+    stillListeningIntervalSec = SharedPreferencesUtil().stillListeningIntervalSec;
+    feedbackBaseVolume = SharedPreferencesUtil().feedbackBaseVolume;
+    feedbackHapticEnabled = SharedPreferencesUtil().feedbackHapticEnabled;
+    await configureTriggerFeedback();
     claudeAgentEnabled = SharedPreferencesUtil().claudeAgentEnabled;
     conversationEventsToggled = SharedPreferencesUtil().conversationEventsToggled;
     transcriptsToggled = SharedPreferencesUtil().transcriptsToggled;
@@ -305,6 +319,49 @@ class DeveloperModeProvider extends BaseProvider {
   void onBtMediaButtonTriggerChanged(bool value) {
     btMediaButtonTriggerEnabled = value;
     SharedPreferencesUtil().btMediaButtonTriggerEnabled = value;
+    notifyListeners();
+  }
+
+  Future<void> configureTriggerFeedback() async {
+    try {
+      await _triggerActionChannel.invokeMethod('configure', {
+        'volume': feedbackBaseVolume,
+        'haptic': feedbackHapticEnabled,
+      });
+    } catch (e) {
+      Logger.debug('Failed to configure trigger feedback: $e');
+    }
+  }
+
+  void onFeedbackBeepsChanged(bool value) {
+    feedbackBeepsEnabled = value;
+    SharedPreferencesUtil().feedbackBeepsEnabled = value;
+    notifyListeners();
+  }
+
+  void onStillListeningBeepChanged(bool value) {
+    stillListeningBeepEnabled = value;
+    SharedPreferencesUtil().stillListeningBeepEnabled = value;
+    notifyListeners();
+  }
+
+  void onStillListeningIntervalChanged(double value) {
+    stillListeningIntervalSec = value.round();
+    SharedPreferencesUtil().stillListeningIntervalSec = stillListeningIntervalSec;
+    notifyListeners();
+  }
+
+  void onFeedbackBaseVolumeChanged(double value) {
+    feedbackBaseVolume = value.round();
+    SharedPreferencesUtil().feedbackBaseVolume = feedbackBaseVolume;
+    configureTriggerFeedback();
+    notifyListeners();
+  }
+
+  void onFeedbackHapticChanged(bool value) {
+    feedbackHapticEnabled = value;
+    SharedPreferencesUtil().feedbackHapticEnabled = value;
+    configureTriggerFeedback();
     notifyListeners();
   }
 

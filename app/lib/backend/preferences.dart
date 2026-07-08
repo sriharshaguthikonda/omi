@@ -256,6 +256,22 @@ class SharedPreferencesUtil {
 
   bool get feedbackBeepsEnabled => getBool('feedbackBeepsEnabled', defaultValue: true);
 
+  set stillListeningBeepEnabled(bool value) => saveBool('stillListeningBeepEnabled', value);
+
+  bool get stillListeningBeepEnabled => getBool('stillListeningBeepEnabled');
+
+  set stillListeningIntervalSec(int value) => saveInt('stillListeningIntervalSec', value);
+
+  int get stillListeningIntervalSec => getInt('stillListeningIntervalSec', defaultValue: 30);
+
+  set feedbackBaseVolume(int value) => saveInt('feedbackBaseVolume', value);
+
+  int get feedbackBaseVolume => getInt('feedbackBaseVolume', defaultValue: 25);
+
+  set feedbackHapticEnabled(bool value) => saveBool('feedbackHapticEnabled', value);
+
+  bool get feedbackHapticEnabled => getBool('feedbackHapticEnabled');
+
   // Notification frequency (0-5): 0 = off, 5 = most frequent. Default is 0 (disabled)
   set notificationFrequency(int value) => saveInt('notificationFrequency', value);
 
