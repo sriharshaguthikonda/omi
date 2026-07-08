@@ -9557,4 +9557,17 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Εγκατάσταση firmware';
+  @override
+  String get transcriptRevisionWindowTitle => 'Παράθυρο αναθεώρησης απομαγνητοφώνησης';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Πόσο παραμένει μια γραμμή αναθεωρήσιμη πριν κλειδώσει.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Προεπιλογή';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

@@ -9511,4 +9511,17 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Flashear firmware';
+  @override
+  String get transcriptRevisionWindowTitle => 'Ventana de revisión de la transcripción';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Tiempo durante el que una línea puede revisarse antes de bloquearse.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Predeterminado';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

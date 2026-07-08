@@ -3081,5 +3081,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "Finestra de revisió de la transcripció",
+    "transcriptRevisionWindowDescription": "Temps durant el qual una línia es pot revisar abans de quedar fixada.",
+    "transcriptRevisionWindowDefault": "Predeterminat",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

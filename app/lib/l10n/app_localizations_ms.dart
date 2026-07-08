@@ -9515,4 +9515,17 @@ class AppLocalizationsMs extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Flash Perisian Tegar';
+  @override
+  String get transcriptRevisionWindowTitle => 'Tetingkap semakan transkrip';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Tempoh baris boleh disemak sebelum dikunci.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Lalai';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

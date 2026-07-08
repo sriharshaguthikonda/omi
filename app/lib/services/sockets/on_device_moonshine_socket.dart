@@ -15,6 +15,7 @@ class OnDeviceMoonshineSocket implements IPureSocket {
   final String model;
   final String language;
   final int sampleRate;
+  final int revisionWindowMs;
   final IAudioTranscoder transcoder;
 
   PureSocketStatus _status = PureSocketStatus.notConnected;
@@ -31,6 +32,7 @@ class OnDeviceMoonshineSocket implements IPureSocket {
     required this.model,
     required this.language,
     required this.sampleRate,
+    this.revisionWindowMs = 0,
     required BleAudioCodec sourceCodec,
   }) : transcoder = AudioTranscoderFactory.createToRawPcm(sourceCodec: sourceCodec, sampleRate: sampleRate) {
     _channel.setMethodCallHandler(_handleNativeCall);
@@ -52,11 +54,13 @@ class OnDeviceMoonshineSocket implements IPureSocket {
 
     _status = PureSocketStatus.connecting;
     try {
-      final initialized = await _channel.invokeMethod<bool>('initialize', {
+      final args = <String, dynamic>{
         'model': model,
         'language': language,
         'sampleRate': sampleRate,
-      });
+        if (revisionWindowMs > 0) 'revisionWindowMs': revisionWindowMs,
+      };
+      final initialized = await _channel.invokeMethod<bool>('initialize', args);
       if (initialized != true) {
         _status = PureSocketStatus.notConnected;
         return false;

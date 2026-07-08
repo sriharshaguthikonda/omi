@@ -9516,4 +9516,17 @@ class AppLocalizationsBs extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Instaliraj firmver';
+  @override
+  String get transcriptRevisionWindowTitle => 'Prozor za reviziju transkripta';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Koliko dugo se red može mijenjati prije zaključavanja.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Zadano';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

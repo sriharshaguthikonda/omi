@@ -9540,4 +9540,17 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Инсталирај фирмвер';
+  @override
+  String get transcriptRevisionWindowTitle => 'Прозорец за ревизија на транскрипт';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Колку долго редот може да се менува пред заклучување.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Стандардно';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

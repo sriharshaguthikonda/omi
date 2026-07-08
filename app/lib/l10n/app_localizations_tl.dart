@@ -9578,4 +9578,17 @@ class AppLocalizationsTl extends AppLocalizations {
 
   @override
   String get flashFirmware => 'I-flash ang Firmware';
+  @override
+  String get transcriptRevisionWindowTitle => 'Palugit ng rebisyon ng transcript';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Gaano katagal maaaring baguhin ang isang linya bago ito ma-lock.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Default';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

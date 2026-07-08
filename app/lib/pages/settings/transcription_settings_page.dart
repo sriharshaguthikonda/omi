@@ -47,6 +47,7 @@ class _TranscriptionSettingsPageState extends State<TranscriptionSettingsPage> {
   bool _showLogs = true;
   bool _isSaving = false;
   String? _validationError;
+  int _moonshineRevisionWindowMs = 0;
 
   // On-device model download state
   static bool _hasShownDebugWarning = false;
@@ -153,6 +154,7 @@ class _TranscriptionSettingsPageState extends State<TranscriptionSettingsPage> {
       _useCustomStt = activeConfig.isEnabled;
       _omiParakeet = !_useCustomStt && SharedPreferencesUtil().transcriptionModel == 'parakeet';
       _selectedProvider = activeConfig.provider == SttProvider.omi ? SttProvider.openai : activeConfig.provider;
+      _moonshineRevisionWindowMs = SharedPreferencesUtil().moonshineRevisionWindowMs;
 
       // Load all provider configs from preferences
       _loadAllProviderConfigs();
@@ -571,12 +573,15 @@ class _TranscriptionSettingsPageState extends State<TranscriptionSettingsPage> {
       final modelChanged = SharedPreferencesUtil().transcriptionModel != prevModel;
 
       final previousConfig = SharedPreferencesUtil().customSttConfig;
+      final previousRevisionWindowMs = SharedPreferencesUtil().moonshineRevisionWindowMs;
       final configChanged = previousConfig.sttConfigId != activeConfig.sttConfigId;
+      final revisionWindowChanged = previousRevisionWindowMs != _moonshineRevisionWindowMs;
 
+      SharedPreferencesUtil().moonshineRevisionWindowMs = _moonshineRevisionWindowMs;
       await SharedPreferencesUtil().saveCustomSttConfig(activeConfig);
       Logger.debug(SharedPreferencesUtil().customSttConfig.provider.toString());
 
-      if ((configChanged || modelChanged) && mounted) {
+      if ((configChanged || modelChanged || revisionWindowChanged) && mounted) {
         await Provider.of<CaptureProvider>(context, listen: false).onTranscriptionSettingsChanged();
       }
 
@@ -1339,9 +1344,9 @@ class _TranscriptionSettingsPageState extends State<TranscriptionSettingsPage> {
     } else if (_selectedProvider == SttProvider.onDeviceWhisper) {
       return _buildOnDeviceWhisperConfig();
     } else if (_selectedProvider == SttProvider.onDeviceMoonshine) {
-      // Fixed on-device engine: tiny-streaming-en only, model + language handled natively. No UI.
+      // Fixed on-device engine: model + language handled natively.
       // ponytail: expose model/language pickers once small/medium checkpoints are wired in the native bridge.
-      return const SizedBox.shrink();
+      return _buildOnDeviceMoonshineConfig();
     } else if (_selectedProvider == SttProvider.custom) {
       return _buildCustomPollingConfig();
     } else if (_selectedProvider == SttProvider.customLive) {
@@ -1353,6 +1358,66 @@ class _TranscriptionSettingsPageState extends State<TranscriptionSettingsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [_buildApiKeyInput(), const SizedBox(height: 20), _buildLanguageSelector()],
+    );
+  }
+
+  Widget _buildOnDeviceMoonshineConfig() {
+    final value = _moonshineRevisionWindowMs.toDouble();
+    final valueLabel = _moonshineRevisionWindowMs == 0
+        ? context.l10n.transcriptRevisionWindowDefault
+        : context.l10n.transcriptRevisionWindowMs(_moonshineRevisionWindowMs);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade800),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  context.l10n.transcriptRevisionWindowTitle,
+                  style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
+                ),
+              ),
+              Text(valueLabel, style: TextStyle(color: Colors.grey.shade400, fontSize: 13)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            context.l10n.transcriptRevisionWindowDescription,
+            style: TextStyle(color: Colors.grey.shade600, fontSize: 12, height: 1.4),
+          ),
+          const SizedBox(height: 12),
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              activeTrackColor: Colors.white,
+              inactiveTrackColor: Colors.grey.shade800,
+              thumbColor: Colors.white,
+              overlayColor: Colors.white.withValues(alpha: 0.12),
+              valueIndicatorColor: Colors.white,
+              valueIndicatorTextStyle: const TextStyle(color: Colors.black),
+            ),
+            child: Slider(
+              value: value,
+              min: 0,
+              max: 8000,
+              divisions: 16,
+              label: valueLabel,
+              onChanged: (nextValue) {
+                setState(() {
+                  _moonshineRevisionWindowMs = nextValue.round();
+                });
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 

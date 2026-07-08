@@ -9487,4 +9487,17 @@ class AppLocalizationsNo extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Flash fastvare';
+  @override
+  String get transcriptRevisionWindowTitle => 'Revisjonsvindu for transkripsjon';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Hvor lenge en linje kan revideres før den låses.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Standard';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

@@ -9545,4 +9545,17 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Installa il firmware';
+  @override
+  String get transcriptRevisionWindowTitle => 'Finestra di revisione della trascrizione';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Per quanto tempo una riga resta modificabile prima del blocco.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Predefinito';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

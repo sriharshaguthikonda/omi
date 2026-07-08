@@ -9519,4 +9519,17 @@ class AppLocalizationsBe extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Усталяваць прашыўку';
+  @override
+  String get transcriptRevisionWindowTitle => 'Акно перагляду транскрыпта';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Колькі часу радок можа змяняцца перад фіксацыяй.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Па змаўчанні';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} мс';
+  }
 }

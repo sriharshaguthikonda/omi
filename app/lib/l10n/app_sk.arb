@@ -3117,5 +3117,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "Okno revízie prepisu",
+    "transcriptRevisionWindowDescription": "Ako dlho možno riadok upravovať pred uzamknutím.",
+    "transcriptRevisionWindowDefault": "Predvolené",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

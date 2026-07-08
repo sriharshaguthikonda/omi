@@ -9492,4 +9492,17 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get flashFirmware => 'فلش کردن میان‌افزار';
+  @override
+  String get transcriptRevisionWindowTitle => 'پنجره بازبینی رونوشت';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'مدت زمانی که یک خط پیش از نهایی شدن قابل بازبینی می‌ماند.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'پیش‌فرض';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} میلی‌ثانیه';
+  }
 }

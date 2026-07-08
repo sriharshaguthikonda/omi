@@ -9336,4 +9336,17 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get flashFirmware => '펌웨어 플래시';
+  @override
+  String get transcriptRevisionWindowTitle => '전사 수정 시간';
+
+  @override
+  String get transcriptRevisionWindowDescription => '줄이 확정되기 전까지 수정 가능한 시간입니다.';
+
+  @override
+  String get transcriptRevisionWindowDefault => '기본값';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds}밀리초';
+  }
 }

@@ -9520,4 +9520,17 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get flashFirmware => 'ಫರ್ಮ್‌ವೇರ್ ಫ್ಲ್ಯಾಶ್ ಮಾಡಿ';
+  @override
+  String get transcriptRevisionWindowTitle => 'ಪ್ರತಿಲಿಪಿ ತಿದ್ದುಪಡಿ ವಿಂಡೋ';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'ಲಾಕ್ ಆಗುವ ಮೊದಲು ಸಾಲು ಎಷ್ಟು ಕಾಲ ತಿದ್ದುಪಡಿಯಾಗಿರುತ್ತದೆ.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'ಡೀಫಾಲ್ಟ್';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ಮಿ.ಸೆ.';
+  }
 }

@@ -10690,5 +10690,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "உரைதிருத்த சாளரம்",
+    "transcriptRevisionWindowDescription": "பூட்டப்படுவதற்கு முன் ஒரு வரி எவ்வளவு நேரம் திருத்தக்கூடியதாக இருக்கும்.",
+    "transcriptRevisionWindowDefault": "இயல்புநிலை",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

@@ -9466,4 +9466,17 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get flashFirmware => 'फ़र्मवेयर फ़्लैश करें';
+  @override
+  String get transcriptRevisionWindowTitle => 'ट्रांसक्रिप्ट संशोधन विंडो';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'लॉक होने से पहले पंक्ति कितनी देर तक संशोधित हो सकती है।';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'डिफ़ॉल्ट';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} मि.से.';
+  }
 }

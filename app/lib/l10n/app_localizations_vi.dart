@@ -9487,4 +9487,17 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Nạp firmware';
+  @override
+  String get transcriptRevisionWindowTitle => 'Cửa sổ sửa bản chép lời';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Thời gian một dòng còn có thể sửa trước khi khóa.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Mặc định';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

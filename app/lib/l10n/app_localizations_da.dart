@@ -9475,4 +9475,17 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Flash firmware';
+  @override
+  String get transcriptRevisionWindowTitle => 'Revisionsvindue for transskription';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Hvor længe en linje kan revideres, før den låses.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Standard';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

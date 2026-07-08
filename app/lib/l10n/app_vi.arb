@@ -3117,5 +3117,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "Cửa sổ chỉnh sửa bản chép lời",
+    "transcriptRevisionWindowDescription": "Dòng có thể chỉnh sửa bao lâu trước khi khóa.",
+    "transcriptRevisionWindowDefault": "Mặc định",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

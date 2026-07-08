@@ -9524,4 +9524,17 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Установить прошивку';
+  @override
+  String get transcriptRevisionWindowTitle => 'Окно правки транскрипта';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Как долго строка остается доступной для правки перед фиксацией.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'По умолчанию';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} мс';
+  }
 }

@@ -9481,4 +9481,17 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Nahrať firmvér';
+  @override
+  String get transcriptRevisionWindowTitle => 'Okno revízie prepisu';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Ako dlho možno riadok upravovať pred uzamknutím.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Predvolené';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

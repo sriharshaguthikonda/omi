@@ -9504,4 +9504,17 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get flashFirmware => 'فرم ویئر فلیش کریں';
+  @override
+  String get transcriptRevisionWindowTitle => 'ٹرانسکرپٹ نظرثانی ونڈو';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'لاک ہونے سے پہلے ایک سطر کتنی دیر تک قابل ترمیم رہتی ہے۔';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'ڈیفالٹ';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ملی سیکنڈ';
+  }
 }

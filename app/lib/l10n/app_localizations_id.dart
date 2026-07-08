@@ -9499,4 +9499,17 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Flash Firmware';
+  @override
+  String get transcriptRevisionWindowTitle => 'Jendela revisi transkrip';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Berapa lama satu baris dapat direvisi sebelum dikunci.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Default';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} md';
+  }
 }

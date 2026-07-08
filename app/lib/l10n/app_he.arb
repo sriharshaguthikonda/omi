@@ -10690,5 +10690,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "חלון תיקון תמלול",
+    "transcriptRevisionWindowDescription": "כמה זמן שורה נשארת ניתנת לתיקון לפני נעילה.",
+    "transcriptRevisionWindowDefault": "ברירת מחדל",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

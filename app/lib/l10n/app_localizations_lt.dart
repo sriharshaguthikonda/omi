@@ -9506,4 +9506,17 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Įrašyti programinę aparatinę įrangą';
+  @override
+  String get transcriptRevisionWindowTitle => 'Transkripto taisymo langas';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Kiek laiko eilutę galima taisyti prieš užrakinimą.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Numatyta';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

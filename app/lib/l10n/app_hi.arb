@@ -3113,5 +3113,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "ट्रांसक्रिप्ट संशोधन विंडो",
+    "transcriptRevisionWindowDescription": "लॉक होने से पहले पंक्ति कितनी देर तक संशोधित हो सकती है।",
+    "transcriptRevisionWindowDefault": "डिफ़ॉल्ट",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

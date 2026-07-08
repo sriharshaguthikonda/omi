@@ -9335,4 +9335,17 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get flashFirmware => 'ファームウェアを書き込む';
+  @override
+  String get transcriptRevisionWindowTitle => '文字起こしの修正ウィンドウ';
+
+  @override
+  String get transcriptRevisionWindowDescription => '行が確定されるまで修正可能な時間です。';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'デフォルト';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ミリ秒';
+  }
 }

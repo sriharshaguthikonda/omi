@@ -3079,5 +3079,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "نافذة مراجعة النص",
+    "transcriptRevisionWindowDescription": "مدة بقاء السطر قابلا للمراجعة قبل تثبيته.",
+    "transcriptRevisionWindowDefault": "افتراضي",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

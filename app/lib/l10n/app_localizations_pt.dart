@@ -9495,4 +9495,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Gravar firmware';
+  @override
+  String get transcriptRevisionWindowTitle => 'Janela de revisão da transcrição';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Por quanto tempo uma linha pode ser revisada antes de ser fixada.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Padrão';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

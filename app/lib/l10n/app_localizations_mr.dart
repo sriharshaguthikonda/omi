@@ -9499,4 +9499,17 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get flashFirmware => 'फर्मवेअर फ्लॅश करा';
+  @override
+  String get transcriptRevisionWindowTitle => 'प्रतिलेख पुनरावलोकन विंडो';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'लॉक होण्यापूर्वी ओळ किती वेळ बदलता येईल.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'डीफॉल्ट';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} मि.से.';
+  }
 }

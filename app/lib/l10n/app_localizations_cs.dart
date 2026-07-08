@@ -9490,4 +9490,17 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Nahrát firmware';
+  @override
+  String get transcriptRevisionWindowTitle => 'Okno revize přepisu';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Jak dlouho může být řádek upravován před uzamčením.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Výchozí';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

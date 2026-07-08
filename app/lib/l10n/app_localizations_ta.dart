@@ -9558,4 +9558,17 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get flashFirmware => 'ஃபார்ம்வேரை ஃபிளாஷ் செய்யவும்';
+  @override
+  String get transcriptRevisionWindowTitle => 'உரைமாற்ற திருத்த நேரம்';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'பூட்டுவதற்கு முன் ஒரு வரி எவ்வளவு நேரம் திருத்தக்கூடியதாக இருக்கும்.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'இயல்பு';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} மி.விநா.';
+  }
 }

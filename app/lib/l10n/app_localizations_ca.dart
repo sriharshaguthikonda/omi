@@ -9544,4 +9544,17 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Grava el microprogramari';
+  @override
+  String get transcriptRevisionWindowTitle => 'Finestra de revisió de la transcripció';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Temps durant el qual una línia es pot revisar abans de quedar fixada.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Predeterminat';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

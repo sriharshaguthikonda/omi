@@ -58,6 +58,7 @@ class MoonshineSttPlugin private constructor(
         val modelName = call.argument<String>("model") ?: "moonshine-streaming-tiny"
         val language = call.argument<String>("language") ?: "en"
         val requestedSampleRate = call.argument<Int>("sampleRate") ?: DEFAULT_SAMPLE_RATE
+        val revisionWindowMs = call.argument<Int>("revisionWindowMs") ?: 0
         val model = modelSpec(modelName, language)
         if (model == null) {
             result.error("moonshine_model", "Unsupported Moonshine model: $modelName ($language)", null)
@@ -76,6 +77,12 @@ class MoonshineSttPlugin private constructor(
                     TranscriberOption("identify_speakers", "false"),
                     TranscriberOption("return_audio_data", "false"),
                 )
+                if (revisionWindowMs > 0) {
+                    // ponytail: Moonshine 0.0.65 parse_transcriber_options accepts `vad_window_duration`
+                    // in seconds; README Transcriber Options documents it as the VAD averaging window.
+                    // Source enforces no min/max, so Flutter clamps the override to 500-8000ms; 0 omits it.
+                    options.add(TranscriberOption("vad_window_duration", (revisionWindowMs / 1000.0).toString()))
+                }
                 val nextTranscriber = Transcriber(options)
                 nextTranscriber.loadFromFiles(modelDir.absolutePath, model.arch)
                 nextTranscriber.addListener { event: TranscriptEvent ->

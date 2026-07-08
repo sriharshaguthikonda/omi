@@ -9515,4 +9515,17 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Wgraj oprogramowanie układowe';
+  @override
+  String get transcriptRevisionWindowTitle => 'Okno korekty transkrypcji';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Jak długo wiersz może być poprawiany przed zablokowaniem.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Domyślnie';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

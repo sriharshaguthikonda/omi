@@ -356,6 +356,7 @@ class TranscriptSocketServiceFactory {
         model: effectiveModel,
         language: effectiveLang,
         sampleRate: sampleRate,
+        revisionWindowMs: SharedPreferencesUtil().moonshineRevisionWindowMs,
         sourceCodec: codec,
       );
       return TranscriptSegmentSocketService.withSocket(

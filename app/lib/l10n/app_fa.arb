@@ -10690,5 +10690,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "پنجره بازبینی رونوشت",
+    "transcriptRevisionWindowDescription": "مدت زمانی که یک خط پیش از نهایی شدن قابل بازبینی می‌ماند.",
+    "transcriptRevisionWindowDefault": "پیش‌فرض",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

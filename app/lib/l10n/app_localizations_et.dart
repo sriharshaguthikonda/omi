@@ -9487,4 +9487,17 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Installi püsivara';
+  @override
+  String get transcriptRevisionWindowTitle => 'Transkripti parandamise aken';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Kui kaua saab rida enne lukustumist parandada.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Vaikimisi';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

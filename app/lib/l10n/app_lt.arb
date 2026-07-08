@@ -3112,5 +3112,9 @@
     "externalTriggersDescription": "Allow apps like Tasker to start/stop recording",
     "@externalTriggersDescription": {
         "description": "Description for external triggers"
-    }
+    },
+    "transcriptRevisionWindowTitle": "Transkripto taisymo langas",
+    "transcriptRevisionWindowDescription": "Kiek laiko eilutę galima taisyti prieš užrakinant.",
+    "transcriptRevisionWindowDefault": "Numatyta",
+    "transcriptRevisionWindowMs": "{milliseconds} ms"
 }

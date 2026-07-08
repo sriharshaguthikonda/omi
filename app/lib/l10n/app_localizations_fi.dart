@@ -9490,4 +9490,17 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Asenna laiteohjelmisto';
+  @override
+  String get transcriptRevisionWindowTitle => 'Transkription tarkistusikkuna';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Kuinka kauan riviä voi muokata ennen lukitusta.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Oletus';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

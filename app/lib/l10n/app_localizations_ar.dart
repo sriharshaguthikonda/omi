@@ -9433,4 +9433,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get flashFirmware => 'تحديث البرنامج الثابت';
+  @override
+  String get transcriptRevisionWindowTitle => 'نافذة مراجعة النص';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'مدة بقاء السطر قابلا للمراجعة قبل تثبيته.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'افتراضي';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} مللي ثانية';
+  }
 }

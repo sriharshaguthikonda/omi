@@ -228,6 +228,10 @@ class SharedPreferencesUtil {
 
   int get voiceResponseMode => getInt('voiceResponseMode', defaultValue: 1);
 
+  set moonshineRevisionWindowMs(int value) => saveInt('moonshineRevisionWindowMs', value);
+
+  int get moonshineRevisionWindowMs => getInt('moonshineRevisionWindowMs', defaultValue: 0);
+
   // VAD Gate — server-side voice activity gating to save Deepgram costs (experimental)
   set vadGateEnabled(bool value) => saveBool('vadGateEnabled', value);
 

@@ -9530,4 +9530,17 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Firmware flashelése';
+  @override
+  String get transcriptRevisionWindowTitle => 'Átirat felülvizsgálati ablaka';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Mennyi ideig módosítható egy sor a zárolás előtt.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Alapértelmezett';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

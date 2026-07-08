@@ -9512,4 +9512,17 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Instalēt aparātprogrammatūru';
+  @override
+  String get transcriptRevisionWindowTitle => 'Transkripta pārskatīšanas logs';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Cik ilgi rindu var labot pirms bloķēšanas.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Noklusējums';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

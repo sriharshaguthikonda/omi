@@ -9418,4 +9418,17 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get flashFirmware => 'צריבת קושחה';
+  @override
+  String get transcriptRevisionWindowTitle => 'חלון תיקון תמלול';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'כמה זמן שורה נשארת ניתנת לתיקון לפני נעילה.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'ברירת מחדל';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} אלפיות שנייה';
+  }
 }

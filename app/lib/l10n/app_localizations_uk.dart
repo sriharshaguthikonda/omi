@@ -9509,4 +9509,17 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Встановити прошивку';
+  @override
+  String get transcriptRevisionWindowTitle => 'Вікно редагування транскрипту';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Як довго рядок можна редагувати перед фіксацією.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Типово';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} мс';
+  }
 }

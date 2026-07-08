@@ -9516,4 +9516,17 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Firmware flashen';
+  @override
+  String get transcriptRevisionWindowTitle => 'Revisievenster voor transcript';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Hoelang een regel kan worden herzien voordat deze wordt vastgezet.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Standaard';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

@@ -9500,4 +9500,17 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Donanım Yazılımını Yükle';
+  @override
+  String get transcriptRevisionWindowTitle => 'Transkript düzeltme penceresi';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Bir satır kilitlenmeden önce ne kadar süre düzeltilebilir.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'Varsayılan';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} ms';
+  }
 }

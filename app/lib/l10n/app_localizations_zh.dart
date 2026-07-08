@@ -9319,4 +9319,17 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get flashFirmware => '刷写固件';
+  @override
+  String get transcriptRevisionWindowTitle => '转录修订窗口';
+
+  @override
+  String get transcriptRevisionWindowDescription => '一行在锁定前保持可修订的时长。';
+
+  @override
+  String get transcriptRevisionWindowDefault => '默认';
+
+  @override
+  String transcriptRevisionWindowMs(int milliseconds) {
+    return '${milliseconds} 毫秒';
+  }
 }
