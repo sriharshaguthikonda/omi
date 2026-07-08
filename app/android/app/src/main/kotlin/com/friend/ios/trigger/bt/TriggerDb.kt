@@ -32,7 +32,7 @@ data class ButtonMapping(
 )
 
 @Dao
-interface TriggerDao {
+interface TriggerDao : ButtonMappingReader {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun upsertDevice(device: BtDevice)
 
@@ -69,13 +69,21 @@ interface TriggerDao {
     fun listMappings(): List<ButtonMapping>
 
     @Query("SELECT * FROM button_mappings WHERE eventKey = :eventKey AND deviceMac = :deviceMac LIMIT 1")
+    override
     fun findDeviceMapping(eventKey: String, deviceMac: String): ButtonMapping?
 
     @Query("SELECT * FROM button_mappings WHERE eventKey = :eventKey AND deviceMac IS NULL LIMIT 1")
+    override
     fun findGlobalMapping(eventKey: String): ButtonMapping?
 
     @Query("SELECT COUNT(*) FROM button_mappings")
     fun mappingCount(): Int
+}
+
+interface ButtonMappingReader {
+    fun findDeviceMapping(eventKey: String, deviceMac: String): ButtonMapping?
+
+    fun findGlobalMapping(eventKey: String): ButtonMapping?
 }
 
 @Database(
