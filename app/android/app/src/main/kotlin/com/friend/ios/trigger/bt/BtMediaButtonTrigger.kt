@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.view.InputDevice
 import android.view.KeyEvent
 import com.friend.ios.TriggerActionBridge
 
@@ -11,6 +12,8 @@ private const val PREFS_NAME = "FlutterSharedPreferences"
 private const val PREF_KEY = "flutter.btMediaButtonTriggerEnabled"
 private const val TRIGGER_SOURCE = "bt_media_button"
 private const val SESSION_TAG = "OmiBtMediaButtonTrigger"
+private const val ATTRIBUTION_AMBIGUOUS = "AMBIGUOUS"
+private const val ATTRIBUTION_INFERRED = "INFERRED"
 
 /**
  * P3 increment 1: while the app is running and the user has opted in, holds a
@@ -42,7 +45,10 @@ object BtMediaButtonTrigger {
                 .setActions(
                     PlaybackStateCompat.ACTION_PLAY_PAUSE or
                         PlaybackStateCompat.ACTION_PLAY or
-                        PlaybackStateCompat.ACTION_PAUSE
+                        PlaybackStateCompat.ACTION_PAUSE or
+                        PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                        PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
+                        PlaybackStateCompat.ACTION_STOP
                 )
                 // Placeholder state: this session never actually plays media, it only exists
                 // to win media-button focus so KeyEvents route through onMediaButtonEvent.
@@ -53,10 +59,19 @@ object BtMediaButtonTrigger {
             override fun onMediaButtonEvent(mediaButtonIntent: Intent): Boolean {
                 val keyEvent = mediaButtonIntent.getParcelableExtra<KeyEvent>(Intent.EXTRA_KEY_EVENT) ?: return true
                 if (keyEvent.action != KeyEvent.ACTION_DOWN || keyEvent.repeatCount != 0) return true
-                when (keyEvent.keyCode) {
-                    KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
-                    KeyEvent.KEYCODE_MEDIA_PLAY,
-                    KeyEvent.KEYCODE_MEDIA_PAUSE -> TriggerActionBridge.sendTrigger(TRIGGER_SOURCE, "toggle")
+                val eventKey = mediaKeyEventKey(keyEvent.keyCode) ?: return true
+                val attribution = attributionFor(keyEvent)
+                BtLearnMode.emit(BtLearnEvent(eventKey = eventKey, deviceMac = null, attribution = attribution))
+
+                val dao = TriggerDb.get(context.applicationContext).triggerDao()
+                val action = MappingEngine(dao).resolve(eventKey, deviceMac = null)
+                if (action != null) {
+                    TriggerActionBridge.sendTrigger(TRIGGER_SOURCE, action)
+                    return true
+                }
+
+                if (dao.mappingCount() == 0 && isLegacyToggleKey(keyEvent.keyCode)) {
+                    TriggerActionBridge.sendTrigger(TRIGGER_SOURCE, "toggle")
                 }
                 return true
             }
@@ -70,4 +85,25 @@ object BtMediaButtonTrigger {
         session?.release()
         session = null
     }
+
+    private fun attributionFor(keyEvent: KeyEvent): String {
+        if (keyEvent.deviceId < 0) return ATTRIBUTION_AMBIGUOUS
+        return if (InputDevice.getDevice(keyEvent.deviceId) != null) ATTRIBUTION_INFERRED else ATTRIBUTION_AMBIGUOUS
+    }
 }
+
+fun mediaKeyEventKey(keyCode: Int): String? =
+    when (keyCode) {
+        KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> "KEYCODE_MEDIA_PLAY_PAUSE"
+        KeyEvent.KEYCODE_MEDIA_PLAY -> "KEYCODE_MEDIA_PLAY"
+        KeyEvent.KEYCODE_MEDIA_PAUSE -> "KEYCODE_MEDIA_PAUSE"
+        KeyEvent.KEYCODE_MEDIA_NEXT -> "KEYCODE_MEDIA_NEXT"
+        KeyEvent.KEYCODE_MEDIA_PREVIOUS -> "KEYCODE_MEDIA_PREVIOUS"
+        KeyEvent.KEYCODE_MEDIA_STOP -> "KEYCODE_MEDIA_STOP"
+        else -> null
+    }
+
+private fun isLegacyToggleKey(keyCode: Int): Boolean =
+    keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ||
+        keyCode == KeyEvent.KEYCODE_MEDIA_PLAY ||
+        keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE

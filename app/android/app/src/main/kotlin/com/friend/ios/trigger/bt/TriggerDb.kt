@@ -103,7 +103,7 @@ abstract class TriggerDb : RoomDatabase() {
                     context.applicationContext,
                     TriggerDb::class.java,
                     "trigger.db",
-                ).build().also { instance = it }
+                ).allowMainThreadQueries().build().also { instance = it }
             }
     }
 }
