@@ -44,6 +44,9 @@ class DeveloperModeProvider extends BaseProvider {
   // External triggers (experimental) — Tasker etc. via TriggerCaptureReceiver, off by default
   bool externalTriggersEnabled = false;
 
+  // BT Media Button Trigger (experimental, P3 increment 1)
+  bool btMediaButtonTriggerEnabled = false;
+
   // Claude Agent (experimental)
   bool claudeAgentEnabled = false;
   bool claudeAgentLoading = false;
@@ -124,6 +127,7 @@ class DeveloperModeProvider extends BaseProvider {
     showPhoneCallButton = SharedPreferencesUtil().showPhoneCallButton;
     vadGateEnabled = SharedPreferencesUtil().vadGateEnabled;
     externalTriggersEnabled = SharedPreferencesUtil().externalTriggersEnabled;
+    btMediaButtonTriggerEnabled = SharedPreferencesUtil().btMediaButtonTriggerEnabled;
     claudeAgentEnabled = SharedPreferencesUtil().claudeAgentEnabled;
     conversationEventsToggled = SharedPreferencesUtil().conversationEventsToggled;
     transcriptsToggled = SharedPreferencesUtil().transcriptsToggled;
@@ -295,6 +299,12 @@ class DeveloperModeProvider extends BaseProvider {
   void onExternalTriggersChanged(bool value) {
     externalTriggersEnabled = value;
     SharedPreferencesUtil().externalTriggersEnabled = value;
+    notifyListeners();
+  }
+
+  void onBtMediaButtonTriggerChanged(bool value) {
+    btMediaButtonTriggerEnabled = value;
+    SharedPreferencesUtil().btMediaButtonTriggerEnabled = value;
     notifyListeners();
   }
 

@@ -1620,6 +1620,18 @@ class _DeveloperSettingsPageState extends State<_DeveloperSettingsPageView> {
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           child: Divider(color: Colors.grey.shade800, height: 1),
                         ),
+                        // BT Media Button Trigger
+                        _buildExperimentalItem(
+                          title: context.l10n.btMediaButtonTrigger,
+                          description: context.l10n.btMediaButtonTriggerDescription,
+                          icon: FontAwesomeIcons.bluetooth,
+                          value: provider.btMediaButtonTriggerEnabled,
+                          onChanged: provider.onBtMediaButtonTriggerChanged,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Divider(color: Colors.grey.shade800, height: 1),
+                        ),
                         // Claude Agent
                         Row(
                           children: [

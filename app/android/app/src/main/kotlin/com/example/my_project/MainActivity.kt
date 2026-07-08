@@ -3,6 +3,7 @@ package com.friend.ios
 import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.NonNull
+import com.friend.ios.trigger.bt.BtMediaButtonTrigger
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -101,6 +102,9 @@ class MainActivity: FlutterActivity() {
             }
         }
 
+        // P3 increment 1: no-op unless the user opted in (see BtMediaButtonTrigger doc).
+        BtMediaButtonTrigger.start(this)
+
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler {
             call, result ->
             if(call.method == "setNotificationOnKillService"){
@@ -152,6 +156,7 @@ class MainActivity: FlutterActivity() {
     }
 
     override fun onDestroy() {
+        BtMediaButtonTrigger.stop()
         triggerActionChannel?.let { TriggerActionBridge.detach(it) }
         triggerActionChannel = null
         if (isFinishing) {
