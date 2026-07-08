@@ -2499,6 +2499,12 @@ class AppLocalizationsBg extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'Автоматично създаване при откриване на име';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'Последващи въпроси';
 
   @override
@@ -9525,6 +9531,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Инсталирай фърмуера';
+
   @override
   String get transcriptRevisionWindowTitle => 'Прозорец за редакция на транскрипта';
 
@@ -9536,6 +9543,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String transcriptRevisionWindowMs(int milliseconds) {
-    return '${milliseconds} мс';
+    return '$milliseconds ms';
   }
 }

@@ -2501,6 +2501,12 @@ class AppLocalizationsBn extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'নাম সনাক্ত হলে স্বয়ংক্রিয়ভাবে তৈরি করুন';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'অনুসরণকারী প্রশ্ন';
 
   @override
@@ -9496,6 +9502,7 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get flashFirmware => 'ফার্মওয়্যার ফ্ল্যাশ করুন';
+
   @override
   String get transcriptRevisionWindowTitle => 'ট্রান্সক্রিপ্ট সংশোধন উইন্ডো';
 
@@ -9507,6 +9514,6 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String transcriptRevisionWindowMs(int milliseconds) {
-    return '${milliseconds} মি.সে.';
+    return '$milliseconds ms';
   }
 }

@@ -2453,6 +2453,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get autoCreateWhenNameDetected => '이름 감지 시 자동 생성';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => '후속 질문';
 
   @override
@@ -9336,6 +9342,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get flashFirmware => '펌웨어 플래시';
+
   @override
   String get transcriptRevisionWindowTitle => '전사 수정 시간';
 
@@ -9347,6 +9354,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String transcriptRevisionWindowMs(int milliseconds) {
-    return '${milliseconds}밀리초';
+    return '$milliseconds ms';
   }
 }

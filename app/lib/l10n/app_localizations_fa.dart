@@ -2500,6 +2500,12 @@ class AppLocalizationsFa extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'ایجاد خودکار هنگام تشخیص نام';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'سؤالات دنبال‌کننده';
 
   @override
@@ -9492,6 +9498,7 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get flashFirmware => 'فلش کردن میان‌افزار';
+
   @override
   String get transcriptRevisionWindowTitle => 'پنجره بازبینی رونوشت';
 
@@ -9503,6 +9510,6 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String transcriptRevisionWindowMs(int milliseconds) {
-    return '${milliseconds} میلی‌ثانیه';
+    return '$milliseconds ms';
   }
 }

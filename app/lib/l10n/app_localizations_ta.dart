@@ -2514,6 +2514,12 @@ class AppLocalizationsTa extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'பெயர் கண்டறியப்படும் போது தானாக உருவாக்கு';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'தொடர்ந்த கேள்விகள்';
 
   @override
@@ -9558,17 +9564,19 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get flashFirmware => 'ஃபார்ம்வேரை ஃபிளாஷ் செய்யவும்';
-  @override
-  String get transcriptRevisionWindowTitle => 'உரைமாற்ற திருத்த நேரம்';
 
   @override
-  String get transcriptRevisionWindowDescription => 'பூட்டுவதற்கு முன் ஒரு வரி எவ்வளவு நேரம் திருத்தக்கூடியதாக இருக்கும்.';
+  String get transcriptRevisionWindowTitle => 'உரைதிருத்த சாளரம்';
 
   @override
-  String get transcriptRevisionWindowDefault => 'இயல்பு';
+  String get transcriptRevisionWindowDescription =>
+      'பூட்டப்படுவதற்கு முன் ஒரு வரி எவ்வளவு நேரம் திருத்தக்கூடியதாக இருக்கும்.';
+
+  @override
+  String get transcriptRevisionWindowDefault => 'இயல்புநிலை';
 
   @override
   String transcriptRevisionWindowMs(int milliseconds) {
-    return '${milliseconds} மி.விநா.';
+    return '$milliseconds ms';
   }
 }

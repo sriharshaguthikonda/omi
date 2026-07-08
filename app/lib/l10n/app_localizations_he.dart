@@ -2483,6 +2483,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'צור אוטומטית כאשר שם מזוהה';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'שאלות המשך';
 
   @override
@@ -9418,6 +9424,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get flashFirmware => 'צריבת קושחה';
+
   @override
   String get transcriptRevisionWindowTitle => 'חלון תיקון תמלול';
 
@@ -9429,6 +9436,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String transcriptRevisionWindowMs(int milliseconds) {
-    return '${milliseconds} אלפיות שנייה';
+    return '$milliseconds ms';
   }
 }

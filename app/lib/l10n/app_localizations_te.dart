@@ -2511,6 +2511,12 @@ class AppLocalizationsTe extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'పేరు కనుగొనబడినప్పుడు స్వయంచాలకంగా సృష్టించండి';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'అనుసరణ ప్రశ్నలు';
 
   @override
@@ -9538,17 +9544,18 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get flashFirmware => 'ఫర్మ్‌వేర్ ఫ్లాష్ చేయండి';
+
   @override
   String get transcriptRevisionWindowTitle => 'ట్రాన్స్‌క్రిప్ట్ సవరణ విండో';
 
   @override
-  String get transcriptRevisionWindowDescription => 'లాక్ కావడానికి ముందు పంక్తి ఎంతసేపు సవరించగలదో.';
+  String get transcriptRevisionWindowDescription => 'లాక్ అయ్యే ముందు వరుస ఎంతసేపు సవరించదగినదిగా ఉంటుంది.';
 
   @override
   String get transcriptRevisionWindowDefault => 'డిఫాల్ట్';
 
   @override
   String transcriptRevisionWindowMs(int milliseconds) {
-    return '${milliseconds} మి.సె.';
+    return '$milliseconds ms';
   }
 }

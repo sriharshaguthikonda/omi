@@ -2493,6 +2493,12 @@ class AppLocalizationsFi extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'Luo automaattisesti kun nimi havaitaan';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'Jatkokysymykset';
 
   @override
@@ -9490,6 +9496,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Asenna laiteohjelmisto';
+
   @override
   String get transcriptRevisionWindowTitle => 'Transkription tarkistusikkuna';
 
@@ -9501,6 +9508,6 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String transcriptRevisionWindowMs(int milliseconds) {
-    return '${milliseconds} ms';
+    return '$milliseconds ms';
   }
 }

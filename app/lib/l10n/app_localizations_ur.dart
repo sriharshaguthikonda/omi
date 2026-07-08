@@ -2501,6 +2501,12 @@ class AppLocalizationsUr extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'جب نام پایا جائے تو خود کار طور پر بنائیں';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'فالو اپ سوالات';
 
   @override
@@ -9504,17 +9510,18 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get flashFirmware => 'فرم ویئر فلیش کریں';
-  @override
-  String get transcriptRevisionWindowTitle => 'ٹرانسکرپٹ نظرثانی ونڈو';
 
   @override
-  String get transcriptRevisionWindowDescription => 'لاک ہونے سے پہلے ایک سطر کتنی دیر تک قابل ترمیم رہتی ہے۔';
+  String get transcriptRevisionWindowTitle => 'نقل نوشت نظرثانی ونڈو';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'لاک ہونے سے پہلے ایک لائن کتنی دیر قابل ترمیم رہتی ہے۔';
 
   @override
   String get transcriptRevisionWindowDefault => 'ڈیفالٹ';
 
   @override
   String transcriptRevisionWindowMs(int milliseconds) {
-    return '${milliseconds} ملی سیکنڈ';
+    return '$milliseconds ms';
   }
 }

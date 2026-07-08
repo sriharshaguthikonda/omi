@@ -2498,6 +2498,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'Tự động tạo khi phát hiện tên';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'Câu hỏi Theo dõi';
 
   @override
@@ -9487,17 +9493,18 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Nạp firmware';
-  @override
-  String get transcriptRevisionWindowTitle => 'Cửa sổ sửa bản chép lời';
 
   @override
-  String get transcriptRevisionWindowDescription => 'Thời gian một dòng còn có thể sửa trước khi khóa.';
+  String get transcriptRevisionWindowTitle => 'Cửa sổ chỉnh sửa bản chép lời';
+
+  @override
+  String get transcriptRevisionWindowDescription => 'Dòng có thể chỉnh sửa bao lâu trước khi khóa.';
 
   @override
   String get transcriptRevisionWindowDefault => 'Mặc định';
 
   @override
   String transcriptRevisionWindowMs(int milliseconds) {
-    return '${milliseconds} ms';
+    return '$milliseconds ms';
   }
 }

@@ -2497,6 +2497,12 @@ class AppLocalizationsCs extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'Automaticky vytvořit při detekci jména';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'Následné otázky';
 
   @override
@@ -9490,6 +9496,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Nahrát firmware';
+
   @override
   String get transcriptRevisionWindowTitle => 'Okno revize přepisu';
 
@@ -9501,6 +9508,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String transcriptRevisionWindowMs(int milliseconds) {
-    return '${milliseconds} ms';
+    return '$milliseconds ms';
   }
 }

@@ -2506,6 +2506,12 @@ class AppLocalizationsRo extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'Creare automată când se detectează un nume';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'Întrebări de urmărire';
 
   @override
@@ -9535,6 +9541,7 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Instalați firmware-ul';
+
   @override
   String get transcriptRevisionWindowTitle => 'Fereastră de revizuire a transcrierii';
 
@@ -9546,6 +9553,6 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String transcriptRevisionWindowMs(int milliseconds) {
-    return '${milliseconds} ms';
+    return '$milliseconds ms';
   }
 }

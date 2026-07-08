@@ -2499,6 +2499,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'Auto-create when name detected';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'Follow-up Questions';
 
   @override
@@ -9485,6 +9491,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Flash Firmware';
+
   @override
   String get transcriptRevisionWindowTitle => 'Transcript revision window';
 
@@ -9496,6 +9503,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String transcriptRevisionWindowMs(int milliseconds) {
-    return '${milliseconds} ms';
+    return '$milliseconds ms';
   }
 }

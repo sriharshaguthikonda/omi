@@ -2495,6 +2495,12 @@ class AppLocalizationsLt extends AppLocalizations {
   String get autoCreateWhenNameDetected => 'Automatiškai sukurti aptikus vardą';
 
   @override
+  String get externalTriggers => 'External Triggers';
+
+  @override
+  String get externalTriggersDescription => 'Allow apps like Tasker to start/stop recording';
+
+  @override
   String get followUpQuestions => 'Tolimesnės užklausos';
 
   @override
@@ -9506,17 +9512,18 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get flashFirmware => 'Įrašyti programinę aparatinę įrangą';
+
   @override
   String get transcriptRevisionWindowTitle => 'Transkripto taisymo langas';
 
   @override
-  String get transcriptRevisionWindowDescription => 'Kiek laiko eilutę galima taisyti prieš užrakinimą.';
+  String get transcriptRevisionWindowDescription => 'Kiek laiko eilutę galima taisyti prieš užrakinant.';
 
   @override
   String get transcriptRevisionWindowDefault => 'Numatyta';
 
   @override
   String transcriptRevisionWindowMs(int milliseconds) {
-    return '${milliseconds} ms';
+    return '$milliseconds ms';
   }
 }
