@@ -133,10 +133,10 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 - [ ] Quick Settings tile (`TileService`) — arm/disarm capture
 - [ ] Explicit-intent entry (Tasker/automation): exported receiver, locked down (signature/token check), documented intent extras
 - [ ] Wire router → existing phone-mic path: `app/lib/providers/capture_provider.dart` / `voice_recorder_provider.dart` / `app/lib/services/capture/capture_controller.dart` (recording state already lives here — reuse, don't duplicate)
-- [ ] Feedback: single soft beep on start, double on stop, optional haptic; 
- - ambient noise basesd volume and haptics.
+- [ ] Feedback: single soft beep on start, double on stop, optional haptic — **subplan [plans/P2.6-listening-beep.md](./plans/P2.6-listening-beep.md)** (Sri asked for this explicitly; the P2 plan wrongly dropped it — restored 2026-07-08):
+ - ambient noise based volume and haptics.
  -  calm settings ...less loud!!! you know
- -  option to toggle periodic "still listening" low volume beeps-  volume should be adjustable in developer settings
+ -  option to toggle periodic "still listening" low volume beeps — volume should be adjustable in developer settings
 - [ ] Trigger test matrix from the research report (locked screen, unlocked, after process death)
 
 **Swallow sources:** upstream foreground-service + notification plumbing (already in repo: `OmiBleForegroundService.kt` patterns, `app/lib/services/notifications.dart`); Android `TileService` is ~100 lines of boilerplate (official docs sample).
@@ -153,6 +153,10 @@ Every later trigger (headset button, BLE GATT, Tasker, wake word, ESP32) is just
 ## P3 — BT multi-device trigger matrix ⭐ (flagship requirement)
 
 **Goal:** *"I might be connected to multiple bluetooth devices, change between them, and trigger recording from multiple different buttons on multiple different devices."* Concretely: any button on any paired BT device can be mapped to any capture action, per-device, persistently.
+
+**Execution plan:** [plans/P3-bt-trigger-matrix.md](./plans/P3-bt-trigger-matrix.md) — device registry + learn-mode wizard (select device, select input) + per-device mapping, TDD tasks, commit-per-task.
+
+**SHIPPED-STATE RECONCILIATION (2026-07-08):** P2 did **not** ship the Kotlin `TriggerRouter` the P3 plan first assumed. Reality (verified): the seam is `TriggerActionBridge.sendTrigger(source, action)` (Kotlin `object` in [MainActivity.kt](./app/android/app/src/main/kotlin/com/example/my_project/MainActivity.kt)) → MethodChannel `com.friend.ios/trigger_actions` (`triggerCapture`) → Dart [`TriggerRouter`](./app/lib/services/capture/trigger_router.dart) → `CaptureController`. **No MediaSession / media-button capture exists yet — so BT device buttons do not control Omi at all today.** Package is `com.friend.ios`; the Kotlin source **dir** is `com/example/my_project/`. New BT-trigger code mirrors that dir+package convention (like `TriggerCaptureReceiver.kt`), and the mapping engine calls `TriggerActionBridge.sendTrigger(...)` — it does not invent a new router. The P3 plan file carries the full reconciled task list.
 
 **Design**
 

@@ -15,7 +15,7 @@
 - New code in **new files** under `app/android/app/src/main/kotlin/com/friend/ios/trigger/` — minimal edits inside upstream files (merge-friendliness rule, ROADMAP "Upstream sync").
 - Package: `com.friend.ios` (matches existing Kotlin sources).
 - Flutter↔native traffic goes through Pigeon (`app/lib/pigeon_interfaces.dart` → regenerate `PigeonCommunicator.g.kt`), never ad-hoc channels.
-- Feedback sounds: single soft beep on start, double on stop, optional haptic. **No periodic "still listening" beeps.**
+- Feedback sounds: single soft beep on start, double on stop, optional haptic. Periodic "still listening" low-volume beeps + ambient-adjusted volume + dev-settings knobs are a **required** follow-on, specced in [P2.6-listening-beep.md](./P2.6-listening-beep.md) (Sri asked for it; do not drop it again).
 - Every trigger event logged: `(trigger_source, timestamp, resolved_action)` — this log is a P3 dependency, not optional.
 - All user-facing strings via l10n (`context.l10n.*`), ARB keys added with `jq` (repo rule, AGENTS.md).
 - Formatting: `dart format --line-length 120`, Kotlin via pre-commit hook.

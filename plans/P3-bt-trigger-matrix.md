@@ -10,7 +10,18 @@
 
 **Working assumption (Decision D3, open):** 🟢 MediaSession KeyEvents first (works with Sri's existing headsets day one), BLE GATT second. If Sri picks BLE-first, Tasks 3–4 swap order — content unchanged.
 
-**Depends on:** P2 Tasks 1–2 (TriggerRouter + Pigeon bridge) merged.
+**Depends on:** the shipped P2 trigger seam (already merged — see reconciliation below).
+
+## ⚠️ SHIPPED-STATE RECONCILIATION (2026-07-08 — read before touching code)
+
+P2 shipped a **leaner** design than this plan first assumed. These facts are verified against the tree and **override** any stale reference below:
+
+- **Seam is `TriggerActionBridge`, not a Kotlin `TriggerRouter`.** `TriggerActionBridge.sendTrigger(source: String, action: String)` (object in `app/android/app/src/main/kotlin/com/example/my_project/MainActivity.kt`) invokes MethodChannel `com.friend.ios/trigger_actions` method `triggerCapture` → Dart `TriggerRouter.handleTrigger` (`app/lib/services/capture/trigger_router.dart`) → `CaptureController`. There is **no** `TriggerRouter.dispatch` / `TriggerEvent` Kotlin type. Wherever this plan says "emit `TriggerEvent` into `TriggerRouter.dispatch`", instead **resolve the mapping in Kotlin and call `TriggerActionBridge.sendTrigger("media_key" (or "ble_gatt"), resolvedAction)`** where `resolvedAction` ∈ {start,stop,toggle,mark}.
+- **No MediaSession / media-button capture exists yet.** BT buttons do nothing today. Task 2 builds the first one.
+- **Package vs directory:** package is `com.friend.ios`; Kotlin **dir** is `app/android/app/src/main/kotlin/com/example/my_project/`. Put new BT-trigger files there (a `trigger/bt/` **subdir under that path** is fine) with `package com.friend.ios` (or `com.friend.ios.trigger.bt`). Mirror `TriggerCaptureReceiver.kt`.
+- **Flutter↔native uses MethodChannel, not Pigeon, for triggers.** Do **not** add Pigeon APIs. For registry read/toggle, mapping CRUD, and the learn-mode event stream, add a new MethodChannel `com.friend.ios/trigger_config` (registered next to the existing `trigger_actions` channel in `MainActivity.configureFlutterEngine`). Learn-mode streams captured events to Dart via `channel.invokeMethod("onLearnEvent", …)`.
+- **BLE donor is live in the same MainActivity:** `OmiBleManager` is initialized there (Task 5 GATT path hooks into it).
+- **Ship order for THIS pass (Claude scope):** Tasks 1→4 (registry, media-key capture + press-pattern + attribution, mapping engine, learn wizard) = the "select device + select input" MVP the user is asking for. Tasks 5 (GATT), 6 (active-device), 7 (matrix doc) are the fast-follow, not this pass.
 
 ## Global Constraints
 
