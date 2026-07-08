@@ -251,6 +251,11 @@ class SharedPreferencesUtil {
 
   bool get btMediaButtonTriggerEnabled => getBool('btMediaButtonTriggerEnabled');
 
+  // Feedback beeps — default on for trigger-driven start/stop confirmation.
+  set feedbackBeepsEnabled(bool value) => saveBool('feedbackBeepsEnabled', value);
+
+  bool get feedbackBeepsEnabled => getBool('feedbackBeepsEnabled', defaultValue: true);
+
   // Notification frequency (0-5): 0 = off, 5 = most frequent. Default is 0 (disabled)
   set notificationFrequency(int value) => saveInt('notificationFrequency', value);
 

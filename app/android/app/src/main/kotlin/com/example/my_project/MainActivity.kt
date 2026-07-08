@@ -95,10 +95,21 @@ class MainActivity: FlutterActivity() {
         triggerActionChannel = triggerChannel
         TriggerActionBridge.attach(triggerChannel, intent)
         triggerChannel.setMethodCallHandler { call, result ->
-            if (call.method == "drainPendingTriggers") {
-                result.success(TriggerActionBridge.drainPendingTriggers())
-            } else {
-                result.notImplemented()
+            when (call.method) {
+                "drainPendingTriggers" -> result.success(TriggerActionBridge.drainPendingTriggers())
+                "feedback" -> {
+                    when (call.argument<String>("type")) {
+                        "beepStart" -> TriggerFeedback.beepStart()
+                        "beepStop" -> TriggerFeedback.beepStop()
+                        "beepStillListening" -> TriggerFeedback.beepStillListening()
+                        else -> {
+                            result.error("invalid_feedback", "Unknown feedback type", null)
+                            return@setMethodCallHandler
+                        }
+                    }
+                    result.success(true)
+                }
+                else -> result.notImplemented()
             }
         }
 

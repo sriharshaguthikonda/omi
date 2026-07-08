@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:omi/backend/preferences.dart';
 import 'package:omi/services/capture/capture_controller.dart';
 import 'package:omi/utils/debug_log_manager.dart';
@@ -7,6 +8,7 @@ import 'package:omi/utils/enums.dart';
 class TriggerRouter {
   TriggerRouter(this._captureController);
 
+  static const _triggerActionChannel = MethodChannel('com.friend.ios/trigger_actions');
   static const _validActions = {'toggle', 'start', 'stop', 'mark'};
 
   final CaptureController _captureController;
@@ -30,9 +32,11 @@ class TriggerRouter {
 
     switch (resolved) {
       case 'start':
+        await _sendFeedback('beepStart');
         await _captureController.streamRecording();
         return;
       case 'stop':
+        await _sendFeedback('beepStop');
         await _captureController.stopStreamRecording();
         return;
       case 'mark':
@@ -65,5 +69,14 @@ class TriggerRouter {
 
   bool _isPhoneMicRecordingState(RecordingState state) {
     return state == RecordingState.record || state == RecordingState.interrupted;
+  }
+
+  Future<void> _sendFeedback(String type) async {
+    if (!SharedPreferencesUtil().feedbackBeepsEnabled) return;
+    try {
+      await _triggerActionChannel.invokeMethod('feedback', {'type': type});
+    } catch (e) {
+      debugPrint('TriggerRouter: feedback $type failed: $e');
+    }
   }
 }
